@@ -12,5 +12,7 @@
     li {
         font-size: 20px;
         width: 50%;
+        padding: 10px;
+        margin: 20px;
     }
 </style>
