@@ -1,18 +1,20 @@
 <script lang="ts">
+import { link } from "svelte-spa-router";
+
+
 
     const imgsrc = "src/assets/svelte.svg"
 
 </script>
 
 <li>
-    <img src={imgsrc} alt="website logo" />
+    <a href="/" use:link><img src={imgsrc} alt="website logo" /></a>
 </li>
 
 <style>
     img {
         height: 7vh;
         width: 7vh;
-        /* margin: 10px; */
     }
     li {
         position: absolute;
