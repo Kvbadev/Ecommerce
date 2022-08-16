@@ -1,51 +1,64 @@
 <script lang="ts">
+    import Fa from "svelte-fa";
+    import {faBars} from '@fortawesome/free-solid-svg-icons'
+
+    import {link} from 'svelte-spa-router'
     import Logo from "./Logo.svelte";
+
 </script>
     
-    <li class="nav-item item-0">
-        <!-- svelte-ignore a11y-missing-attribute -->
-        <!-- TODO add hamburger menu -->
-        <a>Menu</a>
-        <!-- <icon></icon> -->
+    <li class="nav-item item-0" on:click={() => console.log("Hello World")}>
+        <!-- TODO change from icon to div with :after and :before elements for easier anims -->
+        <Fa rotate={'360'} icon={faBars} color={'#FFFFFF'} size={'lg'} />
     </li>
     <li class="nav-item item-1">
-        <!-- svelte-ignore a11y-missing-attribute -->
-        <a>About Us</a>
+        <a href="/About" use:link>About Us</a>
     </li>
-    <!-- svelte-ignore a11y-missing-attribute -->
     <li class="nav-item item-2">
-        <a>Contact</a>
+        <a href="/Contact" use:link>Contact</a>
     </li>
     
     <Logo />
     
     <li class="nav-item item-3">
-        <!-- svelte-ignore a11y-missing-attribute -->
-        <a>Profile</a>
+        <a href="/Profile" use:link>Profile</a>
     </li>
     
     <style>
         
         li {
-            /* TODO: add fonts */
             flex: 0 1 auto;
-            color: black;
             width: 10%;
             text-align: center;
-            font-size: 1.8vw;
+            font-size: 1.7vw;
             cursor: pointer;
-            margin: 0 20px;
+            margin: 0 5px;
+        }
+        a {
+            color: white;
+            transition: 0.5s;
+        }
+        li:last-child > a{
+            color: rgb(216, 211, 211);
+        }
+        li:last-child > a:hover {
+            color: white;
         }
         a:hover {
-            transition: 0.5s;
-            color: rgb(231, 246, 98);
+            color: rgb(216, 211, 211);
         }
         .item-3 {
             margin-right: 0;
             margin-left: auto;
         }
         .item-0 {
-            margin-left: 0;
+            margin-right: 20px;
+            margin-left: 10px;
+            width: auto;
+        }
+        .item-0:hover {
+            /* color: white; */
+            color:rgb(178, 175, 175);
         }
     </style>
     
