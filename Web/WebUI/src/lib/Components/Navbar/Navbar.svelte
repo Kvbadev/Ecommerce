@@ -1,5 +1,4 @@
 <script lang="ts">
-    import Logo from "./Logo.svelte";
     import NavItems from "./NavItems.svelte";
 </script>
 
