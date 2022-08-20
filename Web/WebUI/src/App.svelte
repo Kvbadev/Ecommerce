@@ -1,14 +1,10 @@
 <script lang="ts">
-  import Products from './lib/Products.svelte';
+import Navbar from './lib/Components/Navbar/Navbar.svelte';
+import { routes } from './routes';
+import Router from 'svelte-spa-router'
 </script>
-
-<main>
-  <h1>
-    Hello World
-  </h1>
-  <Products />
-</main>
-
-<style>
   
-</style>
+<main>
+  <Navbar />
+</main>
+<Router {routes} />
