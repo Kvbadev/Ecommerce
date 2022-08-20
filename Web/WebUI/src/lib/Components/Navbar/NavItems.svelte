@@ -1,16 +1,14 @@
 <script lang="ts">
-    import Fa from "svelte-fa";
-    import {faBars} from '@fortawesome/free-solid-svg-icons'
 
     import {link} from 'svelte-spa-router'
     import Logo from "./Logo.svelte";
 
 </script>
     
-    <li class="nav-item item-0" on:click={() => console.log("Hello World")}>
-        <!-- TODO change from icon to div with :after and :before elements for easier anims -->
-        <Fa rotate={'360'} icon={faBars} color={'#FFFFFF'} size={'lg'} />
-    </li>
+    <!-- <li class="nav-item item-0" on:click={() => console.log("Hello World")}>
+        TODO change from icon to div with :after and :before elements for easier anims -->
+        <!-- <Fa rotate={'360'} icon={faBars} color={'#FFFFFF'} size={'lg'} /> -->
+    <!-- </li> -->
     <li class="nav-item item-1">
         <a href="/About" use:link>About Us</a>
     </li>
@@ -39,7 +37,7 @@
             transition: 0.5s;
         }
         li:last-child > a{
-            color: rgb(216, 211, 211);
+            color: rgb(74, 74, 74);
         }
         li:last-child > a:hover {
             color: white;
@@ -50,14 +48,13 @@
         .item-3 {
             margin-right: 0;
             margin-left: auto;
-        }
+        } 
         .item-0 {
             margin-right: 20px;
             margin-left: 10px;
             width: auto;
         }
         .item-0:hover {
-            /* color: white; */
             color:rgb(178, 175, 175);
         }
     </style>

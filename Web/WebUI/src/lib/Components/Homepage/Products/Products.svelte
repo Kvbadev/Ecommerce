@@ -1,17 +1,9 @@
 <script lang="ts">
+
+    import { agent } from "../../../Utils/agent";
 import ProductItem from "./ProductItem.svelte";
 
-        async function getProducts() {
-            const res = await fetch("http://localhost:5000/api/products")
-    
-            if(!res.ok)
-                throw new Error(await res.text());
-    
-            const products = res.json();
-            return products;
-        };
-    
-        const products = getProducts();
+    const products = agent.Products.get();
     </script>
     
     <ul class="list">
