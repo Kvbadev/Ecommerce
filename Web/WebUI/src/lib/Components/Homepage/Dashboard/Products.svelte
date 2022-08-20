@@ -1,13 +1,11 @@
 <script lang="ts">
-
     import { agent } from "../../../Utils/agent";
-import ProductItem from "./ProductItem.svelte";
+    import ProductItem from "./ProductItem.svelte";
 
-    const products = agent.Products.get();
     </script>
     
     <ul class="list">
-            {#await products}
+            {#await agent.Products.get()}
                 waiting...
             {:then data}
                 {#each data as product}
@@ -19,9 +17,10 @@ import ProductItem from "./ProductItem.svelte";
     </ul>
     
     <style>
-        .list {
-            display: grid;
-            grid-template-columns: auto auto;
+        ul {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
         }
     </style>
     
