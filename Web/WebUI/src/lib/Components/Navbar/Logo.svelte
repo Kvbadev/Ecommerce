@@ -13,8 +13,8 @@ import { link } from "svelte-spa-router";
 
 <style>
     img {
-        height: 7vh;
-        width: 7vh;
+        height: 3vw;
+        width: 3vw;
     }
     li {
         position: absolute;

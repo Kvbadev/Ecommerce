@@ -5,5 +5,7 @@
 <img src={src} width={width} height={height} alt={alt} />
 
 <style>
-
+    img {
+        border-radius: 95px;
+    }
 </style>

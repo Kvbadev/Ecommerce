@@ -1,6 +1,7 @@
 <script lang="ts">
 import type Product from "src/lib/Models/product";
-import ItemPhoto from "./ItemPhoto.svelte";
+import ItemPhoto from "../../Products/Homepage/ItemPhoto.svelte";
+
     export let product:Product;
 
     const img_width = "300px";
@@ -8,7 +9,7 @@ import ItemPhoto from "./ItemPhoto.svelte";
     const max_desc_len = 150;
 
     const photoProps = {
-        src: `public/PlaceholderPhotos/${product.name.replaceAll(' ', '_').toLowerCase()}1.png`,
+        src: `/PlaceholderPhotos/${product.name.replaceAll(' ', '_').toLowerCase()}${(Math.random()+1*2).toFixed(0)}.png`,
         width: img_width,
         height: img_height,
         alt: product.name
@@ -16,6 +17,8 @@ import ItemPhoto from "./ItemPhoto.svelte";
 </script>
 
 <li name={product.id}>
+
+    <a href={`/#/product/${product.id}`}>
     <ItemPhoto {...photoProps}/>
     <p class="name">{product.name}</p>
     <p class="description">
@@ -25,43 +28,64 @@ import ItemPhoto from "./ItemPhoto.svelte";
             {product.description.slice(0, max_desc_len)}...
         {/if}
     </p>
-    <p class="price">{product.price} $</p>
+    <p class="price">{product.price.toFixed(2)} $</p>
+    </a>
 </li>
 
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Raleway&display=swap');
 
     li {
+        cursor: pointer;
         font-size: 20px;
         font-family: "Raleway";
         list-style-type: none;
         width: 30%;
-        height: 38vw;
+        height: 32vw;
         overflow: hidden;
-        padding: 2%;
-        margin: 5%;
+        margin: 5% 2%;
+        display: flex;
+       /* From https://css.glass */
+        background: rgba(255, 255, 255, 0.37);
+        border-radius: 16px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.38);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(10px);
+        -moz-backdrop-filter: blur(10px); 
+        border: 1px solid rgba(0, 0, 0, 0.3);
+
+        transition: 0.5s ease-in-out;
+    }
+
+    li:hover {
+        box-shadow: 0 4px 30px rgba(0,0,0,0.7);
+        background-color: white;
+    }
+
+    a {
+        width: 100%;
+        height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
-        /* justify-content: space-between; */
-
-        background: rgba(216, 88, 24, 1.0);
-        background: -webkit-linear-gradient(top left, rgba(216, 88, 24, 1.0), rgba(249, 209, 77, 1.0));
-        background: -moz-linear-gradient(top left, rgba(216, 88, 24, 1.0), rgba(249, 209, 77, 1.0));
-        background: linear-gradient(to bottom right, rgba(216, 88, 24, 0.5), rgba(249, 209, 77, 0.5));
+        justify-content: space-evenly;
     }
 
+    li p {
+        margin-top: 10px;
+    }
+    
     .name {
+        
         font-size: 2vw;
         padding: 10px;
         font-weight: 700;
     }
     .description {
-        margin-top: 20px;
-        font-size: 1vw;
-        width: 50%;
+        font-size: 1.15vw;
+        width: 80%;
     }
     .price {
-        margin-top: auto;
+        font-size: 30px;
     }
 </style>
