@@ -7,16 +7,17 @@
         <NavItems />
     </ul>
 </nav>
+<div class="margin"></div>
 
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Raleway&display=swap');
     nav {
         font-family: "Raleway", sans-serif;
         width: 100vw;
-        height: 10vh;
-        position: sticky;
-        left: 0;
+        height: 4.2vw;
         top: 0;
+        position: fixed;
+        z-index: 2;
         background: #d85818;
         background: -webkit-linear-gradient(top left, #d85818, #f9d14d);
         background: -moz-linear-gradient(top left, #d85818, #f9d14d);
@@ -29,5 +30,8 @@
         flex-direction: row;
         list-style-type: none;
         align-items: center;
+    }
+    .margin {
+        margin-bottom: 4.2vw;
     }
 </style>
