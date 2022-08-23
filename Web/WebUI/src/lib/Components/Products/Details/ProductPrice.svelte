@@ -6,12 +6,14 @@ import type Product from "src/lib/Models/product";
 </script>
 
 <div class="container">
-    <h1>{product.description}</h1>
+    <h1>{product.name}</h1>
+    <h2>{product.price}</h2>
 </div>
 
 <style>
     .container {
-        background-color: gray;
-        grid-area: params;
+        background-color: white;
+        grid-area: price;
+        /* height: 20vh; */
     }
 </style>

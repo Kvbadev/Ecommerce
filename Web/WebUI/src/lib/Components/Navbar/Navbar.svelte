@@ -32,6 +32,7 @@
         align-items: center;
     }
     .margin {
-        margin-bottom: 4.2vw;
+        width: 100vw;
+        height: 4.2vw;
     }
 </style>
