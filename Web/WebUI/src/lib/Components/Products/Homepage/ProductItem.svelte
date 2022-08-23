@@ -4,14 +4,10 @@ import ItemPhoto from "../../Products/Homepage/ItemPhoto.svelte";
 
     export let product:Product;
 
-    const img_width = "300px";
-    const img_height = "300px";
     const max_desc_len = 150;
 
     const photoProps = {
         src: `/PlaceholderPhotos/${product.name.replaceAll(' ', '_').toLowerCase()}${(Math.random()+1*2).toFixed(0)}.png`,
-        width: img_width,
-        height: img_height,
         alt: product.name
     }
 </script>
@@ -70,10 +66,6 @@ import ItemPhoto from "../../Products/Homepage/ItemPhoto.svelte";
         align-items: center;
         justify-content: space-evenly;
     }
-
-    li p {
-        margin-top: 10px;
-    }
     
     .name {
         
@@ -82,10 +74,10 @@ import ItemPhoto from "../../Products/Homepage/ItemPhoto.svelte";
         font-weight: 700;
     }
     .description {
-        font-size: 1.15vw;
+        font-size: 1.25vw;
         width: 80%;
     }
     .price {
-        font-size: 30px;
+        font-size: 1.5vw;
     }
 </style>

@@ -4,6 +4,7 @@
     import type Product from "src/lib/Models/product";
     import { agent } from "../../../Utils/agent";
     import ProductItem from "./ProductItem.svelte";
+import Loader from "../../Common/Loader.svelte";
 
     let prods: Array<Product>;
 
@@ -12,7 +13,8 @@
     })
 
     async function getProducts() {
-        products.set(await agent.Products.get())
+        // setTimeout(async () => (products.set(await agent.Products.get())), 1000);
+        products.set(await agent.Products.getAll());
     }
 
     onMount(async () => {
@@ -22,12 +24,15 @@
     onDestroy(unsubscribe);
 
 </script>
-    
+    {#if !prods.length}
+        <Loader />
+    {:else}
     <ul class="list">
         {#each prods as product}
             <ProductItem product={product}/>
         {/each}
     </ul>
+    {/if}
     
     <style>
         ul {

@@ -1,0 +1,39 @@
+<script lang="ts">
+    import Fa from "svelte-fa";
+    import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+
+    export let size = 10;
+    export let color = "#ff8655";
+</script>
+
+<div class="loader">
+    <div class="spinner">
+        <Fa icon={faCircleNotch} size={`${size}x`} color={color} />
+    </div>
+</div>
+
+<style>
+    .loader {
+        backdrop-filter: blur(5px);
+        z-index: 1000;
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        justify-content: center; 
+        align-items: center;
+    }
+    .spinner {
+        width: auto;
+        height: auto;
+        animation: 1s linear spin infinite;
+    }
+    
+    @keyframes spin {
+        0% {transform: rotate(0);}
+        50% {transform: rotate(180deg);}
+        100% {transform: rotate(360deg);}
+    }
+</style>

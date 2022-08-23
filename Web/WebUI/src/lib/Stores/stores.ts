@@ -1,4 +1,4 @@
 import { writable } from "svelte/store";
-import Product from "../Models/product";
+import type Product from "../Models/product";
 
-export const products = writable([]);
+export const products = writable(new Array<Product>());
