@@ -8,6 +8,6 @@
     img {
         width: 14vw;
         height: 14vw;
-        border-radius: 90px;
+        border-radius: 9rem;
     }
 </style>

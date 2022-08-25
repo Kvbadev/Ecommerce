@@ -32,7 +32,7 @@ onMount(async () => {
     <Loader />
 {:else}
 <div class="container">
-    <ProductSlider />
+    <ProductSlider product={product}/>
     <ProductPrice product={product}/>
     <ProductParameters product={product} />
 </div>
@@ -42,7 +42,8 @@ onMount(async () => {
     .container {
         width: 100vw;
         height: calc(100vh - 4.2vw);
-
+        overflow: scroll;
+        background-color: white;
         display: grid;
         grid-template: 
         'slider slider slider price price price'

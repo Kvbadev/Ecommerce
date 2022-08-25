@@ -29,11 +29,9 @@ import ItemPhoto from "../../Products/Homepage/ItemPhoto.svelte";
 </li>
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Raleway&display=swap');
-
     li {
         cursor: pointer;
-        font-size: 20px;
+        font-size: 2rem;
         font-family: "Raleway";
         list-style-type: none;
         width: 30%;
@@ -43,18 +41,19 @@ import ItemPhoto from "../../Products/Homepage/ItemPhoto.svelte";
         display: flex;
        /* From https://css.glass */
         background: rgba(255, 255, 255, 0.37);
-        border-radius: 16px;
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.38);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(10px);
-        -moz-backdrop-filter: blur(10px); 
-        border: 1px solid rgba(0, 0, 0, 0.3);
+        background-color: white;
+        border-radius: 1.6rem;
+        box-shadow: 0 0.4rem 3rem rgba(0, 0, 0, 0.38);
+        backdrop-filter: blur(2rem);
+        -webkit-backdrop-filter: blur(1rem);
+        -moz-backdrop-filter: blur(1rem); 
+        border: 0.1rem solid rgba(0, 0, 0, 0.3);
 
         transition: 0.5s ease-in-out;
     }
 
     li:hover {
-        box-shadow: 0 4px 30px rgba(0,0,0,0.7);
+        box-shadow: 1.5rem 1.5rem 1.5rem 1.5rem rgba(0,0,0,0.7);
         background-color: white;
     }
 
@@ -70,7 +69,7 @@ import ItemPhoto from "../../Products/Homepage/ItemPhoto.svelte";
     .name {
         
         font-size: 2vw;
-        padding: 10px;
+        padding: 1rem;
         font-weight: 700;
     }
     .description {

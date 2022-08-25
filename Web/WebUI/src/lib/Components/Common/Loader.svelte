@@ -4,17 +4,20 @@
 
     export let size = 10;
     export let color = "#ff8655";
+    export let entire = true;
 </script>
 
-<div class="loader">
+<div class={`loader ${entire ? 'whole':''}`}>
     <div class="spinner">
         <Fa icon={faCircleNotch} size={`${size}x`} color={color} />
     </div>
 </div>
 
 <style>
+    .whole {
+        background-color: white;
+    }
     .loader {
-        backdrop-filter: blur(5px);
         z-index: 1000;
         width: 100vw;
         height: 100vh;
