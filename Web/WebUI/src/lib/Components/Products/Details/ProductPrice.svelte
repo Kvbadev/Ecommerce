@@ -1,11 +1,11 @@
 <script lang="ts">
 import type Product from "src/lib/Models/product";
-import { multiplier } from "../../../Stores/stores";
-import { get, writable } from "svelte/store";
 import BuyButtons from "./BuyButtons.svelte";
 import QuantityInput from "./QuantityInput.svelte";
 
     export let product: Product;
+
+    let multiplier: number = 1;
 
 </script>
 
@@ -14,10 +14,10 @@ import QuantityInput from "./QuantityInput.svelte";
         <h1>{product.name}</h1>
     </span>
     <span class="h2">
-        <h2 data-quantity={`${$multiplier} ${$multiplier == 1 ? "product":"products"}`}>{(product.price * $multiplier).toFixed(2)}$</h2>
+        <h2 data-quantity={`${multiplier} ${multiplier == 1 ? "product":"products"}`}>{(product.price * multiplier).toFixed(2)}$</h2>
     </span>
     <BuyButtons />
-    <QuantityInput />
+    <QuantityInput bind:quantity={multiplier}/>
 </div>
 
 <style>
