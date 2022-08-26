@@ -1,26 +1,24 @@
 <script lang="ts">
     import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
-import { multiplier } from "../../../Stores/stores";
     import Fa from "svelte-fa";
-    // let quantity = 1;
-    // const unsub = multiplier.subscribe(v => v = quantity);
+    export let quantity = 1;
 </script>
 
 <div class="container">
     <div class="items">
         <div class="buttons">
             <div class="button-up" on:click={() => {
-                multiplier.update(n => n+1);
+                quantity++;
             }}>
                 <Fa icon={faCaretUp} size={'2x'} />
             </div>
             <div class="button-down" on:click={() => {
-                $multiplier >= 1 ? multiplier.update(n=>n-1) : null;
+               quantity >= 1 ? quantity-- : null;
             }}>
-                <Fa icon={faCaretDown} size={'2x'} color={$multiplier >= 1 ? '#000000' : 'gray'}/>
+                <Fa icon={faCaretDown} size={'2x'} color={quantity >= 1 ? '#000000' : 'gray'}/>
             </div>
         </div>
-        <input class="field" bind:value={$multiplier} disabled/>
+        <input class="field" bind:value={quantity} disabled/>
     </div>
 </div>
 

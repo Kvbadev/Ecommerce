@@ -3,7 +3,7 @@ import type Product from "src/lib/Models/product";
 import { agent } from "../../../Utils/agent";
 import { onMount } from "svelte";
 import { get } from "svelte/store";
-import { multiplier, products } from "../../../Stores/stores";
+import { products } from "../../../Stores/stores";
 
 import ProductParameters from "./ProductParameters.svelte";
 import ProductSlider from "./ProductSlider.svelte";
@@ -12,6 +12,7 @@ import ProductPrice from "./ProductPrice.svelte";
 import { onDestroy } from "svelte";
 
 export let params = {} as any;
+
 
 let product: Product | undefined;
 
@@ -26,7 +27,7 @@ onMount(async () => {
     await getProduct();
 })
 
-onDestroy(() => multiplier.set(1))
+// onDestroy(() => multiplier.set(1))
 
 </script>
 
