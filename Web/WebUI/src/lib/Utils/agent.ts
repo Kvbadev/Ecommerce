@@ -18,19 +18,30 @@ const postProducts = async (url: string, product: Product) => {
     return response.json();
 }
 
-function getProducts<T>(url: string): Promise<Array<T>> {
+function getProducts<T>(url: string): Promise<T> {
     return fetch(url)
         .then(response => {
             if(!response.ok) {
                 throw new Error(response.statusText);
             }
-            return response.json().then(data => data as Array<T>);
+            return response.json().then(data => data as T);
+        })
+}
+
+function getProduct<T>(url: string): Promise<T> {
+    return fetch(url)
+        .then(response => {
+            if(!response.ok){
+                throw new Error(response.statusText);
+            }
+            return response.json().then(data => data as T)
         })
 }
 
 export const agent = {
     Products: {
-        get: async () => await getProducts<Product>(apiUrl+"/products"),
+        getAll: async () => await getProducts<Array<Product>>(apiUrl+"/products"),
+        getOne: async (id: string) => await getProduct<Product>(apiUrl+"/products/"+id),
         post: async (product: Product) => await postProducts(apiUrl+"/products", product)
     }
 }
