@@ -2,14 +2,14 @@
 import type Product from "src/lib/Models/product";
 import { agent } from "../../../Utils/agent";
 import { onMount } from "svelte";
-import { push } from "svelte-spa-router";
 import { get } from "svelte/store";
-import { products } from "../../../Stores/stores";
+import { multiplier, products } from "../../../Stores/stores";
 
 import ProductParameters from "./ProductParameters.svelte";
 import ProductSlider from "./ProductSlider.svelte";
 import Loader from "../../Common/Loader.svelte";
 import ProductPrice from "./ProductPrice.svelte";
+import { onDestroy } from "svelte";
 
 export let params = {} as any;
 
@@ -25,6 +25,8 @@ async function getProduct() {
 onMount(async () => {
     await getProduct();
 })
+
+onDestroy(() => multiplier.set(1))
 
 </script>
 
