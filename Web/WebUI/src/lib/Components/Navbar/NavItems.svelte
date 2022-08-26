@@ -19,7 +19,7 @@
     <Logo />
     
     <li class="nav-item item-3">
-        <a href="/Profile" use:link>Profile</a>
+        <a href="/Profile" use:link>Log In</a>
     </li>
     
     <style>

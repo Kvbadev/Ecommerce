@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Rubik&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Raleway&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anek+Telugu&display=swap');
 * {
     box-sizing: border-box;
     padding: 0;
@@ -12,6 +13,6 @@ html {
 }
 body {
     font-size: 1.6rem; 
-    background: rgb(129, 129, 129);
-    background: linear-gradient(42deg, rgba(139, 138, 138, 0.4) 0%, rgba(143,143,143,1) 27%, rgba(255,255,255,1) 100%); 
+    background: rgb(0,0,0);
+    background: linear-gradient(42deg, rgba(0,0,0,0.7861345221682423) 0%, rgba(255,111,24,1) 0%, rgba(255,255,255,1) 100%); 
 }

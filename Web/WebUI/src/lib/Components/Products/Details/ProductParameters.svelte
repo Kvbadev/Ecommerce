@@ -10,8 +10,17 @@ import type Product from "src/lib/Models/product";
 </div>
 
 <style>
+    h1 {
+        font-family: 'Anek Telugu', sans-serif;
+        font-size: calc(1vw + 1vh);
+        width: 60%;
+        position: relative;
+        top: 7rem;
+        left: 3rem;
+    }
     .container {
-        background-color: gray;
         grid-area: params;
+        height: 40rem;
+        /* overflow: hidden; */
     }
 </style>
