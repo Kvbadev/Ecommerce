@@ -1,11 +1,13 @@
 <script lang="ts">
-    export let src, width, height, alt;
+    export let src, alt;
 </script>
 
-<img src={src} width={width} height={height} alt={alt} />
+<img src={src} alt={alt} />
 
 <style>
     img {
-        border-radius: 95px;
+        width: 14vw;
+        height: 14vw;
+        border-radius: 9rem;
     }
 </style>

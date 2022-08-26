@@ -10,7 +10,6 @@
 <div class="margin"></div>
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Raleway&display=swap');
     nav {
         font-family: "Raleway", sans-serif;
         width: 100vw;

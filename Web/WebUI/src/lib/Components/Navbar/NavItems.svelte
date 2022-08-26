@@ -19,7 +19,7 @@
     <Logo />
     
     <li class="nav-item item-3">
-        <a href="/Profile" use:link>Profile</a>
+        <a href="/Profile" use:link>Log In</a>
     </li>
     
     <style>
@@ -30,7 +30,7 @@
             text-align: center;
             font-size: 1.7vw;
             cursor: pointer;
-            margin: 0 5px;
+            margin: 0 0.5rem;
         }
         a {
             color: white;
@@ -50,8 +50,8 @@
             margin-left: auto;
         } 
         .item-0 {
-            margin-right: 20px;
-            margin-left: 10px;
+            margin-right: 2rem;
+            margin-left: 1rem;
             width: auto;
         }
         .item-0:hover {
