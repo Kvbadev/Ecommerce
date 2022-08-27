@@ -13,9 +13,9 @@
                 <Fa icon={faCaretUp} size={'2x'} />
             </div>
             <div class="button-down" on:click={() => {
-               quantity >= 1 ? quantity-- : null;
+               quantity > 1 ? quantity-- : null;
             }}>
-                <Fa icon={faCaretDown} size={'2x'} color={quantity >= 1 ? '#000000' : 'gray'}/>
+                <Fa icon={faCaretDown} size={'2x'} color={quantity > 1 ? '#000000' : 'gray'}/>
             </div>
         </div>
         <input class="field" bind:value={quantity} disabled/>
