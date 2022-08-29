@@ -1,5 +1,13 @@
+using System.Text;
+using AutoMapper;
+using Core;
 using Data;
+using Infrastructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +20,42 @@ builder.Services.AddCors(options =>
         policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:5173");
     });
 });
+
+builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+
+builder.Services.AddLogging();
+
+
+
+builder.Services.Configure<IdentityOptions>(opt => 
+{
+    opt.Password.RequireDigit = true;
+    opt.Password.RequireLowercase = true;
+    opt.Password.RequiredLength = 6;
+});
+
+builder.Services.AddAuthentication(opt => 
+{
+    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+    .AddJwtBearer(jwtOpt => 
+    {
+        jwtOpt.Audience = "http://localhost:5000";
+        jwtOpt.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JwtKey"]))
+        };
+});
+
+builder.Services.AddIdentityCore<AppUser>(opt => 
+{
+    opt.SignIn.RequireConfirmedAccount = false;
+})
+    .AddEntityFrameworkStores<DataContext>()
+    .AddSignInManager<SignInManager<AppUser>>();
 
 builder.Services.AddControllers();
 
@@ -42,6 +86,8 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<DataContext>();
     await Seed.SeedData(context);
 }
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
