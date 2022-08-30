@@ -33,6 +33,12 @@ public class AccountController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> RegisterUser(RegisterDto user)
     {
+        // var doesExist = _context.Users.Any(x => x.UserName == user.Username);
+        // if(doesExist)
+        // {
+        //     return BadRequest("This username is already registered");
+        // }
+
         var newUser = new AppUser();
 
         _mapper.Map(user, newUser); 
@@ -44,9 +50,9 @@ public class AccountController : ControllerBase
             _logger.LogInformation("New user {} has been created", user.Username);
             var token = JwtTokenService.GenerateToken(newUser, _configuration);
 
-            return Ok(token);
+            return Ok(token.ToString());
         }
-        return BadRequest("Could not create a user");
+        return BadRequest(result.Errors.ElementAt(0).Description.ToString());
     }
 
     [HttpPost("login")]

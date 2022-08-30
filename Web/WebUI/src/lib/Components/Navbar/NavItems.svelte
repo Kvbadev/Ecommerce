@@ -1,6 +1,7 @@
 <script lang="ts">
 
-    import {link} from 'svelte-spa-router'
+    import { userProfile } from '../../Stores/stores';
+import {link} from 'svelte-spa-router'
     import Logo from "./Logo.svelte";
 
 </script>
@@ -19,7 +20,11 @@
     <Logo />
     
     <li class="nav-item item-3">
+        {#if $userProfile.username}
+        <a href="/Profile" use:link>{$userProfile.username}</a>
+        {:else}
         <a href="/Account/Login" use:link>Log In</a>
+        {/if}
     </li>
     
     <style>
@@ -49,13 +54,5 @@
             margin-right: 0;
             margin-left: auto;
         } 
-        .item-0 {
-            margin-right: 2rem;
-            margin-left: 1rem;
-            width: auto;
-        }
-        .item-0:hover {
-            color:rgb(178, 175, 175);
-        }
     </style>
     
