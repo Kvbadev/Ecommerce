@@ -1,4 +1,6 @@
 import type Product from "../Models/product";
+import type  User  from "../Models/user";
+import { jwtToken } from "../Stores/stores";
 
 const apiUrl = "http://localhost:5000/api";
 
@@ -18,15 +20,6 @@ const postProducts = async (url: string, product: Product) => {
     return response.json();
 }
 
-function getProducts<T>(url: string): Promise<T> {
-    return fetch(url)
-        .then(response => {
-            if(!response.ok) {
-                throw new Error(response.statusText);
-            }
-            return response.json().then(data => data as T);
-        })
-}
 
 function getProduct<T>(url: string): Promise<T> {
     return fetch(url)
@@ -38,10 +31,31 @@ function getProduct<T>(url: string): Promise<T> {
         })
 }
 
+function signUser(url: string, user: User) {
+    return fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(user)
+        }
+        )
+        .then(response => {
+            if(!response.ok){
+                console.log('signUser Error!');
+            }
+            return [response.status, response.text()];
+        })
+}
+
 export const agent = {
     Products: {
-        getAll: async () => await getProducts<Array<Product>>(apiUrl+"/products"),
+        getAll: async () => await getProduct<Array<Product>>(apiUrl+"/products"),
         getOne: async (id: string) => await getProduct<Product>(apiUrl+"/products/"+id),
         post: async (product: Product) => await postProducts(apiUrl+"/products", product)
+    },
+    Account: {
+        SignUp: async (user: User) => signUser(apiUrl+"/Account/register", user),
+        LogIn: async (user: User) => signUser(apiUrl+"/Account/login", user)
     }
 }

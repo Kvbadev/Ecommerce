@@ -36,7 +36,8 @@ builder.Services.Configure<IdentityOptions>(opt =>
 
 builder.Services.AddAuthentication(opt => 
 {
-    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    // opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
     .AddJwtBearer(jwtOpt => 
     {

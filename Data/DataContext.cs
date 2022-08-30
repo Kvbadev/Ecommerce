@@ -10,6 +10,6 @@ public class DataContext : IdentityDbContext<AppUser>
     {
     }
 
-    public DbSet<Product> Products { get; set; } = default!;
-    public DbSet<AppUser> AppUsers {get; set;} = default!;
+    public virtual DbSet<Product> Products { get; set; } = default!;
+    public virtual DbSet<AppUser> AppUsers {get; set;} = default!;
 }
