@@ -1,8 +1,8 @@
 <script lang="ts">
 
-    import { userProfile } from '../../Stores/stores';
+import { userProfile } from '../../Stores/stores';
 import {link} from 'svelte-spa-router'
-    import Logo from "./Logo.svelte";
+import Logo from "./Logo.svelte";
 
 </script>
     
@@ -23,7 +23,7 @@ import {link} from 'svelte-spa-router'
         {#if $userProfile.username}
         <a href="/Profile" use:link>{$userProfile.username}</a>
         {:else}
-        <a href="/Account/Login" use:link>Log In</a>
+        <a href="/Account/Login" use:link>Log In </a>
         {/if}
     </li>
     

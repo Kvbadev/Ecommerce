@@ -7,7 +7,8 @@ using Microsoft.IdentityModel.Tokens;
 namespace Web.Services.JwtTokenService;
 public class JwtTokenService
 {
-    public static string GenerateToken(AppUser user, IConfiguration configuration) {
+    public static string GenerateToken(AppUser user, IConfiguration configuration)
+    {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(configuration["JwtKey"]);
         var tokenDescriptor = new SecurityTokenDescriptor
@@ -24,4 +25,8 @@ public class JwtTokenService
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
+    // public static string ExtractId(string token)
+    // {
+
+    // }
 }

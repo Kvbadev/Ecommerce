@@ -70,4 +70,28 @@ public class AccountController : ControllerBase
         }
         return BadRequest("Invalid Password");
     }
+
+    [HttpGet("profile")]
+    public async Task<Core.Profile?> Profile() 
+    {
+        var username = HttpContext.User.Identity?.Name;
+        if(username == null)
+        {
+            return null;
+        }
+        Core.Profile userProfile = new Core.Profile();
+        AppUser? user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == username);
+        if(user == null){
+            return null;
+        } 
+        _mapper.Map<Core.AppUser, Core.Profile>(user, userProfile);
+
+        return userProfile; 
+        // string authHeader = HttpContext.Request.Headers["Authorization"];
+        // if(authHeader == string.Empty || authHeader.StartsWith("Bearer"))
+        // {
+        //     return null;
+        // }
+        // var id = JwtTokenService.ExtractId();
+    }
 }

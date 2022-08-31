@@ -6,6 +6,7 @@
     import FormField from "./FormField.svelte";
     import { jwtToken, userProfile } from "../../Stores/stores";
 import Loader from "../Common/Loader.svelte";
+import { get } from "svelte/store";
     
     export let fields = ['firstname', 'lastname', 'username','email', 'password'];
     export let type: 'Login' | 'Signup';
@@ -43,17 +44,20 @@ import Loader from "../Common/Loader.svelte";
 
             if(status !== 200){
                 serverError = await message as string;
-                loading = false;
+                loading = canSubmit = false;
             } else {
                 serverError = '';
+
                 jwtToken.set(await message as string);
+                localStorage.setItem("jwt", get(jwtToken))
                 userProfile.set(userData);
-                loading = false;
+
+                loading = canSubmit = false;
                 push('/');
             }
             
         } catch(err) {
-            loading = false;
+            loading = canSubmit = false;
             console.log(err);
         }
         }, 1000);
@@ -63,7 +67,7 @@ import Loader from "../Common/Loader.svelte";
     <div class="all">
         <div class="container">
             <form class="form" on:submit|preventDefault={onSubmit}>
-                <h1>Sign Up!</h1>
+                <h1>{type==='Signup'?'Sign Up!':'Log In!'}</h1>
                 <div class="fields">
                 {#each fields as field, i}
                     {#if field === 'email'}
@@ -78,7 +82,7 @@ import Loader from "../Common/Loader.svelte";
                         <p>{serverError}</p>
                     </span>
                 {/if}
-                <button class="submit" disabled={!canSubmit} class:disabled="{!canSubmit}" type="submit">
+                <button class="submit" disabled={!canSubmit || loading} class:disabled="{!canSubmit || loading}" type="submit">
                     {#if loading}
                         <Loader size={1} inElement={true} color='white'/>
                     {:else}
