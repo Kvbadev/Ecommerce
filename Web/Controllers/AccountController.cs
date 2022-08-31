@@ -87,11 +87,5 @@ public class AccountController : ControllerBase
         _mapper.Map<Core.AppUser, Core.Profile>(user, userProfile);
 
         return userProfile; 
-        // string authHeader = HttpContext.Request.Headers["Authorization"];
-        // if(authHeader == string.Empty || authHeader.StartsWith("Bearer"))
-        // {
-        //     return null;
-        // }
-        // var id = JwtTokenService.ExtractId();
     }
 }

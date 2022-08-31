@@ -5,8 +5,7 @@
     import { link, push } from "svelte-spa-router";
     import FormField from "./FormField.svelte";
     import { jwtToken, userProfile } from "../../Stores/stores";
-import Loader from "../Common/Loader.svelte";
-import { get } from "svelte/store";
+    import Loader from "../Common/Loader.svelte";
     
     export let fields = ['firstname', 'lastname', 'username','email', 'password'];
     export let type: 'Login' | 'Signup';
@@ -15,7 +14,8 @@ import { get } from "svelte/store";
     let canSubmit = false;
     let loading = false;
 
-    $: {
+    const onInput = () => {
+        if(serverError) serverError='';
         canSubmit = true;
         isOk.forEach(val => {
             if(!val) canSubmit=false;
@@ -40,17 +40,19 @@ import { get } from "svelte/store";
 
         const userData = getFormData(e.target);
         try{
+            //get status code and error message / jwt token
             const [status, message] = type === "Signup" ? await agent.Account.SignUp(userData) : await agent.Account.LogIn(userData);
 
             if(status !== 200){
-                serverError = await message as string;
+                serverError = message.length > 100 ? `Server error: ${status}` : message;
                 loading = canSubmit = false;
             } else {
                 serverError = '';
 
-                jwtToken.set(await message as string);
-                localStorage.setItem("jwt", get(jwtToken))
-                userProfile.set(userData);
+                //set jwt in localstorage and in stores
+                jwtToken.set(message);
+                localStorage.setItem("jwt", message);
+                userProfile.set(await agent.Account.getProfile());
 
                 loading = canSubmit = false;
                 push('/');
@@ -68,10 +70,10 @@ import { get } from "svelte/store";
         <div class="container">
             <form class="form" on:submit|preventDefault={onSubmit}>
                 <h1>{type==='Signup'?'Sign Up!':'Log In!'}</h1>
-                <div class="fields">
+                <div class="fields" on:keyup={onInput}>
                 {#each fields as field, i}
                     {#if field === 'email'}
-                        <FormField name={field} regex={new RegExp(/^\S+@\S+\.\S+$/)} bind:isOk={isOk[i]} />
+                        <FormField name={field} regex={new RegExp(/^\S+@\S+\.\S+$/)} bind:isOk={isOk[i]} minLen={4} maxLen={50}/>
                     {:else}
                         <FormField name={field} minLen={5} maxLen={12} bind:isOk={isOk[i]} />
                     {/if}
@@ -163,6 +165,7 @@ import { get } from "svelte/store";
             cursor:auto;
         }
         .form-error{
+            margin: 0;
             text-align: center;
         }
         .form-error p {

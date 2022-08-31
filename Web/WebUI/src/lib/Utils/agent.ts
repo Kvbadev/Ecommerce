@@ -1,4 +1,6 @@
+import { get } from "svelte/store";
 import type Product from "../Models/product";
+import type Profile from "../Models/profile";
 import type  User  from "../Models/user";
 import { jwtToken } from "../Stores/stores";
 
@@ -20,16 +22,34 @@ const postProducts = async (url: string, product: Product) => {
     return response.json();
 }
 
+async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE', body?: any, validation:boolean=false): Promise<T>{
+    const jwt = get(jwtToken) || localStorage.getItem("jwt");
 
-function getProduct<T>(url: string): Promise<T> {
-    return fetch(url)
-        .then(response => {
-            if(!response.ok){
-                throw new Error(response.statusText);
-            }
-            return response.json().then(data => data as T)
-        })
+    const headers = {};
+    
+    method === 'POST' ? headers["Content-Type"] = 'application/json' : null;
+    jwt ? headers["Authorization"] = `Bearer ${jwt}` : null;
+
+    const response = await fetch(url, {
+        method: method,
+        headers: headers,
+        body: body ? JSON.stringify(body) : null
+    }).then(async (response) => {
+        if(!response.ok){
+            console.log(response.statusText)
+        }
+        if(validation){
+            return [response.status, await response.text()] as T;
+        }
+        return response ? 
+        response.json().then(data => data as T) : 
+        null;
+    });
+
+    return response;
 }
+
+
 
 function signUser(url: string, user: User) {
     return fetch(url, {
@@ -66,13 +86,15 @@ async function getUserProfile(url: string){
 
 export const agent = {
     Products: {
-        getAll: async () => await getProduct<Array<Product>>(apiUrl+"/products"),
-        getOne: async (id: string) => await getProduct<Product>(apiUrl+"/products/"+id),
+        // getAll: async () => await getProduct<Array<Product>>(apiUrl+"/products"),
+        getAll: () => authFetch<Array<Product>>(apiUrl+"/products", 'GET', null),
+        // getOne: async (id: string) => await getProduct<Product>(apiUrl+"/products/"+id),
+        getOne: (id: string) => authFetch<Product>(apiUrl+"/products/"+id, 'GET', null),
         post: async (product: Product) => await postProducts(apiUrl+"/products", product)
     },
     Account: {
-        SignUp: async (user: User) => signUser(apiUrl+"/Account/register", user),
-        LogIn: async (user: User) => signUser(apiUrl+"/Account/login", user),
-        getProfile: async () => await getUserProfile(apiUrl+'/Account/profile')
+        SignUp: (user: User) => authFetch<[number, string]>(apiUrl+"/Account/register", 'POST', user, true),
+        LogIn: (user: User) => authFetch<[number, string]>(apiUrl+"/Account/login", 'POST', user, true),
+        getProfile: () => authFetch<Profile>(apiUrl+'/Account/profile', 'GET', null),
     }
 }
