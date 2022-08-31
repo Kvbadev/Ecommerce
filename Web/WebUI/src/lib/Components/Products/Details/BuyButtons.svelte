@@ -1,11 +1,22 @@
 <script lang="ts">
-//TODO: Add functionality to those buttons
+import { updateShoppingCart } from "../../../Stores/stores";
+
+
+export let params = {} as any;
+
+export let quantity: number;
+export let price: number;
+
+const OnCart = () => {
+    updateShoppingCart({quantity: quantity, id: params.id, price: price});
+}
+
 </script>
 
 <div class="container">
     
     <button class="buy-btn"><span>Buy Now</span></button>
-    <button class="cart-btn"><span>Add to cart</span></button>
+    <button on:click={OnCart} class="cart-btn"><span>Add to cart</span></button>
 </div>
 
 <style>
@@ -18,7 +29,10 @@
         background-color: transparent;
         font-size: 3rem;
         text-align: center;
-        transition: 0.5s ease-in-out;
+        transition: position 0.5s ease-in-out;
+    }
+    button:active {
+        background-color: white;
     }
     span::after {
         content: '»'; 
