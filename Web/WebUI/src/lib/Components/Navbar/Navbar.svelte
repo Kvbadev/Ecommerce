@@ -28,6 +28,7 @@
         display: flex;
         flex-direction: row;
         list-style-type: none;
+        justify-content: space-between;
         align-items: center;
     }
     .margin {

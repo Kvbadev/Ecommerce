@@ -2,7 +2,7 @@
   "extends": "@tsconfig/svelte/tsconfig.json",
   "compilerOptions": {
     "lib": [
-      "es5", "es6", "dom", "DOM.Iterable"
+      "ESNext", "dom", "DOM.Iterable"
     ],
     "target": "ESNext",
     "useDefineForClassFields": true,
