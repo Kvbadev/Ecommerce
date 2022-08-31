@@ -48,6 +48,22 @@ function signUser(url: string, user: User) {
         })
 }
 
+async function getUserProfile(url: string){
+    return fetch(url, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem("jwt")}`
+        }
+    })
+        .then(async (response) => {
+            if(!response.ok){
+                throw new Error(response.statusText);
+            }
+            const text = await response.json();
+            return text as User;
+        })
+}
+
 export const agent = {
     Products: {
         getAll: async () => await getProduct<Array<Product>>(apiUrl+"/products"),
@@ -56,6 +72,7 @@ export const agent = {
     },
     Account: {
         SignUp: async (user: User) => signUser(apiUrl+"/Account/register", user),
-        LogIn: async (user: User) => signUser(apiUrl+"/Account/login", user)
+        LogIn: async (user: User) => signUser(apiUrl+"/Account/login", user),
+        getProfile: async () => await getUserProfile(apiUrl+'/Account/profile')
     }
 }
