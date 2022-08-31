@@ -1,9 +1,10 @@
 <script lang="ts">
 
-    export let minLen = null, maxLen = null , regex:RegExp|null=null, name = null, isOk:boolean|null = null;
+    export let minLen:number, maxLen:number, regex:RegExp|null=null, name = null, isOk:boolean|null = null;
     let inpValue = '', errors = [], isDirty = false;
     export let errorReg = `${name} is not valid`;
     export let errorLen = `${name} length should be smaller than ${maxLen} and bigger than ${minLen}`;
+
     $: {
         if(minLen && maxLen){
             if(inpValue.length < minLen || inpValue.length > maxLen){
@@ -27,9 +28,7 @@
     {#if name === 'password'}
     <input
         type="password" name={name} placeholder={name[0].toUpperCase()+name.slice(1)}
-        bind:value={inpValue} on:blur={() => {
-            isDirty=true; 
-        }} 
+        bind:value={inpValue} on:blur={() => isDirty=true}
         class:error="{errors.length&&isDirty}"
     />
     {:else}

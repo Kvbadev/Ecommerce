@@ -20,7 +20,7 @@ import Logo from "./Logo.svelte";
     <Logo />
     
     <li class="nav-item item-3">
-        {#if $userProfile.username}
+        {#if $userProfile}
         <a href="/Profile" use:link>{$userProfile.username}</a>
         {:else}
         <a href="/Account/Login" use:link>Log In </a>

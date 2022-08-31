@@ -10,7 +10,7 @@ import type Profile from './lib/Models/profile';
 
 onMount(async () => {
   if(localStorage.getItem("jwt")){
-    const profile:Profile = await agent.Account.getProfile();
+    const profile:Profile = await agent.Account.getProfile() as Profile;
     userProfile.set(profile);
   }
 })

@@ -24,7 +24,7 @@ import Loader from "../../Common/Loader.svelte";
     onDestroy(unsubscribe);
 
 </script>
-    {#if !prods.length}
+    {#if !prods}
         <Loader />
     {:else}
     <ul class="list">
