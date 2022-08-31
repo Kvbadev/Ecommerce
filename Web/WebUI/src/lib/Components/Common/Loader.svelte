@@ -5,17 +5,30 @@
     export let size = 10;
     export let color = "#ff8655";
     export let entire = true;
+    export let inElement = false;
 </script>
 
+{#if inElement}
+<div class='loader-inelement'>
+    <div class="spinner">
+        <Fa icon={faCircleNotch} size={`${size}x`} color={color}/>
+    </div>
+</div>
+{:else}
 <div class={`loader ${entire ? 'whole':''}`}>
     <div class="spinner">
         <Fa icon={faCircleNotch} size={`${size}x`} color={color} />
     </div>
 </div>
+{/if}
 
 <style>
     .whole {
         background-color: white;
+    }
+    .loader-inelement {
+        width: auto;
+        /* height: auto; */
     }
     .loader {
         z-index: 1000;

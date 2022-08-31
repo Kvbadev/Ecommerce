@@ -1,10 +1,12 @@
 using Core;
 using Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Controllers;
 
+// [Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class ProductsController : ControllerBase
