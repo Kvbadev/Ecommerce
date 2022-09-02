@@ -23,7 +23,7 @@ const postProducts = async (url: string, product: Product) => {
 }
 
 async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE', body?: any, validation:boolean=false): Promise<T>{
-    const jwt = get(jwtToken) || localStorage.getItem("jwt");
+    const jwt = get(jwtToken);
 
     const headers = {};
     
@@ -32,7 +32,7 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE', bod
 
     const response = await fetch(url, {
         method: method,
-        headers: headers,
+        headers: {...headers},
         body: body ? JSON.stringify(body) : null
     }).then(async (response) => {
         if(!response.ok){
@@ -45,7 +45,6 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE', bod
         response.json().then(data => data as T) : 
         null;
     });
-
     return response;
 }
 
