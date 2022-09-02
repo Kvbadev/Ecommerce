@@ -1,6 +1,7 @@
 <script lang="ts">
 
-import { userProfile, shoppingCart} from '../../Stores/stores';
+import { userProfile} from '../../Stores/stores';
+import {shoppingCart} from '../../Stores/shoppingCartStore';
 import {link} from 'svelte-spa-router'
 import Logo from "./Logo.svelte";
 import Fa from 'svelte-fa';
@@ -21,12 +22,13 @@ let cartColor = 'white';
     <div class="group-2 group">
         <li class="nav-item item-3">
             <a href="/ShoppingCart" use:link class="cart-link">
-                <Fa icon={faShoppingCart} size="lg" color={cartColor}/>
                 {#if $shoppingCart}
-                <div class="products-count" transition:fade ><span>
+                <!-- TODO: items' count is too big -->
+                <div class="products-count"><span transition:fade>
                     {$shoppingCart.count}
                 </span></div>
                 {/if}
+                <Fa icon={faShoppingCart} size="lg" color={cartColor}/>
             </a>
         </li>
         <li class="nav-item item-4">
@@ -53,26 +55,27 @@ let cartColor = 'white';
         justify-content: flex-end;
     }
     .cart-link {
-        position: relative;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 7.5rem;
     }
     .products-count{
-        position:absolute;
-        bottom: 2.7rem;
-        left: 5.2rem;
-        font-size: 3rem;
-        border: 0.2rem solid white;
-        width: 3.3rem;
-        height: 3.3rem;
         display: flex;
+        bottom: 35%;
+        left: 40%;
         justify-content: center;
         align-items: center;
+        border: 0.2rem white solid;
         border-radius: 5rem;
     }
     .products-count span {
-        position: relative;
+        font-size: 2rem;
         color: white;
         height: auto;
-        bottom: 0.4rem;
+        padding: 0.7rem;
+        /* bottom: 0.4rem; */
     }
     li {
         flex: 0 1 auto;
@@ -85,7 +88,7 @@ let cartColor = 'white';
 
     a {
         color: white;
-        transition: 0.5s;
+        transition: color 0.5s;
     }
     .item-3 {
         width: auto;

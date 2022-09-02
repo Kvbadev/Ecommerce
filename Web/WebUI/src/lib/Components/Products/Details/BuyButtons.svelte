@@ -1,5 +1,5 @@
 <script lang="ts">
-import { updateShoppingCart } from "../../../Stores/stores";
+import { updateShoppingCart } from "../../../Stores/shoppingCartStore";
 
 
 export let params = {} as any;

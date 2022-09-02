@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Web.Services.JwtTokenService;
 using Web.DTOs;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Web.Controllers;
 
@@ -74,13 +75,14 @@ public class AccountController : ControllerBase
     [HttpGet("profile")]
     public async Task<Core.Profile?> Profile() 
     {
-        var username = HttpContext.User.Identity?.Name;
-        if(username == null)
+        var authHeader = HttpContext.Request.Headers["Authorization"];
+        if(authHeader == string.Empty)
         {
             return null;
         }
+        var userId = JwtTokenService.ExtractId(authHeader);
         Core.Profile userProfile = new Core.Profile();
-        AppUser? user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == username);
+        AppUser? user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
         if(user == null){
             return null;
         } 

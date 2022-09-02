@@ -9,6 +9,7 @@ public class JwtTokenService
 {
     public static string GenerateToken(AppUser user, IConfiguration configuration)
     {
+        JwtSecurityTokenHandler.DefaultInboundClaimTypeMap = new Dictionary<string, string>();
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(configuration["JwtKey"]);
         var tokenDescriptor = new SecurityTokenDescriptor
@@ -25,8 +26,13 @@ public class JwtTokenService
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
-    // public static string ExtractId(string token)
-    // {
+    public static string? ExtractId(string authHeader)
+    {
+        string token = authHeader.Replace("Bearer ", "");
+        var handler = new JwtSecurityTokenHandler();
+        var jwtSecurityToken = handler.ReadJwtToken(token);
 
-    // }
+        var nameId = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value; //unfortunately claimtypes.nameidentifier does not seem to work
+        return nameId;
+    }
 }

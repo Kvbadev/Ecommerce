@@ -27,12 +27,12 @@ import QuantityInput from "./QuantityInput.svelte";
     .container {
         grid-area: price;
         display: grid;
-        grid-template-columns: 1fr 25%;
+        grid-template-columns: 60% 30%;
         grid-template-rows: 50% 1fr;
     }
     .h1 {
         font-family: 'Rubik';
-        font-size: 4rem;
+        font-size: 2.5rem;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -41,14 +41,14 @@ import QuantityInput from "./QuantityInput.svelte";
     .h2 {
         background-color: aliceblue;
         font-family: 'Rubik';
-        font-size: 4.5rem;
+        font-size: 1.5rem;
         display: grid;
         justify-content: center;
         align-content: center;
     }
     h2::after {
         content: attr(data-quantity);
-        font-size: 1.7rem;
+        font-size: 1.2rem;
         font-style: italic;
         color: gray;
         display: block;
