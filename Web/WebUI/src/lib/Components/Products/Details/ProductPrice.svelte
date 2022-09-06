@@ -18,6 +18,7 @@ import QuantityInput from "./QuantityInput.svelte";
     <span class="h2">
         <h2 data-quantity={`${multiplier} ${multiplier == 1 ? "product":"products"}`}>{(product.price * multiplier).toFixed(2)}$</h2>
     </span>
+    <!-- <div class="buy-buttons"></div> -->
     <BuyButtons price={product.price} params={params} quantity={multiplier}/>
     <QuantityInput bind:quantity={multiplier}/>
 </div>
@@ -27,21 +28,24 @@ import QuantityInput from "./QuantityInput.svelte";
     .container {
         grid-area: price;
         display: grid;
-        grid-template-columns: 60% 30%;
-        grid-template-rows: 50% 1fr;
+        /* grid-auto-columns: 0.5fr; */
+        grid-auto-rows: 14rem;
+        grid-template-columns: 3fr 2fr;
+        /* grid-template-rows: 50% 1fr; */ 
     }
     .h1 {
+        grid-column: 1/2;
         font-family: 'Rubik';
         font-size: 2.5rem;
         display: flex;
-        align-items: center;
         justify-content: center;
+        align-items: center;
     }
 
     .h2 {
         background-color: aliceblue;
         font-family: 'Rubik';
-        font-size: 1.5rem;
+        font-size: 2.5rem;
         display: grid;
         justify-content: center;
         align-content: center;

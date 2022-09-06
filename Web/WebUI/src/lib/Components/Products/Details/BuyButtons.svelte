@@ -24,8 +24,8 @@ const OnCart = () => {
         cursor: pointer;
         font-family: Raleway;
         border: black 0.4rem solid;
-        width: 33rem;
-        height: 9rem;
+        width: 23rem;
+        height: 7rem;
         background-color: transparent;
         font-size: 3rem;
         text-align: center;

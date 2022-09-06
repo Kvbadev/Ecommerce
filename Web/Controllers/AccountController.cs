@@ -3,10 +3,9 @@ using Core;
 using Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Web.Services.JwtTokenService;
 using Web.DTOs;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
+using Web.Services.JwtToken;
 
 namespace Web.Controllers;
 
@@ -20,9 +19,12 @@ public class AccountController : ControllerBase
     private readonly ILogger<AccountController>  _logger;
     private readonly IConfiguration _configuration;
     private readonly SignInManager<AppUser> _signInManager;
+    private readonly IJwtTokenService _jwtTokenService;
     public AccountController(DataContext context, UserManager<AppUser> userManager, IMapper mapper,
-            ILogger<AccountController> logger, IConfiguration configuration, SignInManager<AppUser> signInManager)
+            ILogger<AccountController> logger, IConfiguration configuration, SignInManager<AppUser> signInManager,
+            IJwtTokenService jwtTokenService)
     {
+        _jwtTokenService = jwtTokenService;
         _signInManager = signInManager;
         _configuration = configuration;
         _logger = logger;
@@ -34,26 +36,23 @@ public class AccountController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> RegisterUser(RegisterDto user)
     {
-        // var doesExist = _context.Users.Any(x => x.UserName == user.Username);
-        // if(doesExist)
-        // {
-        //     return BadRequest("This username is already registered");
-        // }
 
         var newUser = new AppUser();
-
         _mapper.Map(user, newUser); 
 
         var result = await _userManager.CreateAsync(newUser, user.Password);
 
         if(result.Succeeded)
         {
+            newUser.ShoppingCart = new ShoppingCart();
             _logger.LogInformation("New user {} has been created", user.Username);
-            var token = JwtTokenService.GenerateToken(newUser, _configuration);
+
+            await _context.SaveChangesAsync();
+            var token = _jwtTokenService.GenerateToken(newUser);
 
             return Ok(token.ToString());
         }
-        return BadRequest(result.Errors.ElementAt(0).Description.ToString());
+        return BadRequest(result.Errors.ElementAt(0).Description.ToString()); //return one of the errors
     }
 
     [HttpPost("login")]
@@ -66,7 +65,7 @@ public class AccountController : ControllerBase
         
         var res = await _signInManager.CheckPasswordSignInAsync(user, creds.Password, false);
         if(res.Succeeded){
-            var token = JwtTokenService.GenerateToken(user, _configuration);
+            var token = _jwtTokenService.GenerateToken(user);
             return Ok(token);
         }
         return BadRequest("Invalid Password");
@@ -75,19 +74,20 @@ public class AccountController : ControllerBase
     [HttpGet("profile")]
     public async Task<Core.Profile?> Profile() 
     {
-        var authHeader = HttpContext.Request.Headers["Authorization"];
-        if(authHeader == string.Empty)
+        
+        var userId = _jwtTokenService.ExtractId();
+        if(userId == string.Empty)
         {
             return null;
         }
-        var userId = JwtTokenService.ExtractId(authHeader);
-        Core.Profile userProfile = new Core.Profile();
+
+        Core.Profile? userProfile = new Core.Profile();
         AppUser? user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
         if(user == null){
             return null;
         } 
-        _mapper.Map<Core.AppUser, Core.Profile>(user, userProfile);
 
+        _mapper.Map<Core.AppUser, Core.Profile>(user, userProfile);
         return userProfile; 
     }
 }

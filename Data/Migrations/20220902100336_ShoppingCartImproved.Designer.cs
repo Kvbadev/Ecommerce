@@ -3,6 +3,7 @@ using System;
 using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220902100336_ShoppingCartImproved")]
+    partial class ShoppingCartImproved
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.8");
@@ -68,6 +70,9 @@ namespace Data.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("ShoppingCartRef")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("INTEGER");
 
@@ -84,6 +89,9 @@ namespace Data.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
+                    b.HasIndex("ShoppingCartRef")
+                        .IsUnique();
+
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
@@ -94,9 +102,6 @@ namespace Data.Migrations
 
                     b.Property<Guid>("ShoppingCartId")
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("ProductQuantity")
-                        .HasColumnType("INTEGER");
 
                     b.HasKey("ProductId", "ShoppingCartId");
 
@@ -131,17 +136,13 @@ namespace Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("AppUserId")
-                        .IsRequired()
+                    b.Property<Guid>("AppUserRef")
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("FinalPrice")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AppUserId")
-                        .IsUnique();
 
                     b.ToTable("ShoppingCart");
                 });
@@ -274,6 +275,17 @@ namespace Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Core.AppUser", b =>
+                {
+                    b.HasOne("Core.ShoppingCart", "ShoppingCart")
+                        .WithOne("AppUser")
+                        .HasForeignKey("Core.AppUser", "ShoppingCartRef")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ShoppingCart");
+                });
+
             modelBuilder.Entity("Core.CartProduct", b =>
                 {
                     b.HasOne("Core.Product", "Product")
@@ -291,17 +303,6 @@ namespace Data.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("ShoppingCart");
-                });
-
-            modelBuilder.Entity("Core.ShoppingCart", b =>
-                {
-                    b.HasOne("Core.AppUser", "AppUser")
-                        .WithOne("ShoppingCart")
-                        .HasForeignKey("Core.ShoppingCart", "AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AppUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -355,12 +356,6 @@ namespace Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Core.AppUser", b =>
-                {
-                    b.Navigation("ShoppingCart")
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Core.Product", b =>
                 {
                     b.Navigation("CartProducts");
@@ -368,6 +363,9 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Core.ShoppingCart", b =>
                 {
+                    b.Navigation("AppUser")
+                        .IsRequired();
+
                     b.Navigation("CartProducts");
                 });
 #pragma warning restore 612, 618

@@ -23,7 +23,6 @@ let cartColor = 'white';
         <li class="nav-item item-3">
             <a href="/ShoppingCart" use:link class="cart-link">
                 {#if $shoppingCart}
-                <!-- TODO: items' count is too big -->
                 <div class="products-count"><span transition:fade>
                     {$shoppingCart.count}
                 </span></div>

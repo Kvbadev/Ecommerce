@@ -54,8 +54,8 @@ import Fa from "svelte-fa";
     .big-image {
         overflow: hidden;
         border: black 0.15rem solid;
-        width: 33vw;
-        height: 33vw;
+        width: 52rem;
+        height: 52rem;
     }                
     .button {
         cursor: pointer;
@@ -72,8 +72,8 @@ import Fa from "svelte-fa";
         cursor: pointer;
         border: 0.2rem gray solid;
         margin: 0 2rem;
-        width: 6.5vw;
-        height: 6.5vw;
+        width: 11rem;
+        height: 11rem;
     }
     .main {
         border: 0.3rem red solid;
@@ -85,7 +85,7 @@ import Fa from "svelte-fa";
     .container{
         padding: 1rem;
         grid-area: slider;
-        width: 50vw;
+        width: 90rem;
         display: flex;
         flex-direction: column;
         justify-content: space-evenly;
