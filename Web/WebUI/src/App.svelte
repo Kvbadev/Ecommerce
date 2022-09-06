@@ -16,10 +16,15 @@ onMount(async () => {
   initShoppingCart(localCart ?? null);
 
   if(jwt){
-    jwtToken.set(jwt);
-    const profile:Profile = await agent.Account.getProfile() as Profile;
-    userProfile.set(profile);
+    const profile = await agent.Account.getProfile();
+    if(profile) {
+      jwtToken.set(jwt);
+      userProfile.set(profile);
+    } else { //token does not work anymore
+      localStorage.removeItem("jwt");
+    } 
   }
+  // const prods = await agent.Products.getAll()
   products.set(await agent.Products.getAll());
 
 })

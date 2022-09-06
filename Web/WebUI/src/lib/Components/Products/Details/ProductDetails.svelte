@@ -40,6 +40,7 @@ onMount(async () => {
 
 <style>
     .container {
+        min-width: 108rem;
         width: 100vw;
         height: calc(100vh - 4.2vw);
         overflow: scroll;

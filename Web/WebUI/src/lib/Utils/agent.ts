@@ -23,7 +23,7 @@ const postProducts = async (url: string, product: Product) => {
 }
 
 async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE', body?: any, validation:boolean=false): Promise<T>{
-    const jwt = get(jwtToken);
+    const jwt = localStorage.getItem("jwt");
 
     const headers = {};
     
@@ -41,7 +41,7 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE', bod
         if(validation){
             return [response.status, await response.text()] as T;
         }
-        return response ? 
+        return response.status !== 204 ? 
         response.json().then(data => data as T) : 
         null;
     });
@@ -94,6 +94,6 @@ export const agent = {
     Account: {
         SignUp: (user: User) => authFetch<[number, string]>(apiUrl+"/Account/register", 'POST', user, true),
         LogIn: (user: User) => authFetch<[number, string]>(apiUrl+"/Account/login", 'POST', user, true),
-        getProfile: () => authFetch<Profile>(apiUrl+'/Account/profile', 'GET', null),
+        getProfile: () => authFetch<null | Profile>(apiUrl+'/Account/profile', 'GET', null),
     }
 }

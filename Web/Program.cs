@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Web.Services.JwtToken;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,6 +65,10 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
 builder.Services.AddDbContext<DataContext>(options => 
 {

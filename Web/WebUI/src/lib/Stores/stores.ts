@@ -10,7 +10,7 @@ export async function getProducts() {
     products.set(await agent.Products.getAll());
 }
 
-export const jwtToken = writable(null as string|null);
+export const jwtToken = writable(null as String|null);
 
 export const userProfile = writable(null as Profile|null);
 

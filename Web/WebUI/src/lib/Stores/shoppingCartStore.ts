@@ -19,7 +19,7 @@ export const updateShoppingCart = (item: CartItem) => {
         }
 
         v.count = v.items.reduce((acc, items) => acc+items.quantity, 0);
-        v.sum = v.items.reduce((acc, items) => acc+(items.price*items.quantity), 0).toFixed(2);
+        v.sum = parseFloat(v.items.reduce((acc, items) => acc+(items.price*items.quantity), 0).toFixed(2));
         return v;
     });
     localStorage.setItem("cart", JSON.stringify(get(shoppingCart)));
