@@ -2,6 +2,7 @@ using AutoMapper;
 using Core;
 using Data;
 using Infrastructure.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Web.Services.JwtToken;
@@ -10,6 +11,7 @@ namespace Web.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class ShoppingCartController : ControllerBase
 {
     private readonly DataContext _context;
@@ -40,19 +42,21 @@ public class ShoppingCartController : ControllerBase
     [HttpPatch("{shouldAdd}")]
     public async Task<IActionResult> AddProducts(ProductToCartDto product, string shouldAdd)
     {
-        
-        var user = await _context.Users.Include(x => x.ShoppingCart).ThenInclude(x => x.CartProducts).FirstOrDefaultAsync(user => user.Id == _jwtTokenService.ExtractId());
-        if(user == null)
-        {
-            return BadRequest("User not found");
-        }
+        var selectedProduct = await _context.Products.FindAsync(product.Id);
 
-        var productToAdd = await _context.Products.FindAsync(product.Id);
-        if(productToAdd == null)
+        if(selectedProduct == null)
         {
             return BadRequest("Product not found");
         }
-        var prodInCart = user.ShoppingCart.CartProducts.FirstOrDefault(x => x.ProductId == product.Id);
+        ShoppingCart userCart = _context.ShoppingCarts.Include(x => x.CartProducts)
+            .FirstOrDefault(x => x.AppUserId == _jwtTokenService.ExtractId())!;
+        if(userCart == null)
+        {
+            return BadRequest("Something goes not as expected");
+        }
+
+        var prodInCart = await _context.CartProducts
+            .FirstOrDefaultAsync(x => x.ProductId == product.Id && x.ShoppingCartId == userCart.Id);
 
         if(shouldAdd == "add")
         {
@@ -62,15 +66,15 @@ public class ShoppingCartController : ControllerBase
             }
             else
             {
-                var cartProduct = new CartProduct
+                prodInCart = new CartProduct //redefined to use it further so it is never null
                 {
-                    Product = productToAdd,
+                    Product = selectedProduct,
                     ProductQuantity = product.Quantity
                 };
-                user.ShoppingCart.CartProducts.Add(cartProduct);
+               userCart.CartProducts.Add(prodInCart);
             }
 
-            user.ShoppingCart.FinalPrice += (product.Price * product.Quantity);
+            userCart.FinalPrice += (prodInCart.Product.Price * product.Quantity);
         }
         else if(shouldAdd == "delete")
         {
@@ -85,9 +89,9 @@ public class ShoppingCartController : ControllerBase
             prodInCart.ProductQuantity -= product.Quantity;
             if(prodInCart.ProductQuantity <= 0)
             {
-                user.ShoppingCart.CartProducts.Remove(prodInCart);
+                userCart.CartProducts.Remove(prodInCart);
             }
-            user.ShoppingCart.FinalPrice -= (product.Price * product.Quantity);
+            userCart.FinalPrice -= (prodInCart.Product.Price * product.Quantity);
         }
         else
         {
@@ -95,20 +99,25 @@ public class ShoppingCartController : ControllerBase
         }
 
        
-        await _context.SaveChangesAsync();
-        return Ok();
+        var res = await _context.SaveChangesAsync() > 0;
+        if(res)
+        {
+            return NoContent();
+        }
+        return BadRequest("Could not add the items");
     }
 
     [HttpDelete]
-    public async Task<IActionResult> DeleteProducts(ProductToCartDto product)
+    public async Task<IActionResult> ClearCart()
     {
-        var user = await _context.Users.Include(x => x.ShoppingCart).ThenInclude(x => x.CartProducts).FirstOrDefaultAsync(user => user.Id == _jwtTokenService.ExtractId());
-        if(user == null)
-        {
-            return BadRequest("User not found");
-        }
+        ShoppingCart cart = _context.ShoppingCarts.Include(x => x.CartProducts).FirstOrDefault(x => x.AppUserId == _jwtTokenService.ExtractId())!;
         
+        cart.CartProducts = new List<CartProduct>();
+        cart.FinalPrice = 0;
+
         await _context.SaveChangesAsync();
-        return Ok();
+
+        return NoContent();
     }
+
 }

@@ -13,8 +13,6 @@ public class MappingProfiles: AutoMapper.Profile
 
         CreateMap<AppUser, Core.Profile>();
         
-        CreateMap<ShoppingCart, CartDto>();
-
         CreateMap<Product, CartProduct>()
             .ForPath(d => d.Product.Id, o => o.MapFrom(x => x.Id))
             .ForPath(d => d.Product.Name, o => o.MapFrom(x => x.Name))
