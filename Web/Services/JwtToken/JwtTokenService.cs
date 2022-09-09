@@ -3,17 +3,27 @@ using System.Security.Claims;
 using System.Text;
 using Core;
 using Microsoft.IdentityModel.Tokens;
+using Web.ExtensionMethods;
 
-namespace Web.Services.JwtTokenService;
-public class JwtTokenService
+namespace Web.Services.JwtToken;
+public class JwtTokenService : IJwtTokenService
 {
-    public static string GenerateToken(AppUser user, IConfiguration configuration)
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IConfiguration _configuration;
+    public JwtTokenService(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
     {
+        _configuration = configuration;
+        _httpContextAccessor = httpContextAccessor;
+    }
+
+    public string GenerateToken(AppUser user)
+    {
+        JwtSecurityTokenHandler.DefaultInboundClaimTypeMap = new Dictionary<string, string>();
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(configuration["JwtKey"]);
+        var key = Encoding.ASCII.GetBytes(_configuration["JwtKey"]);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Audience = "http://localhost:5000",
+            Audience = "https://localhost:5000",
             Subject = new System.Security.Claims.ClaimsIdentity(new Claim[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
@@ -25,8 +35,17 @@ public class JwtTokenService
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
-    // public static string ExtractId(string token)
-    // {
+    public string? ExtractId()
+    {
+        string token = _httpContextAccessor.GetBearerToken();
+        if(token == string.Empty)
+        {
+            return string.Empty;
+        }
+        var handler = new JwtSecurityTokenHandler();
+        var jwtSecurityToken = handler.ReadJwtToken(token);
 
-    // }
+        var nameId = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value; //unfortunately claimtypes.nameidentifier does not seem to work
+        return nameId;
+    }
 }

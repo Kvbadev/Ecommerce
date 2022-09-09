@@ -6,6 +6,7 @@
     import FormField from "./FormField.svelte";
     import { jwtToken, userProfile } from "../../Stores/stores";
     import Loader from "../Common/Loader.svelte";
+import { initShoppingCart } from "../../Stores/shoppingCartStore";
     
     export let fields = ['firstname', 'lastname', 'username','email', 'password'];
     export let type: 'Login' | 'Signup';
@@ -41,7 +42,7 @@
         const userData = getFormData(e.target);
         try{
             //get status code and error message / jwt token
-            const [status, message] = type === "Signup" ? await agent.Account.SignUp(userData) : await agent.Account.LogIn(userData);
+            const [status, message] = type === "Signup" ? await agent.Account.signUp(userData) : await agent.Account.logIn(userData);
 
             if(status !== 200){
                 serverError = message.length > 100 ? `Server error: ${status}` : message;
@@ -53,6 +54,8 @@
                 jwtToken.set(message);
                 localStorage.setItem("jwt", message);
                 userProfile.set(await agent.Account.getProfile());
+                //TODO: optional / display a modal what to do about previous cart as it's gonna be updated to one on the server
+                initShoppingCart(await agent.ShoppingCart.GetCart());
 
                 loading = canSubmit = false;
                 push('/');

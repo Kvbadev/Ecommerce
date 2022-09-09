@@ -43,7 +43,8 @@ import ItemPhoto from "../../Products/Homepage/ItemPhoto.svelte";
         background: rgba(255, 255, 255, 0.37);
         background-color: white;
         border-radius: 1.6rem;
-        box-shadow: 0 0.4rem 3rem rgba(0, 0, 0, 0.38);
+        /* box-shadow: 0 0.4rem 3rem rgba(0, 0, 0, 0.38); */
+        box-shadow: 0px 5px 58px -21px rgba(66, 68, 90, 1);
         backdrop-filter: blur(2rem);
         -webkit-backdrop-filter: blur(1rem);
         -moz-backdrop-filter: blur(1rem); 
@@ -53,8 +54,7 @@ import ItemPhoto from "../../Products/Homepage/ItemPhoto.svelte";
     }
 
     li:hover {
-        box-shadow: 1.5rem 1.5rem 1.5rem 1.5rem rgba(0,0,0,0.7);
-        background-color: white;
+        box-shadow: 0px 5px 58px 13px rgba(66, 68, 90, 1);
     }
 
     a {
