@@ -6,11 +6,13 @@ import { push } from "svelte-spa-router";
 
 import { jwtToken, userProfile } from "../../../Stores/stores";
 import Loader from "../../Common/Loader.svelte";
+import { initShoppingCart } from "../../../Stores/shoppingCartStore";
 
 async function SignOut(){
     localStorage.removeItem("jwt");
     jwtToken.set('');
     userProfile.set(null);
+    initShoppingCart(null);
     push('/');
 }
 

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Web.Services.JwtToken;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,7 +42,7 @@ builder.Services.AddAuthentication(opt =>
 })
     .AddJwtBearer(jwtOpt => 
     {
-        jwtOpt.Audience = "http://localhost:5000";
+        jwtOpt.Audience = "https://localhost:5000";
         jwtOpt.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = false,
@@ -50,6 +51,7 @@ builder.Services.AddAuthentication(opt =>
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JwtKey"]))
         };
 });
+
 
 builder.Services.AddIdentityCore<AppUser>(opt => 
 {
@@ -64,6 +66,10 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
 builder.Services.AddDbContext<DataContext>(options => 
 {

@@ -4,20 +4,37 @@ import { routes } from './routes';
 import Router from 'svelte-spa-router'
 import { onMount } from 'svelte';
 import { agent } from './lib/Utils/agent';
-import type User from './lib/Models/user';
-import { userProfile } from './lib/Stores/stores';
-import type Profile from './lib/Models/profile';
+import { jwtToken, products, userProfile } from './lib/Stores/stores';
+import { initShoppingCart } from './lib/Stores/shoppingCartStore';
+import type Cart from './lib/Models/cart';
+import { SvelteToast } from '@zerodevx/svelte-toast';
 
 onMount(async () => {
-  if(localStorage.getItem("jwt")){
-    const profile:Profile = await agent.Account.getProfile() as Profile;
-    userProfile.set(profile);
+  const jwt = localStorage.getItem("jwt");
+  
+  if(jwt){
+    const profile = await agent.Account.getProfile();
+    
+    if(profile) {
+      jwtToken.set(jwt);
+      userProfile.set(profile);
+
+      const localCart: Cart = await agent.ShoppingCart.GetCart(); 
+      initShoppingCart(localCart);
+
+    } else { //token does not work anymore
+      localStorage.removeItem("jwt");
+    } 
+  } else {
+      initShoppingCart(JSON.parse(localStorage.getItem("cart"))||null);
   }
+  products.set(await agent.Products.getAll());
+
 })
 </script>
 
-  
 <main>
   <Navbar />
 </main>
 <Router {routes} />
+<SvelteToast />

@@ -2,22 +2,21 @@
 import type Product from "src/lib/Models/product";
 import { agent } from "../../../Utils/agent";
 import { onMount } from "svelte";
-import { get } from "svelte/store";
 import { products } from "../../../Stores/stores";
 
 import ProductParameters from "./ProductParameters.svelte";
 import ProductSlider from "./ProductSlider.svelte";
 import Loader from "../../Common/Loader.svelte";
 import ProductPrice from "./ProductPrice.svelte";
-import { onDestroy } from "svelte";
 
 export let params = {} as any;
-
 
 let product: Product | undefined;
 
 async function getProduct() {
-    product = get(products).find(v => v.id === params.id);
+    if($products){
+        product = $products.find(v => v.id === params.id);
+    }
     if(!product){
         product = await agent.Products.getOne(params.id);
     }
@@ -27,8 +26,6 @@ onMount(async () => {
     await getProduct();
 })
 
-// onDestroy(() => multiplier.set(1))
-
 </script>
 
 {#if !product}
@@ -36,13 +33,14 @@ onMount(async () => {
 {:else}
 <div class="container">
     <ProductSlider product={product}/>
-    <ProductPrice product={product}/>
+    <ProductPrice params={params} product={product}/>
     <ProductParameters product={product} />
 </div>
 {/if}
 
 <style>
     .container {
+        min-width: 108rem;
         width: 100vw;
         height: calc(100vh - 4.2vw);
         overflow: scroll;
