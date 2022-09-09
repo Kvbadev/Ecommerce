@@ -13,6 +13,8 @@ public class DataContext : IdentityDbContext<AppUser>
     public virtual DbSet<AppUser> AppUsers {get; set;} = default!;
     public virtual DbSet<CartProduct> CartProducts { get; set; } = default!;
 
+    public virtual DbSet<ShoppingCart> ShoppingCarts {get; set;} = default!;
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

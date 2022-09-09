@@ -23,7 +23,7 @@ public class JwtTokenService : IJwtTokenService
         var key = Encoding.ASCII.GetBytes(_configuration["JwtKey"]);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Audience = "http://localhost:5000",
+            Audience = "https://localhost:5000",
             Subject = new System.Security.Claims.ClaimsIdentity(new Claim[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),

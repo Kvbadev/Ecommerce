@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Web.DTOs;
 using Microsoft.EntityFrameworkCore;
 using Web.Services.JwtToken;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Web.Controllers;
 
@@ -47,10 +48,14 @@ public class AccountController : ControllerBase
             newUser.ShoppingCart = new ShoppingCart();
             _logger.LogInformation("New user {} has been created", user.Username);
 
-            await _context.SaveChangesAsync();
             var token = _jwtTokenService.GenerateToken(newUser);
 
-            return Ok(token.ToString());
+            var res = await _context.SaveChangesAsync() > 0;
+            if(res)
+            {
+                return Ok("Shopping cart has been cleared");
+            }
+            return BadRequest("Could not clear the cart");
         }
         return BadRequest(result.Errors.ElementAt(0).Description.ToString()); //return one of the errors
     }
@@ -71,6 +76,7 @@ public class AccountController : ControllerBase
         return BadRequest("Invalid Password");
     }
 
+    [Authorize]
     [HttpGet("profile")]
     public async Task<Core.Profile?> Profile() 
     {
