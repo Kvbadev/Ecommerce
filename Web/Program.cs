@@ -35,6 +35,8 @@ builder.Services.Configure<IdentityOptions>(opt =>
     opt.Password.RequiredLength = 6;
 });
 
+
+
 builder.Services.AddAuthentication(opt => 
 {
     // opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
