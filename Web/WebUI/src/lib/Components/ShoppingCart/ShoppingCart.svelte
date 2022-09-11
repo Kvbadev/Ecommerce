@@ -36,7 +36,7 @@ function buyProducts() {
 
             <h3>{item?.name} [{quantity}] - {sum.toFixed(2)}$</h3>
         {/each}
-        <button on:click={buyProducts}><a href="/Buy" use:link>Buy products</a></button>
+        <a href="/Buy" use:link><button on:click={buyProducts}>Buy products</button></a>
         <button on:click={clearCart}>Clear the cart</button>
     {:else}
         <h1>You have not added any products to your cart</h1>
