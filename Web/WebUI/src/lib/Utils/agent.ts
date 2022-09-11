@@ -85,5 +85,8 @@ export const agent = {
         addItem: (item: CartItem) => authFetch<string>(apiUrl+"/ShoppingCart/add", 'PATCH', item),
         removeItem: (item: CartItem) => authFetch<string>(apiUrl+"/ShoppingCart/delete", 'PATCH', null),
         clearCart: () => authFetch<string>(apiUrl+"/ShoppingCart", 'DELETE', null)
+    }, 
+    PaymentGateway: {
+        GetToken: () => authFetch<string>(apiUrl+"/Payment/charge", 'GET', null)
     }
 }

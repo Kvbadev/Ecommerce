@@ -35,7 +35,7 @@ public class JwtTokenService : IJwtTokenService
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
-    public string? ExtractId()
+    public string ExtractId()
     {
         string token = _httpContextAccessor.GetBearerToken();
         if(token == string.Empty)
@@ -46,6 +46,6 @@ public class JwtTokenService : IJwtTokenService
         var jwtSecurityToken = handler.ReadJwtToken(token);
 
         var nameId = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value; //unfortunately claimtypes.nameidentifier does not seem to work
-        return nameId;
+        return nameId ?? string.Empty;
     }
 }

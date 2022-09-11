@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Stripe;
-using Stripe.Checkout;
+using Web.Services;
+using Web.Services.JwtToken;
 
 namespace Web.Controllers;
 
@@ -8,9 +8,22 @@ namespace Web.Controllers;
 [Route("api/[controller]")]
 public class PaymentController : ControllerBase
 {
-    [HttpGet("charge")]
-    public async Task<IActionResult> Test()
+    private readonly IJwtTokenService _tokenService;
+    public PaymentController(IJwtTokenService tokenService)
     {
-        return Ok();
+        _tokenService = tokenService;
+    }
+
+    [HttpGet("charge")]
+    public async Task<IActionResult> GetToken([FromServices]IPaymentService paymentService)
+    {
+        string id = _tokenService.ExtractId();
+        if(id == string.Empty)
+        {
+            return BadRequest("Could not access necessary client property");
+        }
+
+        var token = paymentService.GenerateToken(id);
+        return Ok(token);
     }
 }
