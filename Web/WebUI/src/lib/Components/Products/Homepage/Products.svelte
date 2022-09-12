@@ -2,7 +2,6 @@
     import { products } from "../../../Stores/stores";
     import ProductItem from "./ProductItem.svelte";
     import Loader from "../../Common/Loader.svelte";
-
 </script>
     {#if !$products}
         <Loader />

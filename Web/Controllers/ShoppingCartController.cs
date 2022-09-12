@@ -95,6 +95,7 @@ public class ShoppingCartController : ControllerBase
                 userCart.CartProducts.Remove(prodInCart);
             }
             userCart.FinalPrice -= (prodInCart.Product.Price * product.Quantity);
+            userCart.Count -= product.Quantity;
         }
         else
         {
@@ -107,7 +108,7 @@ public class ShoppingCartController : ControllerBase
         {
             return NoContent();
         }
-        return BadRequest("Could not add the items");
+        return BadRequest("Could not add/remove items");
     }
 
     [HttpDelete]
@@ -117,6 +118,7 @@ public class ShoppingCartController : ControllerBase
         
         cart.CartProducts = new List<CartProduct>();
         cart.FinalPrice = 0;
+        cart.Count = 0;
 
         await _context.SaveChangesAsync();
 

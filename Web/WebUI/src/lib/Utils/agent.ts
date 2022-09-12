@@ -50,12 +50,11 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PAT
             if(validation){
                 return [response.status, await response.text()] as T;
             }
-            // console.log(await response.text())
-            const x = await response?.text();
-            // console.log(x);
+            const contentType = response.headers.get('content-type');
+            const text = await response?.text();
             //TODO: fix json parse when setting cart
-            return x.length ? 
-            JSON.parse(x) as T :
+            return text.length && contentType.indexOf('application/json') !== -1 ? 
+            JSON.parse(text) as T :
             null;
         });
         return response;

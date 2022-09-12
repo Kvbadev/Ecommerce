@@ -1,5 +1,5 @@
 <script lang="ts">
-import { updateShoppingCart } from "../../../Stores/shoppingCartStore";
+import { addToCart } from "../../../Stores/shoppingCartStore";
 
 
 export let params = {} as any;
@@ -8,7 +8,7 @@ export let quantity: number;
 export let price: number;
 
 const OnCart = () => {
-    updateShoppingCart({quantity: quantity, id: params.id, price: price});
+    addToCart({quantity: quantity, id: params.id, price: price});
 }
 
 </script>
