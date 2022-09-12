@@ -26,17 +26,19 @@ public class ShoppingCartController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IEnumerable<ProductToCartDto>?> Get() 
+    public async Task<ShoppingCartDto?> Get() 
     {
-        var user = await _context.Users.Include(x => x.ShoppingCart).FirstOrDefaultAsync(user => user.Id == _jwtTokenService.ExtractId());
+        var user = await _context.Users.Include(x => x.ShoppingCart).ThenInclude(x => x.CartProducts)
+            .ThenInclude(x => x.Product).FirstOrDefaultAsync(user => user.Id == _jwtTokenService.ExtractId());
         if(user == null)
         {
-            return Enumerable.Empty<ProductToCartDto>();
+            return null;
         }
 
-        List<ProductToCartDto> items = _mapper.Map<CartProduct[], List<ProductToCartDto>>(await _context.CartProducts.Where(x => x.ShoppingCartId == user.ShoppingCart.Id).Include(x => x.Product).ToArrayAsync());
+        var cart = new ShoppingCartDto();
+        _mapper.Map<ShoppingCart, ShoppingCartDto>(user.ShoppingCart, cart);
 
-        return items;
+        return cart;
     }
 
     [HttpPatch("{shouldAdd}")]
@@ -75,6 +77,7 @@ public class ShoppingCartController : ControllerBase
             }
 
             userCart.FinalPrice += (prodInCart.Product.Price * product.Quantity);
+            userCart.Count += product.Quantity;
         }
         else if(shouldAdd == "delete")
         {
@@ -119,5 +122,21 @@ public class ShoppingCartController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpPost]
+    public async Task<IActionResult> SetNewCart(ShoppingCartDto newCart)
+    {
+        ShoppingCart cart = _context.ShoppingCarts.Include(x => x.CartProducts).FirstOrDefault(x => x.AppUserId == _jwtTokenService.ExtractId())!;
+        if(cart == null)
+        {
+            return BadRequest("This user does not exist");
+        }
+
+        // cart.CartProducts = _mapper.Map<newCart.Items
+        _mapper.Map<ShoppingCartDto, ShoppingCart>(newCart, cart);
+        var res = await _context.SaveChangesAsync() > 0;
+
+        return res ? Ok("New cart has been set") : BadRequest("Could not persist changes in database");
+   }
 
 }

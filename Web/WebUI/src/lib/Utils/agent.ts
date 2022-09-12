@@ -24,18 +24,10 @@ const postProducts = async (url: string, product: Product) => {
 }
 
 async function getCart(url: string): Promise<Cart | null> {
-    const cart = await authFetch<Array<CartItem>>(url, 'GET', null);
-    
-    if(cart?.length === 0) return null;
+    const cart = await authFetch<Cart>(url, 'GET', null);
+    if(cart.items.length === 0) return null;
 
-    let newCart: Cart = {items: new Array<CartItem>, count: 0, sum: 0};
-    for(const item of cart){
-        newCart.items.push(item);
-        newCart.count+=item.quantity;
-        newCart.sum+=item.quantity*item.price;
-    }
-
-    return newCart;
+    return cart;
 }
 
 async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PATCH', body?: any, validation:boolean=false): Promise<T>{
@@ -58,13 +50,16 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PAT
             if(validation){
                 return [response.status, await response.text()] as T;
             }
-            return response.status !== 204 ? 
-            response.json().then(data => data as T) : 
+            // console.log(await response.text())
+            const x = await response?.text();
+            // console.log(x);
+            //TODO: fix json parse when setting cart
+            return x.length ? 
+            JSON.parse(x) as T :
             null;
         });
         return response;
     } catch (e) {
-        toast.push(e);
         console.log(e);
     }
 }
@@ -83,8 +78,9 @@ export const agent = {
     ShoppingCart: {
         GetCart: () => getCart(apiUrl+"/ShoppingCart"),
         addItem: (item: CartItem) => authFetch<string>(apiUrl+"/ShoppingCart/add", 'PATCH', item),
-        removeItem: (item: CartItem) => authFetch<string>(apiUrl+"/ShoppingCart/delete", 'PATCH', null),
-        clearCart: () => authFetch<string>(apiUrl+"/ShoppingCart", 'DELETE', null)
+        removeItem: (item: CartItem) => authFetch<string>(apiUrl+"/ShoppingCart/delete", 'PATCH', item),
+        clearCart: () => authFetch<string>(apiUrl+"/ShoppingCart", 'DELETE', null),
+        setCart: (cart: Cart) => authFetch<string>(apiUrl+"/ShoppingCart", 'POST', cart)
     }, 
     PaymentGateway: {
         GetToken: () => authFetch<string>(apiUrl+"/Payment/charge", 'GET', null)
