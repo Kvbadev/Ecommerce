@@ -10,21 +10,23 @@ import Loader from "../../Common/Loader.svelte";
 import ProductPrice from "./ProductPrice.svelte";
 
 export let params = {} as any;
-
-let product: Product | undefined;
+let product;
 
 
 </script>
 
-{#if !$products}
+{#if (product = $products?.find(x => x.id === params.id)) == undefined}
     <Loader />
 {:else}
 <div class="container">
-    <ProductSlider product={$products.find(v => v.id === params.id)}/>
-    <ProductPrice params={params} product={$products.find(v => v.id === params.id)}/>
-    <ProductParameters product={$products.find(v => v.id === params.id)} />
+    <ProductSlider product={product} />
+    <ProductPrice params={params} product={product} />
+    <ProductParameters product={product} />
 </div>
 {/if}
+<!-- {#if !$products}
+{:else} -->
+<!-- {/if} -->
 
 <style>
     .container {

@@ -1,11 +1,21 @@
 <script lang="ts">
     import Fa from "svelte-fa";
     import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+    import { onDestroy, onMount } from "svelte";
+import { push } from "svelte-spa-router";
 
     export let size = 10;
     export let color = "#ff8655";
     export let entire = true;
     export let inElement = false;
+
+    let timeout;
+
+    onMount(() => {
+        timeout = setTimeout(() => push('/NotFound'), 3000);
+    })
+    onDestroy(() => clearTimeout(timeout));
+
 </script>
 
 {#if inElement}
