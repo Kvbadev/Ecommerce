@@ -53,7 +53,7 @@ public class AccountController : ControllerBase
             var res = await _context.SaveChangesAsync() > 0;
             if(res)
             {
-                return Ok("Shopping cart has been cleared");
+                return Ok(token);
             }
             return BadRequest("Could not clear the cart");
         }

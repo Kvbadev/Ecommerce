@@ -4,13 +4,20 @@ import { agent } from '../../Utils/agent';
 
 import {shoppingCart, removeShoppingCart} from '../../Stores/shoppingCartStore';
 
-import {products} from '../../Stores/stores';
+import {products, userProfile} from '../../Stores/stores';
 
 import Loader from '../Common/Loader.svelte';
 import { link } from 'svelte-spa-router';
+import Modal from '../Common/Modal.svelte';
+
+let showModal = false;
 
 async function clearCart() {
    removeShoppingCart(); 
+}
+
+function toggleModal() {
+    showModal = !showModal;
 }
 
 function buyProducts() {
@@ -20,9 +27,12 @@ function buyProducts() {
 
 </script>
 
+<div class="all">
+
 {#if !$shoppingCart || !$products}
     <Loader />
 {:else}
+
 <div class="container">
     {#if $shoppingCart.items.length}
         <h1>{$shoppingCart.sum.toFixed(2)}$</h1>
@@ -36,17 +46,28 @@ function buyProducts() {
 
             <h3>{item?.name} [{quantity}] - {sum.toFixed(2)}$</h3>
         {/each}
-        <a href="/Buy" use:link><button on:click={buyProducts}>Buy products</button></a>
+
+        {#if $userProfile}
+        <a href="/Buy" use:link><button on:click={buyProducts}>Buy products</button></a> 
+        {:else}
+        <a href="/Account/Login" use:link><button on:click={buyProducts}>Buy products</button></a>
+        {/if}
+
         <button on:click={clearCart}>Clear the cart</button>
     {:else}
         <h1>You have not added any products to your cart</h1>
     {/if}
 </div>
 {/if}
+</div>
 
 <style>
+    .all {
+        width: 100%;
+        height: calc(100vh - 4.2vw);
+    }
     .container *{
-        margin: 1rem;
+        margin: 0.1rem 1rem ;
     }
     button {
         display: block;

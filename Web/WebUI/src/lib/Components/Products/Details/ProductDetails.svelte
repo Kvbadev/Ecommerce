@@ -13,28 +13,16 @@ export let params = {} as any;
 
 let product: Product | undefined;
 
-async function getProduct() {
-    if($products){
-        product = $products.find(v => v.id === params.id);
-    }
-    if(!product){
-        product = await agent.Products.getOne(params.id);
-    }
-}
-
-onMount(async () => {
-    await getProduct();
-})
 
 </script>
 
-{#if !product}
+{#if !$products}
     <Loader />
 {:else}
 <div class="container">
-    <ProductSlider product={product}/>
-    <ProductPrice params={params} product={product}/>
-    <ProductParameters product={product} />
+    <ProductSlider product={$products.find(v => v.id === params.id)}/>
+    <ProductPrice params={params} product={$products.find(v => v.id === params.id)}/>
+    <ProductParameters product={$products.find(v => v.id === params.id)} />
 </div>
 {/if}
 
