@@ -41,8 +41,10 @@ public class ShoppingCartController : ControllerBase
         return cart;
     }
 
+    //Method to add/delete products from user's cart
+    //When shouldAdd (that is being obtained by query string) is set to 'Add' then method removes desired quantity of products
     [HttpPatch("{shouldAdd}")]
-    public async Task<IActionResult> AddProducts(ProductToCartDto product, string shouldAdd)
+    public async Task<IActionResult> ManageProducts(ProductToCartDto product, string shouldAdd)
     {
         var selectedProduct = await _context.Products.FindAsync(product.Id);
 
@@ -57,6 +59,7 @@ public class ShoppingCartController : ControllerBase
             return BadRequest("Something goes not as expected");
         }
 
+        //getting prod from the cart (if exist) to change quantity instead of adding the same product to the cart
         var prodInCart = await _context.CartProducts
             .FirstOrDefaultAsync(x => x.ProductId == product.Id && x.ShoppingCartId == userCart.Id);
 

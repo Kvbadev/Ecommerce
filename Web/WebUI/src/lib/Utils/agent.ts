@@ -52,10 +52,12 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PAT
             }
             const contentType = response.headers.get('content-type');
             const text = await response?.text();
-            //TODO: fix json parse when setting cart
-            return text.length && contentType.indexOf('application/json') !== -1 ? 
-            JSON.parse(text) as T :
-            null;
+            if(text.length && contentType.indexOf('application/json') !== -1 ){
+                return JSON.parse(text) as T;
+            } else if(text.length) {
+                return text as T;
+            }
+            return null;
         });
         return response;
     } catch (e) {
