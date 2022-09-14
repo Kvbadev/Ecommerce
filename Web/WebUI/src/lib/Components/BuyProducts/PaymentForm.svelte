@@ -1,10 +1,9 @@
 <script lang="ts">
 
-import dropin from 'braintree-web-drop-in';
 import { agent } from "../../Utils/agent";
 
 import { onMount } from "svelte";
-import { client, hostedFields } from 'braintree-web';
+import { client, hostedFields, HostedFieldsTokenizePayload } from 'braintree-web';
   import Loader from '../Common/Loader.svelte';
 
 let fields: {
@@ -13,10 +12,28 @@ let fields: {
     expirationDate: HTMLElement,
     cvv: HTMLElement
 } = {} as any;
-let loading = true, submitting, tokenize;
+let loading = true, submitting, getPayload;
+
+async function handleSubmit(event: MouseEvent) {
+    const payload = await getPayload(event);
+    if(payload === null){
+        console.error("Could not obtain payload");
+        submitting = false;
+        return;
+    }
+    const res = await agent.PaymentGateway.proceedPayment(payload.nonce);
+    if(res === null){
+        console.error("Could not finalize the transaction");
+        submitting = false;
+        return;
+    }
+    console.log(res);
+    submitting = false;
+}
 
 onMount(async () => {
     const token = await agent.PaymentGateway.GetToken();
+    if(token === null) return;
 
     //return an instance of hostedFileds that are furher used to obtain a transaction nonce
     const instance = await client.create({
@@ -48,27 +65,31 @@ onMount(async () => {
             return fields;
         })
     })
-    tokenize = e => {
+    getPayload = (e) => {
+        submitting = true;
         e.preventDefault();
-
-        instance.tokenize((err, payload) => {
-            if(err){
-                console.error(err);
-                return;
-            }
-            //payload = nonce to process the transaction
-            console.log(payload);
+        let payld = null;
+        return new Promise((res, rej) => {
+            instance.tokenize((err, payload) => {
+                if(err){
+                    console.error(err);
+                    rej(err);
+                }
+                //payload = nonce to process the transaction
+                payld = payload;
+                res(payld);
+            })
         })
     }
 }) 
 
 </script>
 
-{#if loading}
-<Loader />
-{/if}
 
 <div class="container">
+    {#if loading}
+    <Loader inElement size={3} color='#000000' entire/>
+    {/if}
     <form class="form">
         <div class="cardholder-name-div">
             <label for="cardholder-name">Cardholder Name</label>
@@ -84,21 +105,26 @@ onMount(async () => {
             <label for="cvv">CVV</label>
             <div class="cvv" bind:this={fields.cvv}></div>
         </div>
-        <button class="submit" on:click={(e) => tokenize(e)}>Submit</button>
+        <button class="submit" on:click={(e) => handleSubmit(e)}>
+            {#if submitting}
+            <Loader inElement size={1} entire />
+            {/if}
+            Submit
+        </button>
     </form>
 </div>
 
 
 <style>
     .container {
-        width: auto;
-        height: auto;
+        position: relative;
+        width: 50rem;
+        height: 25rem;
     }
     form {
         display: flex;
         flex-direction: column;
         align-items: center;
-        width: 35%;
     }
     form > div {
         width: 45rem;
@@ -108,8 +134,13 @@ onMount(async () => {
     }
     .submit {
         width: 15rem;
+        position: relative;
         height: 3rem;
-        margin-top: 1rem;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
     form > div > div {
         border: 0.2rem black solid;
