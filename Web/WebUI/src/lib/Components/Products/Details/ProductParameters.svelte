@@ -13,11 +13,11 @@ import type Product from "src/lib/Models/product";
     h1 {
         font-family: 'Anek Telugu', sans-serif;
         font-size: 3.5rem;
-        width: 60%;
+        width: 80%;
         max-height: 100%;
     }
     .container {
-        overflow: scroll;
+        overflow: auto;
         grid-area: params;
         height: 50rem;
         display: flex;

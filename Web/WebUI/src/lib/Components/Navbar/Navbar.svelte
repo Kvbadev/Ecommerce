@@ -2,6 +2,7 @@
     import NavItems from "./NavItems.svelte";
 </script>
 
+<!-- TODO: implement media queries at least to the navbar -->
 <nav>
     <ul class="nav-items">
         <NavItems />

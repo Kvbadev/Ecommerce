@@ -2,7 +2,7 @@ import { get, writable } from "svelte/store";
 import type { CartItem } from "../Models/cart";
 import type Cart from "../Models/cart";
 import { agent } from "../Utils/agent";
-import { userProfile } from "./stores";
+import { products, userProfile } from "./stores";
 
 export const shoppingCart = writable(null as Cart|null);
 
@@ -24,7 +24,7 @@ export const addToCart = async (item: CartItem) => {
         }
 
         v.count = v.items.reduce((acc, items) => acc+items.quantity, 0);
-        v.sum = parseFloat(v.items.reduce((acc, items) => acc+(items.price*items.quantity), 0).toFixed(2));
+        v.sum = parseFloat(v.items.reduce((acc, items) => acc+(get(products).find(x => x.id === items.id)?.price*items.quantity), 0).toFixed(2));
         return v;
     });
     localStorage.setItem("cart", JSON.stringify(get(shoppingCart)));
@@ -39,6 +39,7 @@ export const initShoppingCart = (cart?: Cart) => {
 }
 
 export const removeFromCart = async (item: CartItem) => {
+    const product = get(products).find(x => x.id === item.id);
     if(get(userProfile)?.username){
         await agent.ShoppingCart.removeItem(item);
     }
@@ -51,7 +52,7 @@ export const removeFromCart = async (item: CartItem) => {
             v.items = v.items.filter(x => x.id !== item.id);
         }
         v.count -= 1;
-        v.sum -= item.price;
+        v.sum -= product.price;
         return v;
     });
     localStorage.setItem("cart", JSON.stringify(get(shoppingCart)));

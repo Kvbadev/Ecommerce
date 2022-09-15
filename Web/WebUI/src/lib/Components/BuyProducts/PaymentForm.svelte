@@ -5,6 +5,8 @@ import { agent } from "../../Utils/agent";
 import { onMount } from "svelte";
 import { client, hostedFields, HostedFieldsTokenizePayload } from 'braintree-web';
   import Loader from '../Common/Loader.svelte';
+  import {oneTimeProduct} from '../../Stores/stores';
+  import { get } from "svelte/store";
 
 let fields: {
     cardholderName: HTMLElement,
@@ -21,7 +23,10 @@ async function handleSubmit(event: MouseEvent) {
         submitting = false;
         return;
     }
-    const res = await agent.PaymentGateway.proceedPayment(payload.nonce);
+    const res = !$oneTimeProduct.id ?
+     await agent.PaymentGateway.BuyCart(payload.nonce) :
+     await agent.PaymentGateway.BuyProduct(payload.nonce, get(oneTimeProduct));
+
     if(res === null){
         console.error("Could not finalize the transaction");
         submitting = false;

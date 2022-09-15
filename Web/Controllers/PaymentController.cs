@@ -1,6 +1,9 @@
+using AutoMapper;
 using Braintree;
+using Core;
 using Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Web.Services;
 using Web.Services.JwtToken;
@@ -34,19 +37,56 @@ public class PaymentController : ControllerBase
         return Ok(token);
     }
 
-    [HttpPost("transaction")]
-    public async Task<IActionResult> CreateTransaction([FromBody]string nonce)
+    //TODO: improve not to initiate product at request
+    [HttpPost("buy/{nonce}")]
+    public async Task<IActionResult> Buy([FromServices]IMapper mapper, [FromRoute]string nonce, [FromBody]ProductSimplified? product)
     {
-        var user = _context.Users.Include(x => x.ShoppingCart).FirstOrDefault(x => x.Id == _tokenService.ExtractId());
-        if(user == null)
+        Result<Braintree.Transaction> res;
+        Core.Transaction transaction;
+
+        var user = _context.Users.Include(x => x.Transactions).Include(x => x.ShoppingCart).ThenInclude(x => x.CartProducts).ThenInclude(x => x.Product).FirstOrDefault(x => x.Id == _tokenService.ExtractId());
+        if(user == null || user.ShoppingCart.Count == 0)
         {
-            return BadRequest("Invalid user");
+            return BadRequest("Invalid request");
         }
-        var res = await _paymentService.ProceedTransaction(user.ShoppingCart, nonce, user.UserName);
-        if(res.IsSuccess())
+        if(product==null || product?.Quantity == 0) //buy entire cart
         {
-            return Ok("Transaction has been established");
+            res = await _paymentService.ProceedTransaction(user.ShoppingCart, nonce);
+
+            // ICollection<Product> products = mapper.Map<CartProduct[], ICollection<Product>>(user.ShoppingCart.CartProducts.ToArray<CartProduct>());
+
+            transaction = new Core.Transaction
+            {
+                // Products = products,
+                Products = user.ShoppingCart.CartProducts.Select(x => x.Product).ToList() ?? new List<Product>(),
+                Price = user.ShoppingCart.FinalPrice 
+            };
         }
-        return BadRequest("Could not establish a transaction");
+        else //buy only the product provided in the request
+        {
+            var prod = await _context.Products.FindAsync(product!.Id);
+            if(prod == null)
+            {
+                return BadRequest("Product not found");
+            }
+
+            res = await _paymentService.ProceedTransaction(prod, product.Quantity, nonce);
+
+            transaction = new Core.Transaction
+            {
+                Products = new List<Product>{ prod },
+                Price = prod.Price * product.Quantity
+            };
+
+        }
+        transaction.AppUser = user;
+        transaction.Failure = !res.IsSuccess();
+
+        _context.Transactions.Add(transaction);
+        var result = await _context.SaveChangesAsync() > 0;
+
+        return result && res.IsSuccess() ? 
+            Ok("Transaction has been proceeded"):
+            BadRequest("Could not establish a transaction");
     }
 }

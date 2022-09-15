@@ -16,6 +16,7 @@
     })
     onDestroy(() => clearTimeout(timeout));
 
+//TODO: fix loader on app init
 </script>
 
 {#if inElement}

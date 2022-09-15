@@ -1,5 +1,6 @@
 using Braintree;
 using Core;
+using Infrastructure.DTOs;
 
 namespace Web.Services;
 
@@ -25,11 +26,27 @@ public class PaymentService : IPaymentService
         return token;
     }
 
-    public async Task<Result<Transaction>> ProceedTransaction(ShoppingCart cart, string nonce, string DeviceData)
+    public async Task<Result<Braintree.Transaction>> ProceedTransaction(ShoppingCart cart, string nonce)
     {
         var request = new TransactionRequest
         {
             Amount = cart.FinalPrice,
+            PaymentMethodNonce = nonce,
+            DeviceData = string.Empty,
+            Options = new TransactionOptionsRequest
+            {
+                SubmitForSettlement = true
+            }
+        };
+        var result = await _gateway.Transaction.SaleAsync(request);
+        return result;
+    }
+
+    public async Task<Result<Braintree.Transaction>> ProceedTransaction(Product product, int quantity, string nonce)
+    {
+        var request = new TransactionRequest
+        {
+            Amount = product.Price * quantity,
             PaymentMethodNonce = nonce,
             DeviceData = string.Empty,
             Options = new TransactionOptionsRequest

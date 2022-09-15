@@ -1,6 +1,5 @@
 export interface CartItem{
     quantity: number;
-    price: number;
     id: string;
 }
 export default interface Cart {

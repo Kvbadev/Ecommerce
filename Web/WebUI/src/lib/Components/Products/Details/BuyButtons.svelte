@@ -1,21 +1,28 @@
 <script lang="ts">
+  import type { CartItem } from "src/lib/Models/cart";
+  import { push } from "svelte-spa-router";
 import { addToCart } from "../../../Stores/shoppingCartStore";
+import {oneTimeProduct, products} from "../../../Stores/stores";
 
 
 export let params = {} as any;
-
 export let quantity: number;
-export let price: number;
 
 const OnCart = () => {
-    addToCart({quantity: quantity, id: params.id, price: price});
+    addToCart({quantity: quantity, id: params.id});
+}
+
+const buyNow = () => {
+    const prod = {id: params.id, quantity: quantity};
+    oneTimeProduct.set(prod);
+    push('/buy');
 }
 
 </script>
 
 <div class="container">
     
-    <button class="buy-btn"><span>Buy Now</span></button>
+    <button class="buy-btn" on:click={buyNow}><span>Buy Now</span></button>
     <button on:click={OnCart} class="cart-btn"><span>Add to cart</span></button>
 </div>
 

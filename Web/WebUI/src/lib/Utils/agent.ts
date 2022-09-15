@@ -42,7 +42,7 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PAT
         const response = await fetch(url, {
             method: method,
             headers: {...headers},
-            body: body ? JSON.stringify(body) : null
+            body: body !== null ? JSON.stringify(body) : null
         }).then(async (response) => {
             if(!response.ok){
                 toast.push(response.statusText.length > 60 ? 'Server could not handle your request' : response.statusText);
@@ -87,6 +87,7 @@ export const agent = {
     }, 
     PaymentGateway: {
         GetToken: () => authFetch<string>(apiUrl+"/Payment/token", 'GET', null),
-        proceedPayment: (nonce: string) => authFetch<string>(apiUrl+"/Payment/transaction", 'POST', nonce)
+        BuyCart: (nonce: string) => authFetch<string>(apiUrl+`/Payment/buy/${nonce}`, 'POST', {}),
+        BuyProduct: (nonce: string, product: CartItem) => authFetch<string>(apiUrl+`/Payment/buy/${nonce}`, 'POST', product)
     }
 }

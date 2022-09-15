@@ -3,6 +3,7 @@ using System;
 using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220915080528_ProductSimplified")]
+    partial class ProductSimplified
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.8");
@@ -120,6 +122,20 @@ namespace Data.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("TEXT");
 
+                    b.HasKey("Id");
+
+                    b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("Core.ProductSimplified", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
                     b.Property<Guid?>("TransactionId")
                         .HasColumnType("TEXT");
 
@@ -127,7 +143,7 @@ namespace Data.Migrations
 
                     b.HasIndex("TransactionId");
 
-                    b.ToTable("Products");
+                    b.ToTable("ProductSimplified");
                 });
 
             modelBuilder.Entity("Core.ShoppingCart", b =>
@@ -160,7 +176,7 @@ namespace Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("AppUserId")
+                    b.Property<string>("BuyerId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -175,7 +191,7 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppUserId");
+                    b.HasIndex("BuyerId");
 
                     b.ToTable("Transactions");
                 });
@@ -327,7 +343,7 @@ namespace Data.Migrations
                     b.Navigation("ShoppingCart");
                 });
 
-            modelBuilder.Entity("Core.Product", b =>
+            modelBuilder.Entity("Core.ProductSimplified", b =>
                 {
                     b.HasOne("Core.Transaction", null)
                         .WithMany("Products")
@@ -347,13 +363,13 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Core.Transaction", b =>
                 {
-                    b.HasOne("Core.AppUser", "AppUser")
+                    b.HasOne("Core.AppUser", "Buyer")
                         .WithMany("Transactions")
-                        .HasForeignKey("AppUserId")
+                        .HasForeignKey("BuyerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AppUser");
+                    b.Navigation("Buyer");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
