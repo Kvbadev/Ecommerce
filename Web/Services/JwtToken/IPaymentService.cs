@@ -6,5 +6,6 @@ namespace Web.Services;
 public interface IPaymentService
 {
     string GenerateToken(string id);
-    Task<Result<Transaction>> ProceedTransaction(ShoppingCart cart, string nonce, string DeviceData);
+    Task<Result<Braintree.Transaction>> ProceedTransaction(ShoppingCart cart, string nonce);
+    Task<Result<Braintree.Transaction>> ProceedTransaction(Product product, int quantity, string nonce);
 }

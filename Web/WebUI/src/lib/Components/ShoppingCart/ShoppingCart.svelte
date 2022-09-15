@@ -13,6 +13,7 @@ import { faMinus, faMinusCircle, faRemove } from '@fortawesome/free-solid-svg-ic
 import Fa from 'svelte-fa';
 import type { CartItem } from 'src/lib/Models/cart';
 import type Cart from 'src/lib/Models/cart';
+  import LoginForm from '../Account/LogIn/LoginForm.svelte';
 
 let showModal = false;
 
@@ -46,14 +47,14 @@ function removeItem(item: CartItem){
         <h1>{$shoppingCart.sum.toFixed(2)}$</h1>
         {#each $shoppingCart.items.map(v => {
             const item = $products.find(x => x.id===v.id);
-            const sum = v.price * v.quantity;
+            const sum = item.price * v.quantity;
             return {item: item, quantity: v.quantity, sum: sum}
             }) as {item, quantity, sum}}
 
             {#if quantity}
             <div class="item">
                 <h3>{item?.name} [{quantity}] - {sum.toFixed(2)}$</h3>
-                <span class="remove-item" on:click={() => removeItem({id: item.id, price: item.price, quantity: 1})}>
+                <span class="remove-item" on:click={() => removeItem({id: item.id, quantity: 1})}>
                     <Fa icon={faMinus} size='lg'/>
                 </span>
             </div>  

@@ -41,10 +41,11 @@ public class ShoppingCartController : ControllerBase
         return cart;
     }
 
+    //TODO: improve this functions as it's not very concise
     //Method to add/delete products from user's cart
     //When shouldAdd (that is being obtained by query string) is set to 'Add' then method removes desired quantity of products
     [HttpPatch("{shouldAdd}")]
-    public async Task<IActionResult> ManageProducts(ProductToCartDto product, string shouldAdd)
+    public async Task<IActionResult> ManageProducts(ProductSimplified product, string shouldAdd)
     {
         var selectedProduct = await _context.Products.FindAsync(product.Id);
 
@@ -128,6 +129,7 @@ public class ShoppingCartController : ControllerBase
         return NoContent();
     }
 
+    //TODO: cart verification
     [HttpPost]
     public async Task<IActionResult> SetNewCart(ShoppingCartDto newCart)
     {
@@ -137,7 +139,6 @@ public class ShoppingCartController : ControllerBase
             return BadRequest("This user does not exist");
         }
 
-        // cart.CartProducts = _mapper.Map<newCart.Items
         _mapper.Map<ShoppingCartDto, ShoppingCart>(newCart, cart);
         var res = await _context.SaveChangesAsync() > 0;
 

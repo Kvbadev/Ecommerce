@@ -28,11 +28,10 @@ public class MappingProfiles: AutoMapper.Profile
             .ForMember(d => d.CartProducts, o => o.MapFrom(s => s.Items))
             .ForMember(d => d.Count, o => o.MapFrom(s => s.Count));
         
-        CreateMap<CartProduct, ProductToCartDto>()
+        CreateMap<CartProduct, ProductSimplified>()
             .ForMember(d => d.Id, o => o.MapFrom(s => s.ProductId))
-            .ForMember(d => d.Quantity, o => o.MapFrom(s => s.ProductQuantity))
-            .ForMember(d => d.Price, o => o.MapFrom(s => s.Product.Price));
-        CreateMap<ProductToCartDto, CartProduct>()
+            .ForMember(d => d.Quantity, o => o.MapFrom(s => s.ProductQuantity));
+        CreateMap<ProductSimplified, CartProduct>()
             .ForMember(d => d.ProductId, o => o.MapFrom(s => s.Id))
             .ForMember(d => d.ProductQuantity, o => o.MapFrom(s => s.Quantity));
     }

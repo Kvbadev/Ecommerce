@@ -11,6 +11,9 @@ using Microsoft.IdentityModel.Tokens;
 using Web.Services;
 using Web.Services.JwtToken;
 
+
+//TODO: if foreign key contraints failed - CHECK IF ID HASN'T CHANGED  
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
