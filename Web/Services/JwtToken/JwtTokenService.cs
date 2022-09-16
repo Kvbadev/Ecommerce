@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Web.ExtensionMethods;
 
 namespace Web.Services.JwtToken;
+//TODO: implement refresh tokens, improve existing ones to include expiration time better
 public class JwtTokenService : IJwtTokenService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -23,6 +24,7 @@ public class JwtTokenService : IJwtTokenService
         var key = Encoding.ASCII.GetBytes(_configuration["JwtKey"]);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
+            //No Issuer by now as it didn't work with the issuer
             Audience = "https://localhost:5000",
             Subject = new System.Security.Claims.ClaimsIdentity(new Claim[]
             {
@@ -35,7 +37,7 @@ public class JwtTokenService : IJwtTokenService
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
-    public string? ExtractId()
+    public string ExtractId()
     {
         string token = _httpContextAccessor.GetBearerToken();
         if(token == string.Empty)
@@ -46,6 +48,6 @@ public class JwtTokenService : IJwtTokenService
         var jwtSecurityToken = handler.ReadJwtToken(token);
 
         var nameId = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value; //unfortunately claimtypes.nameidentifier does not seem to work
-        return nameId;
+        return nameId ?? string.Empty;
     }
 }

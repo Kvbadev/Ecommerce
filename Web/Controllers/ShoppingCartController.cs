@@ -26,21 +26,26 @@ public class ShoppingCartController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IEnumerable<ProductToCartDto>?> Get() 
+    public async Task<ShoppingCartDto?> Get() 
     {
-        var user = await _context.Users.Include(x => x.ShoppingCart).FirstOrDefaultAsync(user => user.Id == _jwtTokenService.ExtractId());
+        var user = await _context.Users.Include(x => x.ShoppingCart).ThenInclude(x => x.CartProducts)
+            .ThenInclude(x => x.Product).FirstOrDefaultAsync(user => user.Id == _jwtTokenService.ExtractId());
         if(user == null)
         {
-            return Enumerable.Empty<ProductToCartDto>();
+            return null;
         }
 
-        List<ProductToCartDto> items = _mapper.Map<CartProduct[], List<ProductToCartDto>>(await _context.CartProducts.Where(x => x.ShoppingCartId == user.ShoppingCart.Id).Include(x => x.Product).ToArrayAsync());
+        var cart = new ShoppingCartDto();
+        _mapper.Map<ShoppingCart, ShoppingCartDto>(user.ShoppingCart, cart);
 
-        return items;
+        return cart;
     }
 
+    //TODO: improve this functions as it's not very concise
+    //Method to add/delete products from user's cart
+    //When shouldAdd (that is being obtained by query string) is set to 'Add' then method removes desired quantity of products
     [HttpPatch("{shouldAdd}")]
-    public async Task<IActionResult> AddProducts(ProductToCartDto product, string shouldAdd)
+    public async Task<IActionResult> ManageProducts(ProductSimplified product, string shouldAdd)
     {
         var selectedProduct = await _context.Products.FindAsync(product.Id);
 
@@ -55,6 +60,7 @@ public class ShoppingCartController : ControllerBase
             return BadRequest("Something goes not as expected");
         }
 
+        //getting prod from the cart (if exist) to change quantity instead of adding the same product to the cart
         var prodInCart = await _context.CartProducts
             .FirstOrDefaultAsync(x => x.ProductId == product.Id && x.ShoppingCartId == userCart.Id);
 
@@ -75,6 +81,7 @@ public class ShoppingCartController : ControllerBase
             }
 
             userCart.FinalPrice += (prodInCart.Product.Price * product.Quantity);
+            userCart.Count += product.Quantity;
         }
         else if(shouldAdd == "delete")
         {
@@ -92,6 +99,7 @@ public class ShoppingCartController : ControllerBase
                 userCart.CartProducts.Remove(prodInCart);
             }
             userCart.FinalPrice -= (prodInCart.Product.Price * product.Quantity);
+            userCart.Count -= product.Quantity;
         }
         else
         {
@@ -104,7 +112,7 @@ public class ShoppingCartController : ControllerBase
         {
             return NoContent();
         }
-        return BadRequest("Could not add the items");
+        return BadRequest("Could not add/remove items");
     }
 
     [HttpDelete]
@@ -114,10 +122,27 @@ public class ShoppingCartController : ControllerBase
         
         cart.CartProducts = new List<CartProduct>();
         cart.FinalPrice = 0;
+        cart.Count = 0;
 
         await _context.SaveChangesAsync();
 
         return NoContent();
     }
+
+    //TODO: cart verification
+    [HttpPost]
+    public async Task<IActionResult> SetNewCart(ShoppingCartDto newCart)
+    {
+        ShoppingCart cart = _context.ShoppingCarts.Include(x => x.CartProducts).FirstOrDefault(x => x.AppUserId == _jwtTokenService.ExtractId())!;
+        if(cart == null)
+        {
+            return BadRequest("This user does not exist");
+        }
+
+        _mapper.Map<ShoppingCartDto, ShoppingCart>(newCart, cart);
+        var res = await _context.SaveChangesAsync() > 0;
+
+        return res ? Ok("New cart has been set") : BadRequest("Could not persist changes in database");
+   }
 
 }

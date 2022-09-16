@@ -3,6 +3,7 @@ using System;
 using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220915093415_transactionFix4")]
+    partial class transactionFix4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.8");
@@ -120,6 +122,20 @@ namespace Data.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("TEXT");
 
+                    b.HasKey("Id");
+
+                    b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("Core.ProductSimplified", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
                     b.Property<Guid?>("TransactionId")
                         .HasColumnType("TEXT");
 
@@ -127,7 +143,7 @@ namespace Data.Migrations
 
                     b.HasIndex("TransactionId");
 
-                    b.ToTable("Products");
+                    b.ToTable("ProductSimplified");
                 });
 
             modelBuilder.Entity("Core.ShoppingCart", b =>
@@ -327,7 +343,7 @@ namespace Data.Migrations
                     b.Navigation("ShoppingCart");
                 });
 
-            modelBuilder.Entity("Core.Product", b =>
+            modelBuilder.Entity("Core.ProductSimplified", b =>
                 {
                     b.HasOne("Core.Transaction", null)
                         .WithMany("Products")

@@ -6,7 +6,9 @@
     import FormField from "./FormField.svelte";
     import { jwtToken, userProfile } from "../../Stores/stores";
     import Loader from "../Common/Loader.svelte";
-import { initShoppingCart } from "../../Stores/shoppingCartStore";
+    import { initShoppingCart, shoppingCart } from "../../Stores/shoppingCartStore";
+    import Modal from "../Common/Modal.svelte";
+import { get } from "svelte/store";
     
     export let fields = ['firstname', 'lastname', 'username','email', 'password'];
     export let type: 'Login' | 'Signup';
@@ -14,6 +16,7 @@ import { initShoppingCart } from "../../Stores/shoppingCartStore";
     let isOk:Array<boolean> = [];
     let canSubmit = false;
     let loading = false;
+    let showModal = false;
 
     const onInput = () => {
         if(serverError) serverError='';
@@ -54,11 +57,15 @@ import { initShoppingCart } from "../../Stores/shoppingCartStore";
                 jwtToken.set(message);
                 localStorage.setItem("jwt", message);
                 userProfile.set(await agent.Account.getProfile());
-                //TODO: optional / display a modal what to do about previous cart as it's gonna be updated to one on the server
-                initShoppingCart(await agent.ShoppingCart.GetCart());
-
-                loading = canSubmit = false;
-                push('/');
+                
+                if(get(shoppingCart).items.length){
+                    loading = false;
+                    showModal = true;
+                } else {
+                    initShoppingCart(await agent.ShoppingCart.GetCart());
+                    loading = canSubmit = false;
+                    push('/');
+                }
             }
             
         } catch(err) {
@@ -69,6 +76,12 @@ import { initShoppingCart } from "../../Stores/shoppingCartStore";
     }
     
     </script>
+    {#if showModal}
+    <Modal message="Do you want to persist your shopping cart?" 
+           buttons={[{text: 'Persist my cart', type: "good"}, {text: 'Abandon my cart', type: 'bad'}]}
+           bind:showModal={showModal}
+    />
+    {/if}
     <div class="all">
         <div class="container">
             <form class="form" on:submit|preventDefault={onSubmit}>
