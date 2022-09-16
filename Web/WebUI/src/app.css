@@ -18,6 +18,12 @@ body {
     /* background: linear-gradient(42deg, rgba(0,0,0,0.7861345221682423) 0%, rgba(255,111,24,1) 0%, rgba(255,255,255,1) 100%);  */
 }
 
+/* Braintree */
+.braintree-container {
+  color: black;
+  width: 50rem;
+  height: 50rem;
+}
 
 /*Toast*/
 :root {

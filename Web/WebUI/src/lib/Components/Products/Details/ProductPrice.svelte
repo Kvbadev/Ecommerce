@@ -19,7 +19,7 @@ import QuantityInput from "./QuantityInput.svelte";
         <h2 data-quantity={`${multiplier} ${multiplier == 1 ? "product":"products"}`}>{(product.price * multiplier).toFixed(2)}$</h2>
     </span>
     <!-- <div class="buy-buttons"></div> -->
-    <BuyButtons price={product.price} params={params} quantity={multiplier}/>
+    <BuyButtons params={params} quantity={multiplier}/>
     <QuantityInput bind:quantity={multiplier}/>
 </div>
 

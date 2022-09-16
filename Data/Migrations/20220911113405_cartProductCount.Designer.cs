@@ -3,6 +3,7 @@ using System;
 using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220911113405_cartProductCount")]
+    partial class cartProductCount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.8");
@@ -120,12 +122,7 @@ namespace Data.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("TransactionId")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("TransactionId");
 
                     b.ToTable("Products");
                 });
@@ -152,32 +149,6 @@ namespace Data.Migrations
                         .IsUnique();
 
                     b.ToTable("ShoppingCarts");
-                });
-
-            modelBuilder.Entity("Core.Transaction", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("AppUserId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("Failure")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("IssuedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AppUserId");
-
-                    b.ToTable("Transactions");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -327,29 +298,11 @@ namespace Data.Migrations
                     b.Navigation("ShoppingCart");
                 });
 
-            modelBuilder.Entity("Core.Product", b =>
-                {
-                    b.HasOne("Core.Transaction", null)
-                        .WithMany("Products")
-                        .HasForeignKey("TransactionId");
-                });
-
             modelBuilder.Entity("Core.ShoppingCart", b =>
                 {
                     b.HasOne("Core.AppUser", "AppUser")
                         .WithOne("ShoppingCart")
                         .HasForeignKey("Core.ShoppingCart", "AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AppUser");
-                });
-
-            modelBuilder.Entity("Core.Transaction", b =>
-                {
-                    b.HasOne("Core.AppUser", "AppUser")
-                        .WithMany("Transactions")
-                        .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -411,8 +364,6 @@ namespace Data.Migrations
                 {
                     b.Navigation("ShoppingCart")
                         .IsRequired();
-
-                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("Core.Product", b =>
@@ -423,11 +374,6 @@ namespace Data.Migrations
             modelBuilder.Entity("Core.ShoppingCart", b =>
                 {
                     b.Navigation("CartProducts");
-                });
-
-            modelBuilder.Entity("Core.Transaction", b =>
-                {
-                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

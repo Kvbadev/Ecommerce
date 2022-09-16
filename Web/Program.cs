@@ -8,7 +8,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Web.Services;
 using Web.Services.JwtToken;
+
+
+//TODO: if foreign key contraints failed - CHECK IF ID HASN'T CHANGED  
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +58,7 @@ builder.Services.AddAuthentication(opt =>
         };
 });
 
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 builder.Services.AddIdentityCore<AppUser>(opt => 
 {
@@ -99,6 +104,8 @@ using (var scope = app.Services.CreateScope())
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseHttpsRedirection();
 
 app.UseCors();
 

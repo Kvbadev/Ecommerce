@@ -10,33 +10,23 @@ import Loader from "../../Common/Loader.svelte";
 import ProductPrice from "./ProductPrice.svelte";
 
 export let params = {} as any;
+let product;
 
-let product: Product | undefined;
-
-async function getProduct() {
-    if($products){
-        product = $products.find(v => v.id === params.id);
-    }
-    if(!product){
-        product = await agent.Products.getOne(params.id);
-    }
-}
-
-onMount(async () => {
-    await getProduct();
-})
 
 </script>
 
-{#if !product}
+{#if (product = $products?.find(x => x.id === params.id)) == undefined}
     <Loader />
 {:else}
 <div class="container">
-    <ProductSlider product={product}/>
-    <ProductPrice params={params} product={product}/>
+    <ProductSlider product={product} />
+    <ProductPrice params={params} product={product} />
     <ProductParameters product={product} />
 </div>
 {/if}
+<!-- {#if !$products}
+{:else} -->
+<!-- {/if} -->
 
 <style>
     .container {

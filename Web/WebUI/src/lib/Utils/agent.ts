@@ -24,18 +24,10 @@ const postProducts = async (url: string, product: Product) => {
 }
 
 async function getCart(url: string): Promise<Cart | null> {
-    const cart = await authFetch<Array<CartItem>>(url, 'GET', null);
-    
-    if(cart?.length === 0) return null;
+    const cart = await authFetch<Cart>(url, 'GET', null);
+    if(cart.items.length === 0) return null;
 
-    let newCart: Cart = {items: new Array<CartItem>, count: 0, sum: 0};
-    for(const item of cart){
-        newCart.items.push(item);
-        newCart.count+=item.quantity;
-        newCart.sum+=item.quantity*item.price;
-    }
-
-    return newCart;
+    return cart;
 }
 
 async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PATCH', body?: any, validation:boolean=false): Promise<T>{
@@ -50,22 +42,28 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PAT
         const response = await fetch(url, {
             method: method,
             headers: {...headers},
-            body: body ? JSON.stringify(body) : null
+            body: body !== null ? JSON.stringify(body) : null
         }).then(async (response) => {
             if(!response.ok){
                 toast.push(response.statusText.length > 60 ? 'Server could not handle your request' : response.statusText);
+                return null;
             }
             if(validation){
                 return [response.status, await response.text()] as T;
             }
-            return response.status !== 204 ? 
-            response.json().then(data => data as T) : 
-            null;
+            const contentType = response.headers.get('content-type');
+            const text = await response?.text();
+            if(text.length && contentType.indexOf('application/json') !== -1 ){
+                return JSON.parse(text) as T;
+            } else if(text.length) {
+                return text as T;
+            }
+            return null;
         });
         return response;
     } catch (e) {
-        toast.push(e);
         console.log(e);
+        return null;
     }
 }
 
@@ -83,7 +81,13 @@ export const agent = {
     ShoppingCart: {
         GetCart: () => getCart(apiUrl+"/ShoppingCart"),
         addItem: (item: CartItem) => authFetch<string>(apiUrl+"/ShoppingCart/add", 'PATCH', item),
-        removeItem: (item: CartItem) => authFetch<string>(apiUrl+"/ShoppingCart/delete", 'PATCH', null),
-        clearCart: () => authFetch<string>(apiUrl+"/ShoppingCart", 'DELETE', null)
+        removeItem: (item: CartItem) => authFetch<string>(apiUrl+"/ShoppingCart/delete", 'PATCH', item),
+        clearCart: () => authFetch<string>(apiUrl+"/ShoppingCart", 'DELETE', null),
+        setCart: (cart: Cart) => authFetch<string>(apiUrl+"/ShoppingCart", 'POST', cart)
+    }, 
+    PaymentGateway: {
+        GetToken: () => authFetch<string>(apiUrl+"/Payment/token", 'GET', null),
+        BuyCart: (nonce: string) => authFetch<string>(apiUrl+`/Payment/buy/${nonce}`, 'POST', {}),
+        BuyProduct: (nonce: string, product: CartItem) => authFetch<string>(apiUrl+`/Payment/buy/${nonce}`, 'POST', product)
     }
 }

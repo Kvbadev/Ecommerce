@@ -7,7 +7,7 @@ import { agent } from './lib/Utils/agent';
 import { jwtToken, products, userProfile } from './lib/Stores/stores';
 import { initShoppingCart } from './lib/Stores/shoppingCartStore';
 import type Cart from './lib/Models/cart';
-import { SvelteToast } from '@zerodevx/svelte-toast';
+import { SvelteToast, toast } from '@zerodevx/svelte-toast';
 
 onMount(async () => {
   const jwt = localStorage.getItem("jwt");
@@ -24,6 +24,8 @@ onMount(async () => {
 
     } else { //token does not work anymore
       localStorage.removeItem("jwt");
+      initShoppingCart(null);
+      toast.push("You've been logged out");
     } 
   } else {
       initShoppingCart(JSON.parse(localStorage.getItem("cart"))||null);
