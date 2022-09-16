@@ -1,34 +1,18 @@
 <script lang="ts">
-import { agent } from '../../Utils/agent';
 
+import {removeShoppingCart, removeFromCart} from '../../Stores/ShoppingCartExtensions';
 
-import {shoppingCart, removeShoppingCart, removeFromCart} from '../../Stores/shoppingCartStore';
-
-import {products, userProfile} from '../../Stores/stores';
+import {products, userProfile, shoppingCart} from '../../Stores/stores';
 
 import Loader from '../Common/Loader.svelte';
 import { link } from 'svelte-spa-router';
-import Modal from '../Common/Modal.svelte';
-import { faMinus, faMinusCircle, faRemove } from '@fortawesome/free-solid-svg-icons';
+import { faMinus} from '@fortawesome/free-solid-svg-icons';
 import Fa from 'svelte-fa';
 import type { CartItem } from 'src/lib/Models/cart';
-import type Cart from 'src/lib/Models/cart';
-  import LoginForm from '../Account/LogIn/LoginForm.svelte';
-
-let showModal = false;
 
 async function clearCart() {
    removeShoppingCart(); 
 }
-
-function toggleModal() {
-    showModal = !showModal;
-}
-
-function buyProducts() {
-
-}
-
 function removeItem(item: CartItem){
     removeFromCart(item);
 }
@@ -39,7 +23,7 @@ function removeItem(item: CartItem){
 <div class="all">
 
 {#if !$shoppingCart || !$products}
-    <Loader />
+    <Loader entire/>
 {:else}
 
 <div class="container">
@@ -62,9 +46,9 @@ function removeItem(item: CartItem){
         {/each}
 
         {#if $userProfile}
-        <a href="/Buy" use:link><button on:click={buyProducts}>Buy products</button></a> 
+        <a href="/Buy" use:link><button>Buy products</button></a> 
         {:else}
-        <a href="/Account/Login" use:link><button on:click={buyProducts}>Buy products</button></a>
+        <a href="/Account/Login" use:link><button >Buy products</button></a>
         {/if}
 
         <button on:click={clearCart}>Clear the cart</button>

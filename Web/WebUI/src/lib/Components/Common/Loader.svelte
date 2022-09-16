@@ -12,11 +12,10 @@
     let timeout;
 
     onMount(() => {
-        // timeout = setTimeout(() => push('/NotFound'), 3000);
+        timeout = setTimeout(() => push('/NotFound'), 3000);
     })
     onDestroy(() => clearTimeout(timeout));
 
-//TODO: fix loader on app init
 </script>
 
 {#if inElement}
@@ -27,11 +26,13 @@
     </div>
 {:else}
 <div class="loader {entire ? 'whole':''}">
-    <div class="spinner">
+    <div class="rotation">
         <Fa icon={faCircleNotch} size={`${size}x`} color={color} />
     </div>
 </div>
 {/if}
+
+<!-- Loader need to have parent with position relative and display: flex! -->
 
 <style>
     .whole {

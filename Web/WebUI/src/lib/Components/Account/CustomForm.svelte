@@ -4,10 +4,10 @@
     import { agent } from "../../Utils/agent";
     import { link, push } from "svelte-spa-router";
     import FormField from "./FormField.svelte";
-    import { jwtToken, userProfile } from "../../Stores/stores";
+    import { jwtToken, userProfile, shoppingCart} from "../../Stores/stores";
     import Loader from "../Common/Loader.svelte";
-    import { initShoppingCart, shoppingCart } from "../../Stores/shoppingCartStore";
-    import Modal from "../Common/Modal.svelte";
+    import { initShoppingCart} from "../../Stores/ShoppingCartExtensions";
+    import Modal from "./CartModal.svelte";
 import { get } from "svelte/store";
     
     export let fields = ['firstname', 'lastname', 'username','email', 'password'];
@@ -40,7 +40,6 @@ import { get } from "svelte/store";
     
     async function onSubmit (e) {
         loading = true;
-        setTimeout(async () => {
 
         const userData = getFormData(e.target);
         try{
@@ -58,7 +57,7 @@ import { get } from "svelte/store";
                 localStorage.setItem("jwt", message);
                 userProfile.set(await agent.Account.getProfile());
                 
-                if(get(shoppingCart).items.length){
+                if(get(shoppingCart).items.length && type === 'Login'){
                     loading = false;
                     showModal = true;
                 } else {
@@ -70,9 +69,8 @@ import { get } from "svelte/store";
             
         } catch(err) {
             loading = canSubmit = false;
-            console.log(err);
+            console.log(err ?? '');
         }
-        }, 1000);
     }
     
     </script>
@@ -103,7 +101,7 @@ import { get } from "svelte/store";
                 <button class="submit" disabled={!canSubmit || loading} class:disabled="{!canSubmit || loading}" type="submit">
                     {#if loading}
                         <Loader size={1} inElement={true} color='white'/>
-                    {:else}
+                    {:else} 
                         Submit
                     {/if}
                 </button>
@@ -146,6 +144,10 @@ import { get } from "svelte/store";
         .submit {
             font-family: 'Roboto Slab';
             border: none;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             border-radius: 2rem;
             width: 25rem;
             height: 5rem;

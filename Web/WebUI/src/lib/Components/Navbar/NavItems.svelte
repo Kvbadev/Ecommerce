@@ -1,7 +1,6 @@
 <script lang="ts">
 
-import { userProfile} from '../../Stores/stores';
-import {shoppingCart} from '../../Stores/shoppingCartStore';
+import { userProfile, shoppingCart} from '../../Stores/stores';
 import {link} from 'svelte-spa-router'
 import Logo from "./Logo.svelte";
 import Fa from 'svelte-fa';
@@ -40,75 +39,76 @@ let cartColor = 'white';
     </div>
     
 <style>
-    .group {
-        display: flex;
-        flex-direction: row;
-        width: 25%;
-        align-items: center;
-        margin: 0 1rem;
-    }
-    .group-1 {
-        justify-content: flex-start;
-    }
-    .group-2 {
-        justify-content: flex-end;
-    }
-    .cart-link {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        width: 7.5rem;
-    }
-    .products-count{
-        display: flex;
-        bottom: 35%;
-        left: 40%;
-        justify-content: center;
-        align-items: center;
-        border: 0.2rem white solid;
-        border-radius: 5rem;
-    }
-    .products-count span {
-        font-size: 2rem;
-        color: white;
-        height: auto;
-        padding: 0.7rem;
-        /* bottom: 0.4rem; */
-    }
-    li {
-        flex: 0 1 auto;
-        width: 30%;
-        text-align: center;
-        font-size: 1.7vw;
-        cursor: pointer;
-        margin: 0 2rem;
-    }
+    @media only screen and (min-width: 768px){
 
-    a {
-        color: white;
-        transition: color 0.5s;
     }
-    .item-3 {
-        width: auto;
-    }
-    a:hover {
-        color: rgb(216, 211, 211);
-    }
-    .group-2:last-child {
-        color: #7e7603;
-    }
-    /* .item-3 {
-        margin-right: 0;
-    }  */
+    @media only screen and (min-width: 992px){
+        .group {
+            display: flex;
+            flex-direction: row;
+            width: 25%;
+            align-items: center;
+            margin: 0 1rem;
+        }
+        .group-1 {
+            justify-content: flex-start;
+        }
+        .group-2 {
+            justify-content: flex-end;
+        }
+        .cart-link {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            width: 7.5rem;
+        }
+        .products-count{
+            display: flex;
+            bottom: 35%;
+            left: 40%;
+            justify-content: center;
+            align-items: center;
+            border: 0.2rem white solid;
+            border-radius: 5rem;
+        }
+        .products-count span {
+            font-size: 2rem;
+            color: white;
+            height: auto;
+            padding: 0.7rem;
+        }
+        li {
+            flex: 0 1 auto;
+            width: 30%;
+            text-align: center;
+            font-size: 1.7vw;
+            cursor: pointer;
+            margin: 0 2rem;
+        }
 
-    @keyframes test {
-        from {
-            transform: rotate(0);
+        a {
+            color: white;
+            transition: color 0.5s;
         }
-        to {
-            transform: rotate(90deg);
+        .item-3 {
+            width: auto;
         }
+        a:hover {
+            color: rgb(216, 211, 211);
+        }
+        .group-2:last-child {
+            color: #7e7603;
+        }
+        @keyframes test {
+            from {
+                transform: rotate(0);
+            }
+            to {
+                transform: rotate(90deg);
+            }
+        }
+
     }
 </style>
     

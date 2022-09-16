@@ -46,7 +46,6 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PAT
         }).then(async (response) => {
             if(!response.ok){
                 toast.push(response.statusText.length > 60 ? 'Server could not handle your request' : response.statusText);
-                return null;
             }
             if(validation){
                 return [response.status, await response.text()] as T;

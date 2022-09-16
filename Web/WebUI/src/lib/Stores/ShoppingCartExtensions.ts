@@ -2,9 +2,8 @@ import { get, writable } from "svelte/store";
 import type { CartItem } from "../Models/cart";
 import type Cart from "../Models/cart";
 import { agent } from "../Utils/agent";
-import { products, userProfile } from "./stores";
+import { products, shoppingCart, userProfile } from "./stores";
 
-export const shoppingCart = writable(null as Cart|null);
 
 export const addToCart = async (item: CartItem) => {
     if(get(userProfile)?.username){
