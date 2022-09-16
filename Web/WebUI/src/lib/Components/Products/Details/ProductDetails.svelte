@@ -16,17 +16,14 @@ let product;
 </script>
 
 {#if (product = $products?.find(x => x.id === params.id)) == undefined}
-    <Loader />
+    <Loader entire />
 {:else}
 <div class="container">
     <ProductSlider product={product} />
     <ProductPrice params={params} product={product} />
     <ProductParameters product={product} />
-</div>
+</div> 
 {/if}
-<!-- {#if !$products}
-{:else} -->
-<!-- {/if} -->
 
 <style>
     .container {

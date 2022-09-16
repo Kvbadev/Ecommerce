@@ -129,7 +129,6 @@ public class ShoppingCartController : ControllerBase
         return NoContent();
     }
 
-    //TODO: cart verification
     [HttpPost]
     public async Task<IActionResult> SetNewCart(ShoppingCartDto newCart)
     {
@@ -138,11 +137,42 @@ public class ShoppingCartController : ControllerBase
         {
             return BadRequest("This user does not exist");
         }
+        var isValid = await VerifyCart(newCart);
+        if(isValid == false)
+        {
+            return BadRequest("Shopping cart supplied by the was invalid");
+        }
 
         _mapper.Map<ShoppingCartDto, ShoppingCart>(newCart, cart);
         var res = await _context.SaveChangesAsync() > 0;
 
         return res ? Ok("New cart has been set") : BadRequest("Could not persist changes in database");
+   }
+
+   private async Task<bool> VerifyCart(ShoppingCartDto cart)
+   {
+    var products = await _context.Products.ToListAsync();
+    if(cart.Count <= 0){
+        return false;
+    }
+    decimal sum = 0;
+    int count = 0;
+    foreach(var item in cart.Items)
+    {
+        var prod = products.Find(x => x.Id == item.Id);
+        if(prod == null || item.Quantity == 0)
+        {
+            return false;
+        }
+        count += item.Quantity;
+        sum += prod.Price * item.Quantity;
+    }
+
+    if(sum != cart.Sum || count != cart.Count)
+    {
+        return false;
+    }
+    return true;
    }
 
 }

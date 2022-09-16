@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { CartItem } from "src/lib/Models/cart";
-  import { push } from "svelte-spa-router";
-import { addToCart } from "../../../Stores/shoppingCartStore";
-import {oneTimeProduct, products} from "../../../Stores/stores";
+
+import { push } from "svelte-spa-router";
+import { addToCart } from "../../../Stores/ShoppingCartExtensions";
+import {oneTimeProduct} from "../../../Stores/stores";
 
 
 export let params = {} as any;

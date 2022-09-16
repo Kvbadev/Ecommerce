@@ -4,7 +4,7 @@
     import Loader from "../../Common/Loader.svelte";
 </script>
     {#if !$products}
-        <Loader />
+        <Loader entire />
     {:else}
     <ul class="list">
         {#each $products as product}

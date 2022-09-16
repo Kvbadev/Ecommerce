@@ -1,12 +1,12 @@
 <script lang="ts">
 import { faWindowClose } from "@fortawesome/free-solid-svg-icons";
-import { initShoppingCart, shoppingCart } from "../../Stores/shoppingCartStore";
+import { initShoppingCart} from "../../Stores/ShoppingCartExtensions";
 import { agent } from "../../../lib/Utils/agent";
 import Fa from "svelte-fa";
 import { push } from "svelte-spa-router";
 import { get } from "svelte/store";
-import ShoppingCart from "../ShoppingCart/ShoppingCart.svelte";
 import type Cart from "src/lib/Models/cart";
+import { shoppingCart } from "../../Stores/stores";
 
 
 export let message = 'text';
