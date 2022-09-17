@@ -53,8 +53,6 @@ public class PaymentController : ControllerBase
         {
             res = await _paymentService.ProceedTransaction(user.ShoppingCart, nonce);
 
-            // ICollection<Product> products = mapper.Map<CartProduct[], ICollection<Product>>(user.ShoppingCart.CartProducts.ToArray<CartProduct>());
-
             transaction = new Core.Transaction
             {
                 // Products = products,
