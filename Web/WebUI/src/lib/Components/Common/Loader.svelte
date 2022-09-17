@@ -12,7 +12,7 @@
     let timeout;
 
     onMount(() => {
-        timeout = setTimeout(() => push('/NotFound'), 3000);
+        timeout = setTimeout(() => push('/NotFound'), 5000);
     })
     onDestroy(() => clearTimeout(timeout));
 

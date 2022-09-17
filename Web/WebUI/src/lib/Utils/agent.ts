@@ -79,8 +79,8 @@ export const agent = {
     },
     ShoppingCart: {
         GetCart: () => getCart(apiUrl+"/ShoppingCart"),
-        addItem: (item: CartItem) => authFetch<string>(apiUrl+"/ShoppingCart/add", 'PATCH', item),
-        removeItem: (item: CartItem) => authFetch<string>(apiUrl+"/ShoppingCart/delete", 'PATCH', item),
+        addItem: (item: CartItem) => authFetch<string>(apiUrl+"/ShoppingCart/true", 'PATCH', item),
+        removeItem: (item: CartItem) => authFetch<string>(apiUrl+"/ShoppingCart/false", 'PATCH', item),
         clearCart: () => authFetch<string>(apiUrl+"/ShoppingCart", 'DELETE', null),
         setCart: (cart: Cart) => authFetch<string>(apiUrl+"/ShoppingCart", 'POST', cart)
     }, 

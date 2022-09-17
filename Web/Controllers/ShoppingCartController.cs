@@ -44,62 +44,59 @@ public class ShoppingCartController : ControllerBase
     //TODO: improve this functions as it's not very concise
     //Method to add/delete products from user's cart
     //When shouldAdd (that is being obtained by query string) is set to 'Add' then method removes desired quantity of products
-    [HttpPatch("{shouldAdd}")]
-    public async Task<IActionResult> ManageProducts(ProductSimplified product, string shouldAdd)
+    [HttpPatch("{add?}")]
+    public async Task<IActionResult> ManageProducts(ProductSimplified product, bool add)
     {
-        var selectedProduct = await _context.Products.FindAsync(product.Id);
-
-        if(selectedProduct == null)
+        var user = await _context.Users.Include(x => x.ShoppingCart)
+            .ThenInclude(x => x.CartProducts)
+            .ThenInclude(x => x.Product)
+            .FirstOrDefaultAsync(x => x.Id == _jwtTokenService.ExtractId());
+            
+        //additionally checks if user is null by adding ? on dereference
+        var prodInCart = user?.ShoppingCart.CartProducts
+            .FirstOrDefault(x => x.ProductId == product.Id);
+        
+        if(user is null)
         {
-            return BadRequest("Product not found");
+            return BadRequest("Product has not been found in your shopping cart");
         }
-        ShoppingCart userCart = _context.ShoppingCarts.Include(x => x.CartProducts)
-            .FirstOrDefault(x => x.AppUserId == _jwtTokenService.ExtractId())!;
-        if(userCart == null)
-        {
-            return BadRequest("Something goes not as expected");
-        }
 
-        //getting prod from the cart (if exist) to change quantity instead of adding the same product to the cart
-        var prodInCart = await _context.CartProducts
-            .FirstOrDefaultAsync(x => x.ProductId == product.Id && x.ShoppingCartId == userCart.Id);
-
-        if(shouldAdd == "add")
+        if(add)
         {
-            if(prodInCart != null)
+            CartProduct? newProd = null;
+            if(prodInCart is not null)
             {
                 prodInCart.ProductQuantity += product.Quantity;
             }
             else
             {
-                prodInCart = new CartProduct //redefined to use it further so it is never null
+                newProd = new CartProduct //redefined to use it further so it is never null
                 {
-                    Product = selectedProduct,
+                    Product = _context.Products.Find(product.Id)!,
                     ProductQuantity = product.Quantity
                 };
-               userCart.CartProducts.Add(prodInCart);
+               user!.ShoppingCart.CartProducts.Add(newProd);
             }
 
-            userCart.FinalPrice += (prodInCart.Product.Price * product.Quantity);
-            userCart.Count += product.Quantity;
+            user!.ShoppingCart.FinalPrice += ((newProd ?? prodInCart)!.Product.Price * product.Quantity);
+            user.ShoppingCart.Count += product.Quantity;
         }
-        else if(shouldAdd == "delete")
+
+        else if(add is false)
         {
-            if(prodInCart == null)
+            if(product.Quantity > prodInCart!.ProductQuantity)
             {
-                return BadRequest("Product not found");
+                return BadRequest("Number is too big");
             }
-            if(product.Quantity > prodInCart.ProductQuantity)
-            {
-                return BadRequest("Number too big");
-            }
+
             prodInCart.ProductQuantity -= product.Quantity;
             if(prodInCart.ProductQuantity <= 0)
             {
-                userCart.CartProducts.Remove(prodInCart);
+                user!.ShoppingCart.CartProducts.Remove(prodInCart);
             }
-            userCart.FinalPrice -= (prodInCart.Product.Price * product.Quantity);
-            userCart.Count -= product.Quantity;
+
+            user!.ShoppingCart.FinalPrice -= (prodInCart.Product.Price * product.Quantity);
+            user.ShoppingCart.Count -= product.Quantity;
         }
         else
         {
@@ -110,9 +107,10 @@ public class ShoppingCartController : ControllerBase
         var res = await _context.SaveChangesAsync() > 0;
         if(res)
         {
-            return NoContent();
+            return Ok("Changes've been persisted");
         }
-        return BadRequest("Could not add/remove items");
+
+        return BadRequest("Could not add/remove item(s)");
     }
 
     [HttpDelete]
