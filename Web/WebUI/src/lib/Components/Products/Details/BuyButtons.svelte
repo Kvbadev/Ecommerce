@@ -1,7 +1,7 @@
 <script lang="ts">
 
 import { push } from "svelte-spa-router";
-import { addToCart } from "../../../Stores/ShoppingCartExtensions";
+import { modifyCart } from "../../../Stores/ShoppingCartExtensions";
 import {oneTimeProduct} from "../../../Stores/stores";
 
 
@@ -9,13 +9,12 @@ export let params = {} as any;
 export let quantity: number;
 
 const OnCart = () => {
-    addToCart({quantity: quantity, id: params.id});
+    modifyCart({quantity: quantity, id: params.id});
 }
 
 const buyNow = () => {
-    const prod = {id: params.id, quantity: quantity};
-    oneTimeProduct.set(prod);
-    push('/buy');
+    oneTimeProduct.set({id: params.id, quantity: quantity});
+    push('/buyNow');
 }
 
 </script>

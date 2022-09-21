@@ -16,11 +16,9 @@ async function SignOut(){
     push('/');
 }
 
-onMount(() => {
-    if(!localStorage.getItem("jwt")){
-        push('/account/login');
-    }
-})
+if(!localStorage.getItem("jwt")){
+    push('/account/login');
+}
 </script>
 
 

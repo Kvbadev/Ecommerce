@@ -29,7 +29,9 @@ public class ShoppingCartController : ControllerBase
     public async Task<ShoppingCartDto?> Get() 
     {
         var user = await _context.Users.Include(x => x.ShoppingCart).ThenInclude(x => x.CartProducts)
-            .ThenInclude(x => x.Product).FirstOrDefaultAsync(user => user.Id == _jwtTokenService.ExtractId());
+            .ThenInclude(x => x.Product)
+            .FirstOrDefaultAsync(user => user.Id == _jwtTokenService.ExtractId());
+
         if(user == null)
         {
             return null;
@@ -41,82 +43,59 @@ public class ShoppingCartController : ControllerBase
         return cart;
     }
 
-    //TODO: improve this functions as it's not very concise
     //Method to add/delete products from user's cart
-    //When shouldAdd (that is being obtained by query string) is set to 'Add' then method removes desired quantity of products
-    [HttpPatch("{add?}")]
-    public async Task<IActionResult> ManageProducts(ProductSimplified product, bool add)
+    [HttpPatch("update")]
+    public async Task<IActionResult> ManageProducts(ProductSimplified product)
     {
         var user = await _context.Users.Include(x => x.ShoppingCart)
             .ThenInclude(x => x.CartProducts)
             .ThenInclude(x => x.Product)
             .FirstOrDefaultAsync(x => x.Id == _jwtTokenService.ExtractId());
             
-        //additionally checks if user is null by adding ? on dereference
+        //additionally checks if user in null by adding ? on dereference
         var prodInCart = user?.ShoppingCart.CartProducts
             .FirstOrDefault(x => x.ProductId == product.Id);
         
         if(user is null)
         {
-            return BadRequest("Product has not been found in your shopping cart");
+            return BadRequest("User has not been found");
         }
 
-        if(add)
+        if(prodInCart is not null)
         {
-            CartProduct? newProd = null;
-            if(prodInCart is not null)
-            {
-                prodInCart.ProductQuantity += product.Quantity;
-            }
-            else
-            {
-                newProd = new CartProduct //redefined to use it further so it is never null
-                {
-                    Product = _context.Products.Find(product.Id)!,
-                    ProductQuantity = product.Quantity
-                };
-               user!.ShoppingCart.CartProducts.Add(newProd);
-            }
+          
+            prodInCart.ProductQuantity += product.Quantity;
 
-            user!.ShoppingCart.FinalPrice += ((newProd ?? prodInCart)!.Product.Price * product.Quantity);
-            user.ShoppingCart.Count += product.Quantity;
-        }
-
-        else if(add is false)
-        {
-            if(product.Quantity > prodInCart!.ProductQuantity)
-            {
-                return BadRequest("Number is too big");
-            }
-
-            prodInCart.ProductQuantity -= product.Quantity;
             if(prodInCart.ProductQuantity <= 0)
             {
-                user!.ShoppingCart.CartProducts.Remove(prodInCart);
+                user.ShoppingCart.CartProducts.Remove(prodInCart);
             }
-
-            user!.ShoppingCart.FinalPrice -= (prodInCart.Product.Price * product.Quantity);
-            user.ShoppingCart.Count -= product.Quantity;
         }
         else
         {
-            return BadRequest("Incorrect query argument");
+            var newProd = new CartProduct //redefined to use it further so it is never null
+            {
+                Product = _context.Products.Find(product.Id)!,
+                ProductQuantity = product.Quantity
+            };
+            user.ShoppingCart.CartProducts.Add(newProd);
         }
 
+        user.ShoppingCart.FinalPrice = CalculatePrice(user.ShoppingCart);
+        user.ShoppingCart.Count = CalculateCount(user.ShoppingCart);
        
         var res = await _context.SaveChangesAsync() > 0;
-        if(res)
-        {
-            return Ok("Changes've been persisted");
-        }
 
-        return BadRequest("Could not add/remove item(s)");
+        return res ?
+            Ok("Changes've been persisted") :
+            BadRequest("Could not add/remove item(s)");
     }
 
     [HttpDelete]
     public async Task<IActionResult> ClearCart()
     {
-        ShoppingCart cart = _context.ShoppingCarts.Include(x => x.CartProducts).FirstOrDefault(x => x.AppUserId == _jwtTokenService.ExtractId())!;
+        ShoppingCart cart = _context.ShoppingCarts.Include(x => x.CartProducts)
+            .FirstOrDefault(x => x.AppUserId == _jwtTokenService.ExtractId())!;
         
         cart.CartProducts = new List<CartProduct>();
         cart.FinalPrice = 0;
@@ -130,7 +109,8 @@ public class ShoppingCartController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> SetNewCart(ShoppingCartDto newCart)
     {
-        ShoppingCart cart = _context.ShoppingCarts.Include(x => x.CartProducts).FirstOrDefault(x => x.AppUserId == _jwtTokenService.ExtractId())!;
+        ShoppingCart cart = _context.ShoppingCarts.Include(x => x.CartProducts)
+            .FirstOrDefault(x => x.AppUserId == _jwtTokenService.ExtractId())!;
         if(cart == null)
         {
             return BadRequest("This user does not exist");
@@ -138,19 +118,20 @@ public class ShoppingCartController : ControllerBase
         var isValid = await VerifyCart(newCart);
         if(isValid == false)
         {
-            return BadRequest("Shopping cart supplied by the was invalid");
+            return BadRequest("Shopping cart supplied by the client was invalid");
         }
 
         _mapper.Map<ShoppingCartDto, ShoppingCart>(newCart, cart);
         var res = await _context.SaveChangesAsync() > 0;
 
-        return res ? Ok("New cart has been set") : BadRequest("Could not persist changes in database");
+        return res ? Ok("New cart has been set") : 
+        BadRequest("Could not persist changes in database");
    }
 
    private async Task<bool> VerifyCart(ShoppingCartDto cart)
    {
     var products = await _context.Products.ToListAsync();
-    if(cart.Count <= 0){
+    if(cart.Count < 0){
         return false;
     }
     decimal sum = 0;
@@ -171,6 +152,26 @@ public class ShoppingCartController : ControllerBase
         return false;
     }
     return true;
+   }
+
+   private decimal CalculatePrice(ShoppingCart cart)
+   {
+        decimal price = 0M;
+        foreach(var prod in cart.CartProducts)
+        {
+            price += prod.ProductQuantity * prod.Product.Price;
+        }
+        return price;
+   }
+
+   private int CalculateCount(ShoppingCart cart)
+   {
+        int count = 0;
+        foreach(var prod in cart.CartProducts)
+        {
+            count += prod.ProductQuantity;
+        }
+        return count;
    }
 
 }

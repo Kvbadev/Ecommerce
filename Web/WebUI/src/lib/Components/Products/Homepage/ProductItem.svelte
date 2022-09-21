@@ -7,7 +7,7 @@ import ItemPhoto from "../../Products/Homepage/ItemPhoto.svelte";
     const max_desc_len = 150;
 
     const photoProps = {
-        src: `/PlaceholderPhotos/${product.name.replaceAll(' ', '_').toLowerCase()}${(Math.random()+1*2).toFixed(0)}.png`,
+        src: product.mainPhoto,
         alt: product.name
     }
 </script>
