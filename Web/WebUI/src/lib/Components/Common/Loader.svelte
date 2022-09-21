@@ -11,10 +11,12 @@
 
     let timeout;
 
-    onMount(() => {
-        timeout = setTimeout(() => push('/NotFound'), 5000);
-    })
-    onDestroy(() => clearTimeout(timeout));
+    if(inElement === false){
+        onMount(() => {
+            timeout = setTimeout(() => push('/NotFound'), 5000);
+        })
+        onDestroy(() => clearTimeout(timeout));
+    }
 
 </script>
 
