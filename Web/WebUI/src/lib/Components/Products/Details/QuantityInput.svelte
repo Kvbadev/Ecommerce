@@ -1,19 +1,36 @@
 <script lang="ts">
     import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
+  import { modifyCart } from "../../../Stores/ShoppingCartExtensions";
     import Fa from "svelte-fa";
     export let quantity = 1;
+    export let productID = null;
+    export let ModifyCart = false;
+
+    async function updateCart(val) {
+        await modifyCart({id: productID, quantity: val}, true);
+    }
 </script>
 
 <div class="container">
     <div class="items">
         <div class="buttons">
             <div class="button-up" on:click={() => {
-                quantity++;
+                if(ModifyCart){
+                    updateCart(1);
+                } else {
+                    quantity++;
+                }
             }}>
                 <Fa icon={faCaretUp} size={'2.5x'} />
             </div>
             <div class="button-down" on:click={() => {
-               quantity > 1 ? quantity-- : null;
+                if(quantity > 1){
+                    if(ModifyCart){
+                        updateCart(-1);
+                    } else {
+                        quantity--;
+                    }
+                } 
             }}>
                 <Fa icon={faCaretDown} size={'2.5x'} color={quantity > 1 ? '#000000' : '#D0D0D3'}/>
             </div>

@@ -7,20 +7,20 @@ import type  User  from "../Models/user";
 
 const apiUrl = "https://localhost:5000/api";
 
-const postProducts = async (url: string, product: Product) => {
-    let response;
-    try{
-        response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(product)
+async function getProducts(url: string): Promise<Array<Product>> {
+    let prods = await authFetch<Array<Product>>(apiUrl+"/products", 'GET', null);
+    prods = prods.map((v,i) => {
+        v.mainPhoto = `/PlaceholderPhotos/${v.name.replaceAll(' ', '_')
+            .toLowerCase()}1.png`;
+
+        v.photos = Array.from(Array(4)).slice(2).map((n,i) => {
+            return `/PlaceholderPhotos/${v.name.replaceAll(' ', '_')
+        .toLowerCase()}${i+2}.png`;
         });
-    } catch (error) {
-        console.log(error);
-    }
-    return response.json();
+
+        return v;
+    })
+    return prods;
 }
 
 async function getCart(url: string): Promise<Cart | null> {
@@ -68,9 +68,8 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PAT
 
 export const agent = {
     Products: {
-        getAll: () => authFetch<Array<Product>>(apiUrl+"/products", 'GET', null),
+        getAll: () => getProducts(apiUrl+"/products"),
         getOne: (id: string) => authFetch<Product>(apiUrl+"/products/"+id, 'GET', null),
-        post: async (product: Product) => await postProducts(apiUrl+"/products", product)
     },
     Account: {
         signUp: (user: User) => authFetch<[number, string]>(apiUrl+"/Account/register", 'POST', user, true),
@@ -79,8 +78,7 @@ export const agent = {
     },
     ShoppingCart: {
         GetCart: () => getCart(apiUrl+"/ShoppingCart"),
-        addItem: (item: CartItem) => authFetch<string>(apiUrl+"/ShoppingCart/true", 'PATCH', item),
-        removeItem: (item: CartItem) => authFetch<string>(apiUrl+"/ShoppingCart/false", 'PATCH', item),
+        updateCart: (item: CartItem) => authFetch<string>(apiUrl+"/ShoppingCart/update", 'PATCH', item),
         clearCart: () => authFetch<string>(apiUrl+"/ShoppingCart", 'DELETE', null),
         setCart: (cart: Cart) => authFetch<string>(apiUrl+"/ShoppingCart", 'POST', cart)
     }, 

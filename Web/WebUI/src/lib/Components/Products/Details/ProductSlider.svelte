@@ -1,50 +1,34 @@
 <script lang="ts">
-import { faAngleLeft, faAngleRight, faArrowAltCircleLeft } from "@fortawesome/free-solid-svg-icons";
-import {fade, fly} from 'svelte/transition';
+import { faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
+import {fade} from 'svelte/transition';
 
 import Fa from "svelte-fa";
+import type Product from "../../../Models/product";
+export let product: Product;
+export let maxPhotos = 3;
+const photos = [product.mainPhoto, ...product.photos];
+let index = 0;
 
-
-    export let product;
-    export let maxPhotos = 3;
-    let smallPhotoSize = "2"
-
-    let src = Array.from({length: 3}).map((v, i) => {
-        return `/PlaceholderPhotos/${product.name.replaceAll(' ', '_').toLowerCase()}${i+1}.png`
-    });
-
-    let selectedPhoto = src[0];
-
-    function changePhoto(forward: boolean) {
-        let tmpsrc;
-        if(forward){
-            tmpsrc = src[(src.indexOf(selectedPhoto)+1)%maxPhotos];
-        } else {
-            const helper = src.indexOf(selectedPhoto)-1;
-            tmpsrc = src[(helper == -1 ? maxPhotos-1 : helper)];
-        }
-        selectedPhoto = tmpsrc;
-    }
 </script>
 
 <div class="container">
     <div class="slider">
-        <span class="button left" on:click={() => changePhoto(false)}>
+        <span class="button left" on:click={() => index = --index%(0-maxPhotos)}>
             <Fa icon={faAngleLeft} size={"7x"} color={'rgba(0, 0, 0, 0.7)'}/>
         </span>
 
         <span in:fade class="big-image">
-            <img src={selectedPhoto} alt="Product photos"/>
+            <img src={photos.at(index)} alt="Product photos"/>
         </span>
 
-        <span class="button right" on:click={() => changePhoto(true)}>
+        <span class="button right" on:click={() => index = ++index%maxPhotos}>
             <Fa icon={faAngleRight} size={"7x"} color={'rgba(0, 0, 0, 0.7)'}/>
         </span>  
     </div>
     <div class="others">
-        {#each src as photo}
-            <div class="image {selectedPhoto === photo ? 'main':''}">
-                <img on:click={() => {selectedPhoto = photo}} src={photo} width={smallPhotoSize} height={smallPhotoSize} alt="Product" />
+        {#each photos as photo, i}
+            <div class="image {photos.at(index) === photo ? 'main':''}">
+                <img on:click={() => {index=i}} src={photo} alt="Product" />
             </div>
         {/each}
     </div>

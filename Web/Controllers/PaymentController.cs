@@ -37,7 +37,6 @@ public class PaymentController : ControllerBase
         return Ok(token);
     }
 
-    //TODO: improve not to initiate product at request
     [HttpPost("buy/{nonce}")]
     public async Task<IActionResult> Buy([FromServices]IMapper mapper, [FromRoute]string nonce, [FromBody]ProductSimplified? product)
     {
