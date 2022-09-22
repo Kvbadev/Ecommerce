@@ -16,7 +16,6 @@ $: {
 };
 
 async function removeItem() {
-    console.log('remove: ',product.name, product.id);
     await modifyCart({...prod,quantity: -prod.quantity}, true);
 }
 

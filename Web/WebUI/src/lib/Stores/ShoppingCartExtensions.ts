@@ -17,9 +17,7 @@ export const modifyCart = async (item: CartItem, localChanges: boolean = false) 
         }
         //if quantity < 0 then remove element
         if((itemInCart ?? item).quantity <= 0){
-            console.log(v.items);
             v.items = v.items.filter(x => x.id !== item.id);
-            console.log(v.items);
         }
 
         v.count = v.items.reduce((acc, items) => acc+items.quantity, 0);

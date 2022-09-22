@@ -8,7 +8,6 @@ import { oneTimeProduct } from "../../Stores/stores";
 
 if($location == '/buyNow') {
     onDestroy(() => oneTimeProduct.set(null))
-    console.log($oneTimeProduct);
 }
 </script>
 {#if !$userProfile?.username}
