@@ -15,62 +15,97 @@ async function clearCart() {
    removeShoppingCart(); 
 }
 
-let changes: Cart;
-
-onMount(() => {
-    changes = {
-        ...get(shoppingCart)
-    }
-})
+let changes: Cart | null = null;
 
 onDestroy(async () => {
-    if(JSON.stringify(changes) !== JSON.stringify($shoppingCart) && 
-       $shoppingCart.items.length !== null){
-        await saveLocalCart();
+    if( changes !== null && 
+        JSON.stringify(changes) !== JSON.stringify($shoppingCart) && 
+        $shoppingCart?.items.length !== 0){
+            await saveLocalCart();
     }
 })
 
+$: if(changes === null && $shoppingCart !== null){
+    changes = {...get(shoppingCart)};
+}
+
 </script>
-
-<div class="all">
-
+<div class="container">
 {#if !$shoppingCart || !$products}
     <Loader entire/>
 {:else}
 
+{#if $shoppingCart.items.length}
 <h1>My Shopping Cart</h1>
-<div class="container">
-    {#if $shoppingCart.items.length}
         <div class="items">
             {#each $shoppingCart.items as cartitem}
                 <CartProduct prod={cartitem} />
             {/each}
         </div>
-        {#if $userProfile}
-        <a href="/Buy" use:link><button>Buy products</button></a> 
-        {:else}
-        <a href="/Account/Login" use:link><button >Buy products</button></a>
-        {/if}
-
-        <button on:click={clearCart}>Clear the cart</button>
+        <div class="buttons">
+            {#if $userProfile}
+            <a href="/Buy" use:link class="buy-btn">
+                <button>Buy products</button>
+            </a> 
+            {:else}
+            <a href="/Account/Login" use:link class="buy-btn">
+                <button >Buy products</button>
+            </a>
+            {/if}
+            <button on:click={clearCart}>Clear the cart</button>
+        </div>
     {:else}
         <h1>You have not added any products to your cart</h1>
     {/if}
-</div>
 {/if}
 </div>
 
 <style>
-    .all {
-        width: 100%;
-        height: calc(100vh - 4.2vw);
+    .buttons {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+    .container h1 {
+        font-size: 4rem;
+    }
+    .buttons button {
+        margin: 2rem;
+        display: block;
+        width: 25rem;
+        border: none;
+        border-radius: 2rem;
+        background-color: black;
+        font-size: 3.0rem;
+        font-family: 'Raleway';
+        color: white;
+        height: 7rem;
+        cursor: pointer;
+    }
+    .buy-btn{
+        width: auto;
+        height: auto;
+        margin: 2rem;
+    }
+    .buy-btn button {
+        color: black;
+        margin: 0;
+        border: 0.2rem black solid;
+        border-radius: 2rem;
+        background-color: white;
     }
     .items {
         display: flex;
-        justify-content: center;
+        justify-content: flex-start;
+        padding: 1.5rem 0;
         align-items: center;
         flex-direction: column;
-        margin: 2rem 0;
+        overflow: auto;
+        margin: 0 auto;
+        width: 85%;
+        height: 50vh;
+        border: 0.1rem black solid;
+        border-radius: 1rem;
     }
     h1 {
         padding: 3rem;
@@ -78,23 +113,15 @@ onDestroy(async () => {
         text-align: center;
     }
     .container {
-        overflow: auto;
-        margin: 0 auto;
-        width: 90%;
-        height: 80%;
-        border: 0.5rem black solid;
-        border-radius: 1rem;
+        width: 100%;
+        height: calc(100vh - 4.2vw);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
     }
     a {
         width: auto;
         display: inline-block;
     }
-    button {
-        display: block;
-        width: 15rem;
-        border: none;
-        background-color: rgb(184, 184, 184);
-        height: 5rem;
-        cursor: pointer;
-    }
+
 </style>
