@@ -1,7 +1,4 @@
 <script type="typescript">
-import type Product from "src/lib/Models/product";
-import { agent } from "../../../Utils/agent";
-import { onMount } from "svelte";
 import { products } from "../../../Stores/stores";
 
 import ProductParameters from "./ProductParameters.svelte";

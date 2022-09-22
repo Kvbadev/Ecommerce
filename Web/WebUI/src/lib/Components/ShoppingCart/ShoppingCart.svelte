@@ -1,101 +1,127 @@
 <script lang="ts">
 
-import {removeShoppingCart, removeFromCart} from '../../Stores/ShoppingCartExtensions';
+import {removeShoppingCart, saveLocalCart} from '../../Stores/ShoppingCartExtensions';
 
 import {products, userProfile, shoppingCart} from '../../Stores/stores';
 
 import Loader from '../Common/Loader.svelte';
 import { link } from 'svelte-spa-router';
-import { faMinus} from '@fortawesome/free-solid-svg-icons';
-import Fa from 'svelte-fa';
-import type { CartItem } from 'src/lib/Models/cart';
+import CartProduct from './CartProduct.svelte';
+  import { onDestroy, onMount } from 'svelte';
+  import type Cart from 'src/lib/Models/cart';
+  import { get } from 'svelte/store';
 
 async function clearCart() {
    removeShoppingCart(); 
 }
-function removeItem(item: CartItem){
-    removeFromCart(item);
+
+let changes: Cart | null = null;
+
+onDestroy(async () => {
+    if( changes !== null && 
+        JSON.stringify(changes) !== JSON.stringify($shoppingCart) && 
+        $shoppingCart?.items.length !== 0){
+            await saveLocalCart();
+    }
+})
+
+$: if(changes === null && $shoppingCart !== null){
+    changes = {...get(shoppingCart)};
 }
 
-
 </script>
-
-<div class="all">
-
+<div class="container">
 {#if !$shoppingCart || !$products}
     <Loader entire/>
 {:else}
 
-<div class="container">
-    {#if $shoppingCart.items.length}
-        <h1>{$shoppingCart.sum.toFixed(2)}$</h1>
-        {#each $shoppingCart.items.map(v => {
-            const item = $products.find(x => x.id===v.id);
-            const sum = item.price * v.quantity;
-            return {item: item, quantity: v.quantity, sum: sum}
-            }) as {item, quantity, sum}}
-
-            {#if quantity}
-            <div class="item">
-                <h3>{item?.name} [{quantity}] - {sum.toFixed(2)}$</h3>
-                <span class="remove-item" on:click={() => removeItem({id: item.id, quantity: 1})}>
-                    <Fa icon={faMinus} size='lg'/>
-                </span>
-            </div>  
+{#if $shoppingCart.items.length}
+<h1>My Shopping Cart</h1>
+        <div class="items">
+            {#each $shoppingCart.items as cartitem}
+                <CartProduct prod={cartitem} />
+            {/each}
+        </div>
+        <div class="buttons">
+            {#if $userProfile}
+            <a href="/Buy" use:link class="buy-btn">
+                <button>Buy products</button>
+            </a> 
+            {:else}
+            <a href="/Account/Login" use:link class="buy-btn">
+                <button >Buy products</button>
+            </a>
             {/if}
-        {/each}
-
-        {#if $userProfile}
-        <a href="/Buy" use:link><button>Buy products</button></a> 
-        {:else}
-        <a href="/Account/Login" use:link><button >Buy products</button></a>
-        {/if}
-
-        <button on:click={clearCart}>Clear the cart</button>
+            <button on:click={clearCart}>Clear the cart</button>
+        </div>
     {:else}
         <h1>You have not added any products to your cart</h1>
     {/if}
-</div>
 {/if}
 </div>
 
 <style>
-    .all {
+    .buttons {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+    .container h1 {
+        font-size: 4rem;
+    }
+    .buttons button {
+        margin: 2rem;
+        display: block;
+        width: 25rem;
+        border: none;
+        border-radius: 2rem;
+        background-color: black;
+        font-size: 3.0rem;
+        font-family: 'Raleway';
+        color: white;
+        height: 7rem;
+        cursor: pointer;
+    }
+    .buy-btn{
+        width: auto;
+        height: auto;
+        margin: 2rem;
+    }
+    .buy-btn button {
+        color: black;
+        margin: 0;
+        border: 0.2rem black solid;
+        border-radius: 2rem;
+        background-color: white;
+    }
+    .items {
+        display: flex;
+        justify-content: flex-start;
+        padding: 1.5rem 0;
+        align-items: center;
+        flex-direction: column;
+        overflow: auto;
+        margin: 0 auto;
+        width: 85%;
+        height: 50vh;
+        border: 0.1rem black solid;
+        border-radius: 1rem;
+    }
+    h1 {
+        padding: 3rem;
+        font-family: 'Raleway';
+        text-align: center;
+    }
+    .container {
         width: 100%;
         height: calc(100vh - 4.2vw);
-    }
-    .container *{
-        margin: 0.1rem 1rem ;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
     }
     a {
         width: auto;
         display: inline-block;
     }
-    button {
-        display: block;
-        width: 15rem;
-        border: none;
-        background-color: rgb(184, 184, 184);
-        height: 5rem;
-        cursor: pointer;
-    }
-    h3 {
-        display: inline-block;
-        margin: 0;
-        padding: 0;
-    }
-    .item {
-        /* width: 32rem; */
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: flex-start;
-    }
-    .remove-item {
-        cursor: pointer;
-        margin: 0;
-        padding: 0;
-        width: auto;
-        height: auto;
-    }
+
 </style>

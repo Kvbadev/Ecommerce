@@ -1,12 +1,9 @@
 <script lang="ts">
 import { faWindowClose } from "@fortawesome/free-solid-svg-icons";
-import { initShoppingCart} from "../../Stores/ShoppingCartExtensions";
+import { initShoppingCart, saveLocalCart} from "../../Stores/ShoppingCartExtensions";
 import { agent } from "../../../lib/Utils/agent";
 import Fa from "svelte-fa";
 import { push } from "svelte-spa-router";
-import { get } from "svelte/store";
-import type Cart from "src/lib/Models/cart";
-import { shoppingCart } from "../../Stores/stores";
 
 
 export let message = 'text';
@@ -17,8 +14,7 @@ function hideModal () {
     showModal = false;
 }
 async function setNewCart() {
-    const cart: Cart = get(shoppingCart);
-    const x = await agent.ShoppingCart.setCart(cart);
+    saveLocalCart();
 }
 async function onButton() {
     hideModal();

@@ -15,6 +15,7 @@ export const routes: any = {
     '/profile': ProfilePage,
     '/ShoppingCart': ShoppingCart,
     '/Buy': BuyProducts,
+    '/BuyNow': BuyProducts,
     '*': NotFound
     //TODO: implement contact and about us page (could be static tho)
 }
