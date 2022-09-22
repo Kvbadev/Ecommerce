@@ -1,11 +1,12 @@
 <script lang="ts">
 import { faRemove } from "@fortawesome/free-solid-svg-icons";
 import type { CartItem } from "src/lib/Models/cart";
-  import { modifyCart } from "../../Stores/ShoppingCartExtensions";
+import { modifyCart } from "../../Stores/ShoppingCartExtensions";
 import Fa from "svelte-fa";
 import {products} from '../../Stores/stores';
 import {shoppingCart} from '../../Stores/stores';
 import QuantityInput from "../Products/Details/QuantityInput.svelte";
+  import { link } from "svelte-spa-router";
 
 export let prod: CartItem;
 let product;
@@ -23,11 +24,11 @@ async function removeItem() {
 </script>
 
 <div class="container">
-    <div class="photo">
+    <div id="photo">
         <img alt="Product" class="main-photo" src="{product.mainPhoto}"/>
     </div>
     <div class="main-info" id="main-info">
-        <p>{product.name}</p>
+        <p><a href={`/product/${product.id}`} use:link>{product.name}</a></p>
         <p class="little-price">{product.price}$</p>
     </div>
     <div class="quantity">
@@ -78,8 +79,8 @@ async function removeItem() {
     padding: 0.2rem;
     }
     img {
-        width: 9rem;
-        height: 9rem;
+        width: 10rem;
+        height: 10rem;
         border-radius: 2rem;
     }
     .remove span{
