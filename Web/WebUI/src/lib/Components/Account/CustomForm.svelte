@@ -82,35 +82,36 @@ import { get } from "svelte/store";
     {/if}
     <div class="all">
         <div class="container">
-            <form class="form" on:submit|preventDefault={onSubmit}>
-                <h1>{type==='Signup'?'Sign Up!':'Log In!'}</h1>
-                <div class="fields" on:keyup={onInput}>
-                {#each fields as field, i}
-                    {#if field === 'email'}
-                        <FormField name={field} regex={new RegExp(/^\S+@\S+\.\S+$/)} bind:isOk={isOk[i]} minLen={4} maxLen={50}/>
-                    {:else}
-                        <FormField name={field} minLen={5} maxLen={12} bind:isOk={isOk[i]} />
-                    {/if}
-                {/each}
-                </div>
-                {#if serverError}
-                    <span class="form-error">
-                        <p>{serverError}</p>
-                    </span>
+        <form class="form" on:submit|preventDefault={onSubmit}>
+            <h1>{type==='Signup'?'Sign Up!':'Log In!'}</h1>
+            <div class="fields" on:keyup={onInput}>
+            <!-- TODO: change input sizes not to be reactive -->
+            {#each fields as field, i}
+                {#if field === 'email'}
+                    <FormField name={field} regex={new RegExp(/^\S+@\S+\.\S+$/)} bind:isOk={isOk[i]} minLen={4} maxLen={50}/>
+                {:else}
+                    <FormField name={field} minLen={5} maxLen={12} bind:isOk={isOk[i]} />
                 {/if}
-                <button class="submit" disabled={!canSubmit || loading} class:disabled="{!canSubmit || loading}" type="submit">
-                    {#if loading}
-                        <Loader size={1} inElement={true} color='white'/>
-                    {:else} 
-                        Submit
-                    {/if}
-                </button>
-            </form>
-            <div class="links">
-                <a href={type === 'Signup'?"/Account/login":"/Account/signup"} use:link>{type === 'Signup' ? "You already have an account?" : "You don't have an account?"}</a>
-                <a href="/Account/ForgotPassword" use:link>Forgot your password?</a>
+            {/each}
             </div>
+            {#if serverError}
+                <span class="form-error">
+                    <p>{serverError}</p>
+                </span>
+            {/if}
+            <button class="submit" disabled={!canSubmit || loading} class:disabled="{!canSubmit || loading}" type="submit">
+                {#if loading}
+                    <Loader size={1} inElement={true} color='white'/>
+                {:else} 
+                    Submit
+                {/if}
+            </button>
+        </form>
+        <div class="links">
+            <a href={type === 'Signup'?"/Account/login":"/Account/signup"} use:link>{type === 'Signup' ? "You already have an account?" : "You don't have an account?"}</a>
+            <a href="/Account/ForgotPassword" use:link>Forgot your password?</a>
         </div>
+    </div>
     </div>
     
     <style>
@@ -168,8 +169,6 @@ import { get } from "svelte/store";
             display: flex;
             flex-direction: column;
             align-items: center;
-        }
-        .all {
             width: 100%;
             height: calc(100vh - 4.2vw);
             min-height: 58rem;

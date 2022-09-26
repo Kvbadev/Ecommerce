@@ -25,6 +25,21 @@ body {
   height: 50rem;
 }
 
+.braintree-hosted-fields-focused {
+  border-color: rgb(97, 224, 250) !important;
+  transition: all 200ms ease;
+}
+
+.braintree-hosted-fields-invalid {
+  border-color: red !important;
+  transition: all 200ms ease;
+}
+
+.label-error {
+  color: red;
+  font-size: 2.5rem !important;
+}
+  
 /*Toast*/
 :root {
     --toastBackground: #fc0505;
