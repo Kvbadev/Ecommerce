@@ -9,6 +9,7 @@ import QuantityInput from "../Products/Details/QuantityInput.svelte";
   import { link } from "svelte-spa-router";
 
 export let prod: CartItem;
+export let input=true;
 let product;
 
 $: {
@@ -24,6 +25,9 @@ async function removeItem() {
 </script>
 
 <div class="container">
+    <div id="count">
+        <h4>{prod.quantity}x</h4>
+    </div>
     <div id="photo">
         <img alt="Product" class="main-photo" src="{product.mainPhoto}"/>
     </div>
@@ -31,9 +35,11 @@ async function removeItem() {
         <p><a href={`/product/${product.id}`} use:link>{product.name}</a></p>
         <p class="little-price">{product.price}$</p>
     </div>
+    {#if input}
     <div class="quantity">
         <QuantityInput bind:quantity={prod.quantity} ModifyCart productID={prod.id}/>
     </div>
+    {/if}
     <div class="remove">
         <span on:click={removeItem}>
             <Fa icon={faRemove} size={'3.5x'}/>
@@ -59,6 +65,19 @@ async function removeItem() {
     }
     .container div {
         width: 20%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    #count {
+        width: 5%;
+        height: auto;
+        font-size: 3rem;
+        font-family: 'Roboto slab';
+    }
+
+    h4 {
+        height: auto;
         display: flex;
         align-items: center;
         justify-content: center;

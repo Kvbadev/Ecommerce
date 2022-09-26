@@ -23,7 +23,7 @@
 {#if inElement}
     <div class="spinner {entire ? 'whole':''}">
         <span class="rotation">
-        <Fa icon={faCircleNotch} size={`${size}x`} color={color}/>
+            <Fa icon={faCircleNotch} size={`${size}x`} color={color} spin />
         </span>
     </div>
 {:else}
@@ -62,14 +62,7 @@
         align-items: center;
     }
     .rotation {
-        animation: 1s linear spin infinite;
         width: auto;
-        display: inline;
-    }
-    
-    @keyframes spin {
-        0% {transform: rotate(0);}
-        50% {transform: rotate(180deg);}
-        100% {transform: rotate(360deg);}
+        display: flex;
     }
 </style>

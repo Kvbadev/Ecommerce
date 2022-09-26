@@ -3,23 +3,32 @@
 import { agent } from "../../Utils/agent";
 
 import { onMount } from "svelte";
-import { client, hostedFields} from 'braintree-web';
-  import Loader from '../Common/Loader.svelte';
-  import {oneTimeProduct} from '../../Stores/stores';
-  import { get } from "svelte/store";
-  import { toast } from "@zerodevx/svelte-toast";
-  import { push } from "svelte-spa-router";
-  import { removeShoppingCart } from "../../Stores/ShoppingCartExtensions";
+import { client, HostedFields, hostedFields, HostedFieldsEvent} from 'braintree-web';
+import Loader from '../Common/Loader.svelte';
+import {oneTimeProduct} from '../../Stores/stores';
+import { get } from "svelte/store";
+import { toast } from "@zerodevx/svelte-toast";
+import { push } from "svelte-spa-router";
+import { removeShoppingCart } from "../../Stores/ShoppingCartExtensions";
+import type { HostedFieldsHostedFieldsFieldData } from "braintree-web/modules/hosted-fields";
 
 let fields: {
-    cardholderName: HTMLElement,
-    number: HTMLElement,
-    expirationDate: HTMLElement,
+    cardholderName: HTMLElement, 
+    number: HTMLElement, 
+    expirationDate: HTMLElement, 
     cvv: HTMLElement
 } = {} as any;
-let loading = true, submitting, getPayload;
+//make an object that contains isvalid instead of these classlist adds
+
+let loading = true, submitting, getPayload, instance: HostedFields, canSubmit: any=false;
+
 
 async function handleSubmit(event: MouseEvent) {
+    event.preventDefault();
+    if(!canSubmit){
+        toast.push("You have to fill the payment form with proper values!"); //change width
+        return;
+    } 
     const payload = await getPayload(event);
     if(payload === null){
         console.error("Could not obtain payload");
@@ -45,44 +54,72 @@ onMount(async () => {
     const token = await agent.PaymentGateway.GetToken();
     if(token === null) return;
 
+
     //return an instance of hostedFileds that are furher used to obtain a transaction nonce
-    const instance = await client.create({
-        authorization: token
-    }).then(cl => {
-        return hostedFields.create( {
-            client: cl,
-            authorization: token,
-            fields: {
-                cardholderName: {
-                    container: fields.cardholderName,
-                    placeholder: 'Name as it appears on your card'
-                },
-                number: {
-                    container: fields.number,
-                    placeholder: '4111 1111 1111 1111'
-                },
-                expirationDate: {
-                    container: fields.expirationDate,
-                    placeholder: '02/22'
-                },
-                cvv: {
-                    container: fields.cvv,
-                    placeholder: '123'
+    try{
+        instance = await client.create({
+            authorization: token
+        }).then(cl => {
+            return hostedFields.create( {
+                client: cl,
+                authorization: token,
+                fields: {
+                    cardholderName: {
+                        container: fields.cardholderName,
+                        placeholder: 'Name as it appears on your card'
+                    },
+                    number: {
+                        container: fields.number,
+                        placeholder: '4111 1111 1111 1111'
+                    },
+                    expirationDate: {
+                        container: fields.expirationDate,
+                        placeholder: '02/22'
+                    },
+                    cvv: {
+                        container: fields.cvv,
+                        placeholder: '123'
+                    }
                 }
-            }
-        }).then(fields => {
-            loading = false;
-            return fields;
+            }).then(fields => {
+                loading = false;
+                return fields;
+            })
         })
-    })
+    } catch (err){
+        console.error(err);
+        loading = false;
+    } 
+    const onInputChange = (event: HostedFieldsEvent) => {
+        const field:HostedFieldsHostedFieldsFieldData = event.fields[event.emittedBy];
+        if(!field.isValid && !field.isEmpty) {
+            field.container.dataset.valid = 'false';
+        }
+        else if(field.isEmpty){
+            canSubmit = false;
+            return;
+        }
+        else {
+            field.container.dataset.valid = 'true';
+        }
+        fields = fields; //triggering reactivity
+
+        canSubmit = 
+        (Object.values(fields).filter(x => x.dataset.valid === "false").length===0) &&
+        Object.values(event.fields).filter(x => x.isEmpty).length===0;
+    }
+    instance.on('blur', e => onInputChange(e));
+    instance.on('validityChange', e => onInputChange(e));
+    instance.on('empty', e => onInputChange(e));
+    
     getPayload = (e) => {
         submitting = true;
-        e.preventDefault();
         let payld = null;
         return new Promise((res, rej) => {
             instance.tokenize((err, payload) => {
                 if(err){
                     console.error(err);
+                    submitting = false;
                     rej(err);
                 }
                 //payload = nonce to process the transaction
@@ -97,73 +134,139 @@ onMount(async () => {
 
 
 <div class="container">
-    {#if loading}
-    <Loader inElement size={3} color='#000000' entire/>
-    {/if}
     <form class="form">
-        <div class="cardholder-name-div">
-            <label for="cardholder-name">Cardholder Name</label>
-            <div class="cardholder-name" bind:this={fields.cardholderName}></div>
+        {#if loading}
+        <Loader inElement size={3} color='#000000' entire/>
+        {/if}
+        <div class="cardholder-name-div form-div">
+            <label for="cardholer-name" 
+                class={ fields.cardholderName?.dataset.valid === "true" ? '' : 'label-error'}>
+                Cardholder Name
+            </label>
+            <div class="cardholder-name" bind:this={fields.cardholderName} data-valid="true">
+            </div>
         </div>
-        <div class="card-number-div">
-            <label for="card-number">Credit card number</label>
-            <div class="card-number" bind:this={fields.number}></div>
+        <div class="card-number-div form-div">
+            <label for="card-number" 
+                class={ fields.number?.dataset.valid === "true" ? '' : 'label-error'}>
+                Credit card number
+            </label>
+            <div class="card-number " bind:this={fields.number} data-valid="true">
+            </div>
         </div>
-        <div class="exp-cvv-div">
-            <label for="expiration">Expiration</label>
-            <div class="expiration" bind:this={fields.expirationDate}></div>
-            <label for="cvv">CVV</label>
-            <div class="cvv" bind:this={fields.cvv}></div>
+        <div class="exp-cvv-div form-div">
+            <div class="exp-div">
+                <label for="expiration" 
+                    class={ fields.expirationDate?.dataset.valid === "true" ? '' : 'label-error'}>
+                    Expiration Date
+                </label>
+                <div class="expiration" bind:this={fields.expirationDate} data-valid="true">
+                </div>
+            </div>
+            <div class="cvv-div">
+                <label for="cvv" class={ fields.cvv?.dataset.valid === "true" ? '' : 'label-error'}>
+                    CVV
+                </label>
+                <div class="cvv" bind:this={fields.cvv} data-valid="true">
+                </div>
+            </div>
         </div>
-        <button class="submit" on:click={(e) => handleSubmit(e)}>
-            {#if submitting}
-            <Loader inElement size={1} entire />
-            {/if}
-            Submit
-        </button>
+        <div class="submit-div">
+            <button class='submit' 
+                on:click={(e) => handleSubmit(e)}>
+
+                <!-- {#if submitting} -->
+                <Loader inElement size={1} color="#ffffff"/>
+                <!-- {/if} -->
+                <!-- Submit -->
+            </button>
+        </div>
     </form>
 </div>
 
 
 <style>
     .container {
-        position: relative;
-        width: 50rem;
-        height: 25rem;
-    }
-    form {
+        margin: 0 2rem;
+        width: calc(50vw - 2rem);
+        height: 100%;
         display: flex;
-        flex-direction: column;
+        justify-content: center;
         align-items: center;
     }
-    form > div {
-        width: 45rem;
-        justify-content: center;
-        height: 6rem;
+
+    .form-div, .exp-cvv-div > div{
+        width: 100%;
+        height: 12rem;
         display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        align-items: center;
+        border: none;
+    }
+    .exp-cvv-div > div {
+        width: 20rem;
+        padding: 0;
+    }
+    .submit-div {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
     .submit {
-        width: 15rem;
-        position: relative;
-        height: 3rem;
+        width: 25rem;
+        height: 4.5rem;
         margin: 0;
         padding: 0;
         display: flex;
         justify-content: center;
-        align-items: center;
+        align-items: flex-end;
+        position: relative;
+        border: none;
+        border-radius: 1rem;
+        font-size: 2.5rem;
+        font-family: 'Anek Telugu';
+        background-color: rgb(15, 193, 15);
+        cursor: pointer;
     }
-    form > div > div {
+    form > div > div, .exp-cvv-div > div > div {
         border: 0.2rem black solid;
+        border-radius: 0.5rem;
         padding: 1rem;
-        display: grid;
+        height: 6.5rem;
     }
-    form > div > label {
-        width: 12rem;
+
+    .exp-cvv-div {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-evenly;
+    }
+
+    label {
+        font-family: 'Roboto slab';
+        font-size: 2rem;
+        height: 1.5rem;
         display: flex;
         justify-content: center;
         align-items: center;
+        transition: all 100ms;
+    }
+    form {
+        position: relative;
+        width: 80%;
+        height: 100%;
+        border-radius: 2rem;
+        border: 0.2rem solid black;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-items: flex-end;
     }
     form * {
         margin: 0.3rem;
     }
+
+
 </style>

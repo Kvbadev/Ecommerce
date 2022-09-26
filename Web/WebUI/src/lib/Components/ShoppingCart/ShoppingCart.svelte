@@ -39,7 +39,7 @@ $: if(changes === null && $shoppingCart !== null){
 <h1>My Shopping Cart</h1>
         <div class="items">
             {#each $shoppingCart.items as cartitem}
-                <CartProduct prod={cartitem} />
+                <CartProduct prod={cartitem} input={true} />
             {/each}
         </div>
         <div class="buttons">
