@@ -29,7 +29,7 @@
 {:else}
 <div class="loader {entire ? 'whole':''}">
     <div class="rotation">
-        <Fa icon={faCircleNotch} size={`${size}x`} color={color} />
+        <Fa icon={faCircleNotch} size={`${size}x`} color={color} spin />
     </div>
 </div>
 {/if}

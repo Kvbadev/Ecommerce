@@ -19,12 +19,16 @@ let changes: Cart | null = null;
 
 onDestroy(async () => {
     if( changes !== null && 
-        JSON.stringify(changes) !== JSON.stringify($shoppingCart) && 
-        $shoppingCart?.items.length !== 0){
-            await saveLocalCart();
+        JSON.stringify(changes) !== JSON.stringify($shoppingCart)){ 
+            if($shoppingCart?.items.length === 0){
+                await clearCart();
+            } else {
+                await saveLocalCart();
+            }
     }
 })
 
+//cannot use onmount because cart'd not be initialized
 $: if(changes === null && $shoppingCart !== null){
     changes = {...get(shoppingCart)};
 }
@@ -39,7 +43,7 @@ $: if(changes === null && $shoppingCart !== null){
 <h1>My Shopping Cart</h1>
         <div class="items">
             {#each $shoppingCart.items as cartitem}
-                <CartProduct prod={cartitem} input={true} />
+                <CartProduct prod={cartitem} />
             {/each}
         </div>
         <div class="buttons">

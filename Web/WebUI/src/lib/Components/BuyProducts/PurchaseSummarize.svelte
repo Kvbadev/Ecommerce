@@ -1,24 +1,55 @@
 <script lang="ts">
-  import { shoppingCart, products} from "../../Stores/stores";
-
-  const prods = $shoppingCart?.items.map(v => $products.find(x => x.id == v.id))
-
+  import { onMount } from "svelte";
+  import { shoppingCart, products, oneTimeProduct} from "../../Stores/stores";
+  import CartProduct from "../ShoppingCart/CartProduct.svelte";
+  console.log($oneTimeProduct);
+  
+  const prods = $shoppingCart.count ? $shoppingCart.items : $oneTimeProduct ?
+                [$oneTimeProduct] : [];
+  console.log(prods);
+  
 </script>
 
 <div class="container">
     <ul class="list">
-        {#each prods as prod}
-          <li class="element">{prod.name}</li>
-        {/each}
+      {#each prods as prod}
+        <li class="element">
+          <CartProduct prod={prod} simplified/>
+        </li>
+      {:else}
+        <h1>Add some products to the cart at first</h1>
+      {/each}
     </ul>
 </div>
 
 <style>
-  .container {
-    width: 50vw;
-    height: 100%;
+  li {
+    width: 95%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
-  ul {
+  .list {
+    width: 80%;
+    min-height: 48rem;
+    height: 100%;
+    border-radius: 2rem;
+    border: 0.2rem solid rgb(255, 255, 255);
+    background-color: rgba(202, 202, 202, 0.15);
     list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 1.5rem 0;
+    overflow: scroll;
+  }
+  .container {
+    margin: 0 2rem;
+    width: calc(50vw - 2rem);
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 </style>
