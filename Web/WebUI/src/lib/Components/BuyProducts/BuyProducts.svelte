@@ -37,9 +37,12 @@ if($location == '/buyNow') {
     h1 {
         padding: 2rem 0;
         font-family: 'Raleway';
-        text-align: center;
+        font-size: 4rem;
         box-sizing: border-box;
         height: 15%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     .container {
         height: calc(100vh - 4.2vw);

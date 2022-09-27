@@ -5,7 +5,7 @@ import { agent } from "../../Utils/agent";
 import { onMount } from "svelte";
 import { client, HostedFields, hostedFields, HostedFieldsEvent} from 'braintree-web';
 import Loader from '../Common/Loader.svelte';
-import {oneTimeProduct} from '../../Stores/stores';
+import {oneTimeProduct, shoppingCart} from '../../Stores/stores';
 import { get } from "svelte/store";
 import { toast } from "@zerodevx/svelte-toast";
 import { push } from "svelte-spa-router";
@@ -18,7 +18,8 @@ let fields: {
     expirationDate: HTMLElement, 
     cvv: HTMLElement
 } = {} as any;
-//make an object that contains isvalid instead of these classlist adds
+//TODO: add paypal gateway 
+//TODO: add delivery
 
 let loading = true, submitting, getPayload, instance: HostedFields, canSubmit: any=false;
 
@@ -29,6 +30,10 @@ async function handleSubmit(event: MouseEvent) {
         toast.push("You have to fill the payment form with proper values!"); //change width
         return;
     } 
+    if($shoppingCart.items.length === 0 && $oneTimeProduct === null){
+        toast.push("You have to select products firstly!");
+        return;
+    }
     const payload = await getPayload(event);
     if(payload === null){
         console.error("Could not obtain payload");
@@ -135,6 +140,7 @@ onMount(async () => {
 
 <div class="container">
     <form class="form">
+        <span>
         {#if loading}
         <Loader inElement size={3} color='#000000' entire/>
         {/if}
@@ -175,12 +181,13 @@ onMount(async () => {
             <button class='submit' 
                 on:click={(e) => handleSubmit(e)}>
 
-                <!-- {#if submitting} -->
+                {#if submitting}
                 <Loader inElement size={1} color="#ffffff"/>
-                <!-- {/if} -->
-                <!-- Submit -->
+                {/if}
+                Submit
             </button>
         </div>
+        </span> 
     </form>
 </div>
 
@@ -230,7 +237,7 @@ onMount(async () => {
         background-color: rgb(15, 193, 15);
         cursor: pointer;
     }
-    form > div > div, .exp-cvv-div > div > div {
+    form > span > div > div, .exp-cvv-div > div > div {
         border: 0.2rem black solid;
         border-radius: 0.5rem;
         padding: 1rem;
@@ -254,19 +261,20 @@ onMount(async () => {
         transition: all 100ms;
     }
     form {
-        position: relative;
         width: 80%;
+        min-height: 48rem;
         height: 100%;
         border-radius: 2rem;
         border: 0.2rem solid black;
         display: flex;
-        flex-direction: column;
         align-items: center;
-        justify-items: flex-end;
+        justify-content: center;
     }
     form * {
         margin: 0.3rem;
     }
-
+    span {
+        position: relative;
+    }
 
 </style>

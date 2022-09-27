@@ -60,6 +60,13 @@ import { get } from "svelte/store";
                 if(get(shoppingCart).items.length && type === 'Login'){
                     loading = false;
                     showModal = true;
+                }
+                //if registering then persist a cart
+                else if($shoppingCart.items.length && type === "Signup"){
+                    loading = canSubmit = false;
+                    await agent.ShoppingCart.setCart(get(shoppingCart))
+                    push('/');
+
                 } else {
                     initShoppingCart(await agent.ShoppingCart.GetCart());
                     loading = canSubmit = false;
