@@ -5,7 +5,7 @@ using Infrastructure.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Web.Services.JwtToken;
+using Web.Services;
 
 namespace Web.Controllers;
 
@@ -18,7 +18,8 @@ public class ShoppingCartController : ControllerBase
     private readonly IJwtTokenService _jwtTokenService;
     private readonly IMapper _mapper;
 
-    public ShoppingCartController(DataContext context, IJwtTokenService jwtTokenService, IMapper mapper)
+    public ShoppingCartController(DataContext context, IJwtTokenService jwtTokenService,
+    IMapper mapper)
     {
         _jwtTokenService = jwtTokenService;
         _context = context;
@@ -128,50 +129,50 @@ public class ShoppingCartController : ControllerBase
         BadRequest("Could not persist changes in database");
    }
 
-   private async Task<bool> VerifyCart(ShoppingCartDto cart)
-   {
-    var products = await _context.Products.ToListAsync();
-    if(cart.Count < 0){
-        return false;
-    }
-    decimal sum = 0;
-    int count = 0;
-    foreach(var item in cart.Items)
+
+    private int CalculateCount(ShoppingCart cart)
     {
-        var prod = products.Find(x => x.Id == item.Id);
-        if(prod == null || item.Quantity == 0)
-        {
-            return false;
-        }
-        count += item.Quantity;
-        sum += prod.Price * item.Quantity;
-    }
-
-    if(sum != cart.Sum || count != cart.Count)
-    {
-        return false;
-    }
-    return true;
-   }
-
-   private decimal CalculatePrice(ShoppingCart cart)
-   {
-        decimal price = 0M;
-        foreach(var prod in cart.CartProducts)
-        {
-            price += prod.ProductQuantity * prod.Product.Price;
-        }
-        return price;
-   }
-
-   private int CalculateCount(ShoppingCart cart)
-   {
         int count = 0;
         foreach(var prod in cart.CartProducts)
         {
             count += prod.ProductQuantity;
         }
         return count;
-   }
+    }
 
+    private decimal CalculatePrice(ShoppingCart cart)
+    {
+        decimal price = 0M;
+        foreach(var prod in cart.CartProducts)
+        {
+            price += prod.ProductQuantity * prod.Product.Price;
+        }
+        return price;
+    }
+
+    private async Task<bool> VerifyCart(ShoppingCartDto cart)
+    {
+        var products = await _context.Products.ToListAsync();
+        if(cart.Count < 0){
+            return false;
+        }
+        decimal sum = 0;
+        int count = 0;
+        foreach(var item in cart.Items)
+        {
+            var prod = products.Find(x => x.Id == item.Id);
+            if(prod == null || item.Quantity == 0)
+            {
+                return false;
+            }
+            count += item.Quantity;
+            sum += prod.Price * item.Quantity;
+        }
+
+        if(sum != cart.Sum || count != cart.Count)
+        {
+            return false;
+        }
+        return true;
+    }
 }
