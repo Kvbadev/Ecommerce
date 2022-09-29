@@ -1,12 +1,9 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { shoppingCart, products, oneTimeProduct} from "../../Stores/stores";
+  import { shoppingCart, oneTimeProduct} from "../../Stores/stores";
   import CartProduct from "../ShoppingCart/CartProduct.svelte";
-  console.log($oneTimeProduct);
   
   const prods = $shoppingCart.count ? $shoppingCart.items : $oneTimeProduct ?
                 [$oneTimeProduct] : [];
-  console.log(prods);
   
 </script>
 
@@ -31,8 +28,7 @@
   }
   .list {
     width: 80%;
-    min-height: 48rem;
-    height: 100%;
+    height: auto;
     border-radius: 2rem;
     border: 0.2rem solid rgb(255, 255, 255);
     background-color: rgba(202, 202, 202, 0.15);
@@ -40,7 +36,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     padding: 1.5rem 0;
     overflow: scroll;
   }

@@ -5,7 +5,9 @@ import {link, location} from 'svelte-spa-router'
 import {userProfile} from '../../Stores/stores';
 import { onDestroy } from "svelte";
 import { oneTimeProduct, products, shoppingCart } from "../../Stores/stores";
-  import Loader from "../Common/Loader.svelte";
+import Loader from "../Common/Loader.svelte";
+import Fa from "svelte-fa";
+import { faAngleDoubleLeft} from "@fortawesome/free-solid-svg-icons";
 
 
 if($location == '/buyNow') {
@@ -22,8 +24,9 @@ if($location == '/buyNow') {
     {:else}
     <h1>Buy Products</h1>
     <div class="checkout">
-    <PaymentForm />
-    <PurchaseSummarize />
+        <PaymentForm />
+        <Fa icon={faAngleDoubleLeft} size={"5x"} />
+        <PurchaseSummarize />
     </div>
     {/if}
 {/if}
@@ -51,6 +54,7 @@ if($location == '/buyNow') {
     .checkout {
         display: flex;
         flex-direction: row;
+        align-items: center;
         height: calc(85% - 2rem);
         box-sizing: border-box;
         margin-bottom: 2rem;

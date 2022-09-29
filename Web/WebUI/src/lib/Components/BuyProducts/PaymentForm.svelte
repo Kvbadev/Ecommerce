@@ -3,7 +3,7 @@
 import { agent } from "../../Utils/agent";
 
 import { onMount } from "svelte";
-import { client, HostedFields, hostedFields, HostedFieldsEvent} from 'braintree-web';
+import { client, HostedFields, hostedFields, HostedFieldsEvent, dataCollector, paypal} from 'braintree-web';
 import Loader from '../Common/Loader.svelte';
 import {oneTimeProduct, shoppingCart} from '../../Stores/stores';
 import { get } from "svelte/store";
@@ -19,15 +19,17 @@ let fields: {
     cvv: HTMLElement
 } = {} as any;
 //TODO: add paypal gateway 
-//TODO: add delivery
+//TODO: add delivery (inpost and something foreign)
 
-let loading = true, submitting, getPayload, instance: HostedFields, canSubmit: any=false;
+let loading = true, submitting, getPayload, instance: HostedFields,
+canSubmit = false, deviceData;
 
 
 async function handleSubmit(event: MouseEvent) {
     event.preventDefault();
     if(!canSubmit){
-        toast.push("You have to fill the payment form with proper values!"); //change width
+        toast.push("You have to fill the payment form with proper values!",
+        {theme: {'--toastHeight': '10rem'}}); 
         return;
     } 
     if($shoppingCart.items.length === 0 && $oneTimeProduct === null){
@@ -41,8 +43,8 @@ async function handleSubmit(event: MouseEvent) {
         return;
     }
     const res = !$oneTimeProduct?.id ?
-    await agent.PaymentGateway.BuyCart(payload.nonce) :
-    await agent.PaymentGateway.BuyProduct(payload.nonce, get(oneTimeProduct));
+    await agent.PaymentGateway.BuyCart(payload.nonce, deviceData) :
+    await agent.PaymentGateway.BuyProduct(payload.nonce,  deviceData, get(oneTimeProduct));
 
     if(res === null){
         console.error("Could not finalize the transaction");
@@ -64,8 +66,8 @@ onMount(async () => {
     try{
         instance = await client.create({
             authorization: token
-        }).then(cl => {
-            return hostedFields.create( {
+        }).then(async cl => {
+            const hf = await hostedFields.create( {
                 client: cl,
                 authorization: token,
                 fields: {
@@ -86,10 +88,15 @@ onMount(async () => {
                         placeholder: '123'
                     }
                 }
-            }).then(fields => {
-                loading = false;
-                return fields;
-            })
+            });
+            await dataCollector.create({
+                client: cl
+            }).then(dataCollectorInstance => {
+                deviceData = dataCollectorInstance.deviceData;
+            });
+            loading = false;
+
+            return hf; //returning hosted fields
         })
     } catch (err){
         console.error(err);
@@ -182,9 +189,10 @@ onMount(async () => {
                 on:click={(e) => handleSubmit(e)}>
 
                 {#if submitting}
-                <Loader inElement size={1} color="#ffffff"/>
-                {/if}
+                <Loader inElement size={1} color="#000000"/>
+                {:else}
                 Submit
+                {/if}
             </button>
         </div>
         </span> 
@@ -217,19 +225,19 @@ onMount(async () => {
     }
     .submit-div {
         width: 100%;
+        padding: 1rem;
         display: flex;
         justify-content: center;
         align-items: center;
     }
     .submit {
+        position: relative;
         width: 25rem;
         height: 4.5rem;
         margin: 0;
-        padding: 0;
         display: flex;
         justify-content: center;
         align-items: flex-end;
-        position: relative;
         border: none;
         border-radius: 1rem;
         font-size: 2.5rem;
