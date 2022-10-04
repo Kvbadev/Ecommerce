@@ -19,12 +19,16 @@ let changes: Cart | null = null;
 
 onDestroy(async () => {
     if( changes !== null && 
-        JSON.stringify(changes) !== JSON.stringify($shoppingCart) && 
-        $shoppingCart?.items.length !== 0){
-            await saveLocalCart();
+        JSON.stringify(changes) !== JSON.stringify($shoppingCart)){ 
+            if($shoppingCart?.items.length === 0){
+                await clearCart();
+            } else {
+                await saveLocalCart();
+            }
     }
 })
 
+//cannot use onmount because cart'd not be initialized
 $: if(changes === null && $shoppingCart !== null){
     changes = {...get(shoppingCart)};
 }
@@ -32,7 +36,7 @@ $: if(changes === null && $shoppingCart !== null){
 </script>
 <div class="container">
 {#if !$shoppingCart || !$products}
-    <Loader entire/>
+    <Loader />
 {:else}
 
 {#if $shoppingCart.items.length}

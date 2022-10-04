@@ -1,6 +1,6 @@
 using Core;
 
-namespace Web.Services.JwtToken;
+namespace Web.Services;
 public interface IJwtTokenService
 {
     string GenerateToken(AppUser user);

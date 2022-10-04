@@ -5,7 +5,7 @@
     //TODO: page automatically scrolls back up on page change, fix it
 </script>
     {#if !$products}
-        <Loader entire />
+        <Loader />
     {:else}
     <ul class="list">
         {#each $products as product}
