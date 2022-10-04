@@ -58,8 +58,11 @@ public class PaymentController : ControllerBase
 
             transaction = new Core.Transaction
             {
-                // Products = products,
-                Products = user.ShoppingCart.CartProducts.Select(x => x.Product).ToList() ?? new List<Product>(),
+                // Products = user.ShoppingCart.CartProducts.Select(x => x.Product)
+                //     .ToList() ?? new List<CountableProduct>(),
+                Products = new List<CountableProduct>().Concat(
+                    mapper.Map<CartProduct[], ICollection<CountableProduct>>(user.ShoppingCart.CartProducts.ToArray())
+                ).ToList(),
                 Price = user.ShoppingCart.FinalPrice 
             };
         }
@@ -71,11 +74,17 @@ public class PaymentController : ControllerBase
                 return BadRequest("Product not found");
             }
 
+            var localProduct = new CountableProduct //product to add to transaction
+            {
+                Product = prod,
+                Quantity = quantity
+            };
+
             res = await _paymentService.ProceedTransaction(prod, quantity, nonce, devData);
 
             transaction = new Core.Transaction
             {
-                Products = new List<Product>{ prod },
+                Products = new List<CountableProduct>(1){localProduct},
                 Price = prod.Price * quantity
             };
 
