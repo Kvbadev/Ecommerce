@@ -31,9 +31,22 @@ public class MappingProfiles: AutoMapper.Profile
         CreateMap<CartProduct, ProductSimplified>()
             .ForMember(d => d.Id, o => o.MapFrom(s => s.ProductId))
             .ForMember(d => d.Quantity, o => o.MapFrom(s => s.ProductQuantity));
+
         CreateMap<ProductSimplified, CartProduct>()
             .ForMember(d => d.ProductId, o => o.MapFrom(s => s.Id))
             .ForMember(d => d.ProductQuantity, o => o.MapFrom(s => s.Quantity));
+        
+        CreateMap<CartProduct, CountableProduct>()
+            .ForMember(d => d.Product, o => o.MapFrom(s => s.Product))
+            .ForMember(d => d.Quantity, o => o.MapFrom(s => s.ProductQuantity));
+        
+        CreateMap<CountableProduct, ProductSimplified>()
+            .ForMember(d => d.Id, o => o.MapFrom(s => s.Product.Id))
+            .ForMember(d => d.Quantity, o => o.MapFrom(s => s.Quantity));
+
+        CreateMap<Transaction, TransactionDto>()
+            .ForMember(d => d.Products, o => o.MapFrom(s => s.Products))
+            .ForMember(d => d.Success, o=>o.MapFrom(s => !s.Failure));
     }
 
 }
