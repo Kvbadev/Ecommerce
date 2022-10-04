@@ -26,13 +26,14 @@ public class PaymentService : IPaymentService
         return token;
     }
 
-    public async Task<Result<Braintree.Transaction>> ProceedTransaction(ShoppingCart cart, string nonce)
+    public async Task<Result<Braintree.Transaction>> ProceedTransaction(ShoppingCart cart,
+        string nonce, string devData)
     {
         var request = new TransactionRequest
         {
             Amount = cart.FinalPrice,
             PaymentMethodNonce = nonce,
-            DeviceData = string.Empty,
+            DeviceData = devData,
             Options = new TransactionOptionsRequest
             {
                 SubmitForSettlement = true
@@ -42,13 +43,14 @@ public class PaymentService : IPaymentService
         return result;
     }
 
-    public async Task<Result<Braintree.Transaction>> ProceedTransaction(Product product, int quantity, string nonce)
+    public async Task<Result<Braintree.Transaction>> ProceedTransaction(Product product,
+        int quantity, string nonce, string devData)
     {
         var request = new TransactionRequest
         {
             Amount = product.Price * quantity,
             PaymentMethodNonce = nonce,
-            DeviceData = string.Empty,
+            DeviceData = devData,
             Options = new TransactionOptionsRequest
             {
                 SubmitForSettlement = true

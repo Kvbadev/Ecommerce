@@ -4,6 +4,9 @@ import type Product from "../Models/product";
 import { toast } from '@zerodevx/svelte-toast';
 import type Profile from "../Models/profile";
 import type  User  from "../Models/user";
+import { jwtToken } from "../Stores/stores";
+import { get } from "svelte/store";
+import type Transaction from "../Models/Transaction";
 
 const apiUrl = "https://localhost:5000/api";
 
@@ -25,7 +28,7 @@ async function getProducts(url: string): Promise<Array<Product>> {
 
 async function getCart(url: string): Promise<Cart | null> {
     const cart = await authFetch<Cart>(url, 'GET', null);
-    if(cart.items.length === 0) return null;
+    if(cart?.items?.length === 0) return null;
 
     return cart;
 }
@@ -75,6 +78,7 @@ export const agent = {
         signUp: (user: User) => authFetch<[number, string]>(apiUrl+"/Account/register", 'POST', user, true),
         logIn: async (user: User) => authFetch<[number, string]>(apiUrl+"/Account/login", 'POST', user, true),
         getProfile: () => authFetch<null | Profile>(apiUrl+'/Account/profile', 'GET', null),
+        getTransactions: () => authFetch<Array<Transaction>>(apiUrl+'/Account/transactions', 'GET', null)
     },
     ShoppingCart: {
         GetCart: () => getCart(apiUrl+"/ShoppingCart"),
@@ -84,7 +88,13 @@ export const agent = {
     }, 
     PaymentGateway: {
         GetToken: () => authFetch<string>(apiUrl+"/Payment/token", 'GET', null),
-        BuyCart: (nonce: string) => authFetch<string>(apiUrl+`/Payment/buy/${nonce}`, 'POST', {}),
-        BuyProduct: (nonce: string, product: CartItem) => authFetch<string>(apiUrl+`/Payment/buy/${nonce}`, 'POST', product)
+        BuyCart: (nonce: string, deviceData: string) => 
+        authFetch<string>(apiUrl+`/Payment/buy?nonce=${nonce}`, 'POST', deviceData),
+
+        BuyProduct: (nonce: string, deviceData: string, product: CartItem) => {
+        return authFetch<string>(
+        apiUrl+`/Payment/buy?nonce=${nonce}&id=${product.id}&quantity=${product.quantity}`,
+        'POST', deviceData)
+        }
     }
 }

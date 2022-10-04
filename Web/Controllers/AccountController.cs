@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Web.DTOs;
 using Microsoft.EntityFrameworkCore;
-using Web.Services.JwtToken;
+using Web.Services;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Web.Controllers;

@@ -9,6 +9,7 @@ import QuantityInput from "../Products/Details/QuantityInput.svelte";
   import { link } from "svelte-spa-router";
 
 export let prod: CartItem;
+export let simplified = false;
 let product;
 
 $: {
@@ -24,13 +25,19 @@ async function removeItem() {
 </script>
 
 <div class="container">
+    <div id="count">
+        <h4>{prod.quantity}x</h4>
+    </div>
     <div id="photo">
         <img alt="Product" class="main-photo" src="{product.mainPhoto}"/>
     </div>
     <div class="main-info" id="main-info">
         <p><a href={`/product/${product.id}`} use:link>{product.name}</a></p>
+        {#if !simplified}
         <p class="little-price">{product.price}$</p>
+        {/if}
     </div>
+    {#if !simplified}
     <div class="quantity">
         <QuantityInput bind:quantity={prod.quantity} ModifyCart productID={prod.id}/>
     </div>
@@ -39,6 +46,7 @@ async function removeItem() {
             <Fa icon={faRemove} size={'3.5x'}/>
         </span>
     </div>
+    {/if}
     <div class="price">
         <p>{(product.price*prod.quantity).toFixed(2)}$</p>
     </div>
@@ -59,6 +67,19 @@ async function removeItem() {
     }
     .container div {
         width: 20%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    #count {
+        width: 5%;
+        height: auto;
+        font-size: 3rem;
+        font-family: 'Roboto slab';
+    }
+
+    h4 {
+        height: auto;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -88,6 +109,7 @@ async function removeItem() {
     }
     p {
         font-family: 'Roboto Slab';
-        font-size: 3.5rem;
+        font-size: 3rem;
+        text-align: center;
     }
 </style>

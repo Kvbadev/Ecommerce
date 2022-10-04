@@ -1,18 +1,20 @@
 using System.Text;
-using AutoMapper;
 using Core;
 using Data;
+using Microsoft.Extensions.DependencyInjection;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Web.Services;
-using Web.Services.JwtToken;
 
 
 //TODO: if foreign key contraints failed - CHECK IF ID HASN'T CHANGED  
+
+//TODO: add roles (admin, user)
+
+//TODO: add filters
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +24,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:5173");
+        policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:5173", "http://localhost");
     });
 });
 
@@ -58,7 +60,6 @@ builder.Services.AddAuthentication(opt =>
         };
 });
 
-builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 builder.Services.AddIdentityCore<AppUser>(opt => 
 {
@@ -77,6 +78,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
+
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+
 
 builder.Services.AddDbContext<DataContext>(options => 
 {

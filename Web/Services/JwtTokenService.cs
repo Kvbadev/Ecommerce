@@ -5,7 +5,7 @@ using Core;
 using Microsoft.IdentityModel.Tokens;
 using Web.ExtensionMethods;
 
-namespace Web.Services.JwtToken;
+namespace Web.Services;
 //TODO: implement refresh tokens, improve existing ones to include expiration time better
 public class JwtTokenService : IJwtTokenService
 {

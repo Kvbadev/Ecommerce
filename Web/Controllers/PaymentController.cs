@@ -3,10 +3,8 @@ using Braintree;
 using Core;
 using Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Web.Services;
-using Web.Services.JwtToken;
 
 namespace Web.Controllers;
 
@@ -17,7 +15,8 @@ public class PaymentController : ControllerBase
     private readonly IJwtTokenService _tokenService;
     private readonly DataContext _context;
     private readonly IPaymentService _paymentService;
-    public PaymentController(IJwtTokenService tokenService, DataContext context, IPaymentService paymentService)
+    public PaymentController(IJwtTokenService tokenService, DataContext context,
+    IPaymentService paymentService)
     {
         _paymentService = paymentService; 
         _context = context;
@@ -37,20 +36,25 @@ public class PaymentController : ControllerBase
         return Ok(token);
     }
 
-    [HttpPost("buy/{nonce}")]
-    public async Task<IActionResult> Buy([FromServices]IMapper mapper, [FromRoute]string nonce, [FromBody]ProductSimplified? product)
+    [HttpPost("buy")] //example: buy?nonce=test&id=id&quantity=quantity
+    public async Task<IActionResult> Buy([FromServices]IMapper mapper, string nonce,
+        Guid id, int quantity, [FromBody]string devData)
     {
         Result<Braintree.Transaction> res;
         Core.Transaction transaction;
 
-        var user = _context.Users.Include(x => x.Transactions).Include(x => x.ShoppingCart).ThenInclude(x => x.CartProducts).ThenInclude(x => x.Product).FirstOrDefault(x => x.Id == _tokenService.ExtractId());
-        if(user == null || user.ShoppingCart.Count == 0)
+        var user = _context.Users.Include(x => x.Transactions)
+            .Include(x => x.ShoppingCart).ThenInclude(x => x.CartProducts)
+            .ThenInclude(x => x.Product).FirstOrDefault(x => x.Id == _tokenService.ExtractId());
+
+        if(user == null || (user.ShoppingCart.Count == 0 && quantity==0 && id != Guid.Empty))
         {
             return BadRequest("Invalid request");
         }
-        if(product==null || product?.Quantity == 0) //buy entire cart
+
+        if(quantity == 0) //buy entire cart
         {
-            res = await _paymentService.ProceedTransaction(user.ShoppingCart, nonce);
+            res = await _paymentService.ProceedTransaction(user.ShoppingCart, nonce, devData);
 
             transaction = new Core.Transaction
             {
@@ -61,22 +65,22 @@ public class PaymentController : ControllerBase
         }
         else //buy only the product provided in the request
         {
-            var prod = await _context.Products.FindAsync(product!.Id);
+            var prod = await _context.Products.FindAsync(id);
             if(prod == null)
             {
                 return BadRequest("Product not found");
             }
 
-            res = await _paymentService.ProceedTransaction(prod, product.Quantity, nonce);
+            res = await _paymentService.ProceedTransaction(prod, quantity, nonce, devData);
 
             transaction = new Core.Transaction
             {
                 Products = new List<Product>{ prod },
-                Price = prod.Price * product.Quantity
+                Price = prod.Price * quantity
             };
 
         }
-        transaction.AppUser = user;
+        transaction.AppUser = user; //is it necessary?
         transaction.Failure = !res.IsSuccess();
 
         _context.Transactions.Add(transaction);
