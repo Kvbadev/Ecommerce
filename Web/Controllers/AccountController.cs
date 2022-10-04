@@ -7,6 +7,7 @@ using Web.DTOs;
 using Microsoft.EntityFrameworkCore;
 using Web.Services;
 using Microsoft.AspNetCore.Authorization;
+using Infrastructure.DTOs;
 
 namespace Web.Controllers;
 
@@ -95,5 +96,26 @@ public class AccountController : ControllerBase
 
         _mapper.Map<Core.AppUser, Core.Profile>(user, userProfile);
         return userProfile; 
+    }
+
+    [Authorize]
+    [HttpGet("transactions")]
+    public async Task<IEnumerable<TransactionDto>> Transactions()
+    {
+        var user = await _context.Users.Include(x => x.Transactions)
+        .ThenInclude(x => x.Products).ThenInclude(x => x.Product)
+        .FirstAsync(x => x.Id == _jwtTokenService.ExtractId());
+
+        if(user == null || user.Transactions.Count <= 0)
+        {
+            return Enumerable.Empty<TransactionDto>();
+        }
+        var transactions = _mapper.Map<Transaction[], IEnumerable<TransactionDto>>(user.Transactions.ToArray());
+        
+        if(transactions.Any())
+        {
+            return transactions;
+        }
+        return Enumerable.Empty<TransactionDto>();
     }
 }
