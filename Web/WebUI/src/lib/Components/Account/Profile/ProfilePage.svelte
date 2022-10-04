@@ -1,20 +1,14 @@
 <script lang="ts">
-import { agent } from "../../../Utils/agent";
 
-import { onMount } from "svelte";
 import { push } from "svelte-spa-router";
 
 import { jwtToken, userProfile } from "../../../Stores/stores";
 import Loader from "../../Common/Loader.svelte";
 import { initShoppingCart } from "../../../Stores/ShoppingCartExtensions";
+import ProfileInfo from "./ProfileInfo.svelte";
+import TransactionsInfo from "./TransactionsInfo.svelte";
 
-async function SignOut(){
-    localStorage.removeItem("jwt");
-    jwtToken.set('');
-    userProfile.set(null);
-    initShoppingCart(null);
-    push('/');
-}
+
 
 if(!localStorage.getItem("jwt")){
     push('/account/login');
@@ -23,17 +17,20 @@ if(!localStorage.getItem("jwt")){
 
 
 {#if !$userProfile}
-    <Loader entire />
+    <Loader />
 {:else}
 <div class="container">
-    <h1>{$userProfile.username}</h1>
-    <p>{$userProfile.email}</p>
-    <button class="signout" type="button" on:click={SignOut}>Sign out</button>
+    <ProfileInfo />
+    <TransactionsInfo />
 </div>
 {/if}
 
 <style>
-.container *{
-    margin: 2rem;
+.container {
+    width: 100vw;
+    height: calc(100vh - 4.2vw);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr ;
 }
 </style>

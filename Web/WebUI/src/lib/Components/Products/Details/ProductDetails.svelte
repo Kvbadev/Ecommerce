@@ -13,7 +13,7 @@ let product;
 </script>
 
 {#if (product = $products?.find(x => x.id === params.id)) == undefined}
-    <Loader entire />
+    <Loader />
 {:else}
 <div class="container">
     <ProductSlider product={product} />

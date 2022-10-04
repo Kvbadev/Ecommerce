@@ -17,7 +17,7 @@ if($location == '/buyNow') {
 
 <div class="container">
 {#if !$shoppingCart || !$products}
-<Loader entire />
+<Loader />
 {:else}
     {#if !$userProfile?.username}
     <h1>You must be <a href="/account/login" use:link>logged in </a>to buy from our store!</h1>

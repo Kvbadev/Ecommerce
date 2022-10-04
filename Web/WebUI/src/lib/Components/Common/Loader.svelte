@@ -6,7 +6,6 @@
 
     export let size = 10;
     export let color = "#ff8655";
-    export let entire = false;
     export let inElement = false;
 
     let timeout;
@@ -21,13 +20,13 @@
 </script>
 
 {#if inElement}
-    <div class="spinner {entire ? 'whole':''}">
+    <div class="spinner">
         <span class="rotation">
             <Fa icon={faCircleNotch} size={`${size}x`} color={color} spin />
         </span>
     </div>
 {:else}
-<div class="loader {entire ? 'whole':''}">
+<div class="loader">
     <div class="rotation">
         <Fa icon={faCircleNotch} size={`${size}x`} color={color} spin />
     </div>
@@ -37,11 +36,8 @@
 <!-- Loader need to have parent with position relative and display: flex! -->
 
 <style>
-    .whole {
-        background-color: white;
-    }
-
     .loader {
+        background-color: white;
         z-index: 1000;
         width: 100vw;
         height: 100vh;
@@ -53,6 +49,7 @@
         align-items: center;
     }
     .spinner {
+        background-color: inherit;
         z-index: 2;
         width: 100%;
         height: 100%;
