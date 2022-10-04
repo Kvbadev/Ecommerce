@@ -36,7 +36,7 @@ $: if(changes === null && $shoppingCart !== null){
 </script>
 <div class="container">
 {#if !$shoppingCart || !$products}
-    <Loader entire/>
+    <Loader />
 {:else}
 
 {#if $shoppingCart.items.length}

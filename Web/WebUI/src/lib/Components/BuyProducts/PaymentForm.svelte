@@ -3,7 +3,7 @@
 import { agent } from "../../Utils/agent";
 
 import { onMount } from "svelte";
-import { client, HostedFields, hostedFields, HostedFieldsEvent, dataCollector, paypal} from 'braintree-web';
+import { client, HostedFields, hostedFields, HostedFieldsEvent, dataCollector} from 'braintree-web';
 import Loader from '../Common/Loader.svelte';
 import {oneTimeProduct, shoppingCart} from '../../Stores/stores';
 import { get } from "svelte/store";
@@ -89,6 +89,7 @@ onMount(async () => {
                     }
                 }
             });
+
             await dataCollector.create({
                 client: cl
             }).then(dataCollectorInstance => {
@@ -149,7 +150,7 @@ onMount(async () => {
     <form class="form">
         <span>
         {#if loading}
-        <Loader inElement size={3} color='#000000' entire/>
+        <Loader inElement size={3} color='#000000'/>
         {/if}
         <div class="cardholder-name-div form-div">
             <label for="cardholer-name" 
@@ -273,7 +274,8 @@ onMount(async () => {
         min-height: 48rem;
         height: 100%;
         border-radius: 2rem;
-        border: 0.2rem solid black;
+        /* border: 0.2rem solid black; */
+        background-color: rgba(202, 202, 202, 0.15);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -283,6 +285,7 @@ onMount(async () => {
     }
     span {
         position: relative;
+        background-color: #f7f7f7;
     }
 
 </style>

@@ -6,6 +6,7 @@ import type Profile from "../Models/profile";
 import type  User  from "../Models/user";
 import { jwtToken } from "../Stores/stores";
 import { get } from "svelte/store";
+import type Transaction from "../Models/Transaction";
 
 const apiUrl = "https://localhost:5000/api";
 
@@ -77,6 +78,7 @@ export const agent = {
         signUp: (user: User) => authFetch<[number, string]>(apiUrl+"/Account/register", 'POST', user, true),
         logIn: async (user: User) => authFetch<[number, string]>(apiUrl+"/Account/login", 'POST', user, true),
         getProfile: () => authFetch<null | Profile>(apiUrl+'/Account/profile', 'GET', null),
+        getTransactions: () => authFetch<Array<Transaction>>(apiUrl+'/Account/transactions', 'GET', null)
     },
     ShoppingCart: {
         GetCart: () => getCart(apiUrl+"/ShoppingCart"),
