@@ -7,14 +7,17 @@ import {products} from '../../Stores/stores';
 import {shoppingCart} from '../../Stores/stores';
 import QuantityInput from "../Products/Details/QuantityInput.svelte";
   import { link } from "svelte-spa-router";
+  import Loader from "../Common/Loader.svelte";
 
 export let prod: CartItem;
 export let simplified = false;
+export let size = 62.5;
 let product;
 
 $: {
-    if($shoppingCart) //if statement used to update on shoppingcart's change
+    if($shoppingCart && $products){ //if statement used to update on shoppingcart's change
         product = $products.find(x => x.id === prod.id)
+    }
 };
 
 async function removeItem() {
@@ -23,8 +26,9 @@ async function removeItem() {
 
 
 </script>
+{#if $products} <!--Weird bug when opening profile without this if-->
 
-<div class="container">
+<div class="container" style={`font-size: ${size}%`}>
     <div id="count">
         <h4>{prod.quantity}x</h4>
     </div>
@@ -51,6 +55,7 @@ async function removeItem() {
         <p>{(product.price*prod.quantity).toFixed(2)}$</p>
     </div>
 </div>
+{/if}
 
 <style>
     .container {
@@ -58,10 +63,10 @@ async function removeItem() {
         align-items: center;
         justify-content: space-evenly;
         flex-direction: row;
-        border: 0.2rem black solid;
-        border-radius: 1.5rem;
-        margin: 1rem;
-        padding: 0 0.5rem;
+        border: 0.2em black solid;
+        border-radius: 1.5em;
+        margin: 1em;
+        padding: 0 0.5em;
         width: 90%;
         height: auto;
     }
@@ -74,7 +79,7 @@ async function removeItem() {
     #count {
         width: 5%;
         height: auto;
-        font-size: 3rem;
+        font-size: 3em;
         font-family: 'Roboto slab';
     }
 
@@ -92,24 +97,24 @@ async function removeItem() {
     }
 
     .little-price {
-        font-size: 2rem;
+        font-size: 2em;
         color: gray;
     }
     
     .container * {
-    padding: 0.2rem;
+    padding: 0.2em;
     }
     img {
-        width: 10rem;
-        height: 10rem;
-        border-radius: 2rem;
+        width: 10em;
+        height: 10em;
+        border-radius: 2em;
     }
     .remove span{
         cursor: pointer;
     }
     p {
         font-family: 'Roboto Slab';
-        font-size: 3rem;
+        font-size: 3em;
         text-align: center;
     }
 </style>

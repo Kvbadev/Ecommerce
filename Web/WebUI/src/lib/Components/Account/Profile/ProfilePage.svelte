@@ -2,9 +2,8 @@
 
 import { push } from "svelte-spa-router";
 
-import { jwtToken, userProfile } from "../../../Stores/stores";
+import { userProfile } from "../../../Stores/stores";
 import Loader from "../../Common/Loader.svelte";
-import { initShoppingCart } from "../../../Stores/ShoppingCartExtensions";
 import ProfileInfo from "./ProfileInfo.svelte";
 import TransactionsInfo from "./TransactionsInfo.svelte";
 

@@ -110,12 +110,10 @@ public class AccountController : ControllerBase
         {
             return Enumerable.Empty<TransactionDto>();
         }
-        var transactions = _mapper.Map<Transaction[], IEnumerable<TransactionDto>>(user.Transactions.ToArray());
+        var transactions = _mapper.Map<Transaction[], IEnumerable<TransactionDto>>
+                            (user.Transactions.ToArray()).Where(x => x.Success);
         
-        if(transactions.Any())
-        {
-            return transactions;
-        }
-        return Enumerable.Empty<TransactionDto>();
+        return transactions.Any() ? transactions : 
+        Enumerable.Empty<TransactionDto>();
     }
 }

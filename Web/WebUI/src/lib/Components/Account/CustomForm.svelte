@@ -57,17 +57,20 @@ import { get } from "svelte/store";
                 localStorage.setItem("jwt", message);
                 userProfile.set(await agent.Account.getProfile());
                 
-                if(get(shoppingCart).items.length && type === 'Login'){
+                if($shoppingCart.items.length && type === 'Login'){
+                    console.log(1);
                     loading = false;
                     showModal = true;
                 }
                 //if registering then persist a cart
                 else if($shoppingCart.items.length && type === "Signup"){
+                    console.log(2);
                     loading = canSubmit = false;
                     await agent.ShoppingCart.setCart(get(shoppingCart))
                     push('/');
 
                 } else {
+                    console.log(3);
                     initShoppingCart(await agent.ShoppingCart.GetCart());
                     loading = canSubmit = false;
                     push('/');

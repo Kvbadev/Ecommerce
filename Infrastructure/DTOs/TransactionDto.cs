@@ -4,6 +4,7 @@ namespace Infrastructure.DTOs;
 
 public class TransactionDto
 {
+    public Guid Id { get; set; }
     public decimal Price { get; set; }
     public IEnumerable<ProductSimplified> Products { get; set; } = default!;
     public DateTime IssuedAt { get; set; }
