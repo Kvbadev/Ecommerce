@@ -26,12 +26,16 @@ const buyNow = () => {
 </div>
 
 <style>
+    .container {
+        display: flex;
+        flex-direction: row;
+    }
     button {
         cursor: pointer;
         font-family: Raleway;
         border: black 0.4rem solid;
-        width: 23rem;
-        height: 7rem;
+        width: 50%;
+        height: 8rem;
         background-color: transparent;
         font-size: 3rem;
         text-align: center;

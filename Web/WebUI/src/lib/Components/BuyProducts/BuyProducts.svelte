@@ -20,7 +20,7 @@ if($location == '/buyNow') {
 <Loader />
 {:else}
     {#if !$userProfile?.username}
-    <h1>You must be <a href="/account/login" use:link>logged in </a>to buy from our store!</h1>
+    <h1>You must be&nbsp;<a href="/account/login" use:link>logged in</a>&nbsp;to buy from our store!</h1>
     {:else}
     <h1>Buy Products</h1>
     <div class="checkout">

@@ -17,7 +17,7 @@ function edit(){
 </script>
 
 <div class="container">
-    <div class="username"><p>{$userProfile.username}</p></div>
+    <h1 class="username">{$userProfile.username}</h1>
     <div class="details">
         <div class="firstname">
             <p>{$userProfile.firstname}</p>
@@ -37,12 +37,14 @@ function edit(){
 
 <style>
     .username {
+        background-color: aliceblue;
+        align-self: flex-start;
         width: 100%;
         height: 20%;
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 8rem;
+        font-size: 7rem;
         font-family: 'Raleway';
     }
     .details {
@@ -56,10 +58,6 @@ function edit(){
         color: rgb(187, 187, 187);
         font-size: 4rem;
         font-family: 'Raleway';
-    }
-    .username p {
-        background-color: aliceblue;
-        padding: 1rem;
     }
     .details div p{
         width: 25rem;
@@ -85,7 +83,6 @@ function edit(){
     .container {
         display: flex;
         flex-direction: column;
-        justify-content: center;
         align-items: center;
     }
     .buttons {
