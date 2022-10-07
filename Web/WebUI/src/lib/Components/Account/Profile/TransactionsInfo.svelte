@@ -1,18 +1,15 @@
 <script lang="ts">
 import { agent } from "../../../Utils/agent";
-import { onMount } from "svelte";
 import Loader from "../../Common/Loader.svelte";
 import CartProduct from "../../ShoppingCart/CartProduct.svelte";
-  import type Transaction from "src/lib/Models/Transaction";
-  import { link } from "svelte-spa-router";
-  import { select_value } from "svelte/internal";
-
-let transactions: Array<Transaction> | Promise<Array<Transaction>>;
+import { link } from "svelte-spa-router";
+//TODO: fix left margin as it is smaller than the right one
 </script>
 
 <div class="container">
+    
     <h1>Previous Purchases</h1>
-    {#await transactions = agent.Account.getTransactions()}
+    {#await agent.Account.getTransactions()}
         <Loader inElement color={'#000000'} size={5}/>
     {:then value} 
     {#if !value.length}
@@ -57,6 +54,7 @@ let transactions: Array<Transaction> | Promise<Array<Transaction>>;
         position: relative;
         background-color: rgb(239, 248, 255);
         overflow: auto;
+        margin-bottom: 1rem;
     }
     ul {
         list-style: none !important;
@@ -93,7 +91,7 @@ let transactions: Array<Transaction> | Promise<Array<Transaction>>;
         border-radius: 3rem;
         margin: 1rem;
         display: flex;
-        height: 20rem;
+        height: 26rem;
         flex-direction: column;
         border-radius: 1rem;
         overflow: scroll;
@@ -112,7 +110,11 @@ let transactions: Array<Transaction> | Promise<Array<Transaction>>;
     .list {
         font-family: 'Raleway';
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        place-items: center;
+        height: 80%;
+        
+        /* grid-template-columns: 1fr 1fr; */
+        grid-template-columns: repeat(auto-fit, minmax(40%, 1fr))
         /* grid-template-rows: minmax(auto, 27rem) 27rem; */
     }
     h2 {
