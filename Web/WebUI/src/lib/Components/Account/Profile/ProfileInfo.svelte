@@ -1,17 +1,53 @@
 <script lang="ts">
   import { push } from 'svelte-spa-router';
+  import { select_option } from 'svelte/internal';
   import { initShoppingCart } from '../../../Stores/ShoppingCartExtensions';
 import {jwtToken, userProfile} from '../../../Stores/stores'
+  import Loader from '../../Common/Loader.svelte';
+
+let clientInfo = {
+    firstname: $userProfile.firstname,
+    lastname: $userProfile.lastname,
+    email: $userProfile.email
+};
+
+let editmode = false, submitting = false, prevForm = JSON.stringify(clientInfo),
+changed = false;
+
+$: if(prevForm !== JSON.stringify(clientInfo)) changed = true; else changed = false;
+
 
 async function SignOut(){
+    if(editmode){
+        editmode = false;
+        clientInfo = JSON.parse(prevForm);
+        return;
+    }
     localStorage.removeItem("jwt");
     jwtToken.set('');
     userProfile.set(null);
     initShoppingCart(null);
     push('/');
 }
-function edit(){
+function getInputValues() {
+    return JSON.stringify(clientInfo);
+}
+async function onSubmit() {
+    await new Promise(res => setTimeout(res, 2000));
+}
+async function edit(){
 
+    if(!editmode){
+        editmode = true;
+        prevForm = getInputValues();
+        console.log(prevForm);
+        return;
+    }
+    
+    submitting = true;
+    await onSubmit();
+    submitting = false;
+    editmode = false;
 }
 
 </script>
@@ -20,22 +56,49 @@ function edit(){
     <h1 class="username">{$userProfile.username}</h1>
     <div class="details">
         <div class="firstname">
+            {#if editmode}
+            <input bind:value={clientInfo.firstname} placeholder="Jan"/>
+            {:else}
             <p>{$userProfile.firstname}</p>
+            {/if}
         </div>
         <div class="lastname">
+            {#if editmode}
+            <input bind:value={clientInfo.lastname} placeholder="Kowalski"/>
+            {:else}
             <p>{$userProfile.lastname}</p>
+            {/if}
         </div>
         <div class="email">
+            {#if editmode}
+            <input bind:value={clientInfo.email} placeholder="jan@kowalski.com"/>
+            {:else}
             <p>{$userProfile.email}</p>
+            {/if}
         </div>
     </div>
     <div class="buttons">
-        <button class="signout" type="button" on:click={SignOut}>Sign out</button>
-        <button class="edit" type="button" on:click={edit}>Edit</button>
+        <button class={`${editmode ? 'cancel':'signout'}`} type="button" on:click={SignOut}>
+            {#if editmode}
+            Cancel
+            {:else}
+            Sign out
+            {/if}
+        </button>
+        <button class={`edit ${editmode ? !changed ? 'disabled' : 'submit':''}`} type="submit"
+        on:click={edit} disabled={editmode && !changed}>
+            {editmode? 'Submit' : 'Edit'}
+            {#if editmode && submitting}
+            <Loader inElement size={1} color={'#ffffff'}/>
+            {/if}
+        </button>
     </div>
 </div>
 
 <style>
+    .container {
+        background-color: rgb(201, 216, 228);
+    }
     .username {
         background-color: aliceblue;
         align-self: flex-start;
@@ -59,26 +122,41 @@ function edit(){
         font-size: 4rem;
         font-family: 'Raleway';
     }
-    .details div p{
-        width: 25rem;
+    .details > div {
+        position: relative;
+        height: auto;
+        margin: 1rem;
     }
+    .details div *{
+        font-family: 'Raleway';
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        width: 25rem;
+        height: 3rem;
+        font-size: 3.5rem;
+    }
+    .details div input {
+        font-size: 2rem !important;
+        border: 0.2rem black solid;
+        border-radius: 0.5rem;
+        text-align: center;
+        background-color: transparent;
+    }
+    .details > div::before {
+        position: absolute;
+        right: 130%;
+        top: -35%;
+        color: rgba(114, 114, 114, 0.46);
+    }  
     .firstname::before {
         content: 'Firstname';
-        position: absolute;
-        left: 6%;
-        color: rgba(114, 114, 114, 0.46);
     }
     .email::before {
         content: 'Email';
-        position: absolute;
-        left: 6%;
-        color: rgba(114, 114, 114, 0.46);
     }
     .lastname::before {
         content: 'Lastname';
-        position: absolute;
-        left: 6%;
-        color: rgba(114, 114, 114, 0.46);
     }
     .container {
         display: flex;
@@ -96,10 +174,12 @@ function edit(){
         font-family: 'Raleway';
         width: 30%;
         height: 100%;
-        /* padding: 2%; */
         border: none;
         font-size: 3rem;
         border-radius: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         transition: all 0.5s ease;
         cursor: pointer;
     }
@@ -107,11 +187,25 @@ function edit(){
         background-color: white;
         border: 0.2rem black solid !important;
     }
+    .cancel {
+        background-color: red;
+        color: white;
+    }
     .edit {
         background-color: black !important;
         color: white;
+        position: relative;
     }
-    .buttons button:hover{
-        opacity: 50%;
+    .submit {
+        background-color: rgb(47, 177, 27) !important;
+        position: relative;
+        color: white;
+    }
+    .disabled {
+        background-color: rgb(151, 151, 151) !important;
+        cursor:default !important;
+    }
+    .submit:hover{
+        opacity: 70%;
     }
 </style>
