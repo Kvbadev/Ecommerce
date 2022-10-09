@@ -1,4 +1,5 @@
 <script lang="ts">
+    //TODO: make them slider smaller
 import { faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {fade} from 'svelte/transition';
 

@@ -11,7 +11,7 @@
     <ul class="list">
       {#each prods as prod}
         <li class="element">
-          <CartProduct prod={prod} simplified/>
+          <CartProduct prod={prod} simplified size={60}/>
         </li>
       {:else}
         <h1>Add some products to the cart at first</h1>
@@ -28,6 +28,7 @@
   }
   .list {
     width: 80%;
+    /* height: 100%; */
     height: auto;
     border-radius: 2rem;
     border: 0.2rem solid rgb(255, 255, 255);
@@ -36,7 +37,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     padding: 1.5rem 0;
     overflow: scroll;
   }
