@@ -36,8 +36,10 @@ public class MappingProfiles: AutoMapper.Profile
             .ForMember(d => d.ProductId, o => o.MapFrom(s => s.Id))
             .ForMember(d => d.ProductQuantity, o => o.MapFrom(s => s.Quantity));
         
+        CreateMap<Core.Profile, AppUser>()
+            .ForMember(d => d.UserName, o => o.Ignore());
+        
         CreateMap<CartProduct, CountableProduct>()
-            .ForMember(d => d.Product, o => o.MapFrom(s => s.Product))
             .ForMember(d => d.Quantity, o => o.MapFrom(s => s.ProductQuantity));
         
         CreateMap<CountableProduct, ProductSimplified>()
