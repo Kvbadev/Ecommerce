@@ -57,7 +57,7 @@ import { get } from "svelte/store";
                 localStorage.setItem("jwt", message);
                 userProfile.set(await agent.Account.getProfile());
                 
-                if(get(shoppingCart).items.length && type === 'Login'){
+                if($shoppingCart.items.length && type === 'Login'){
                     loading = false;
                     showModal = true;
                 }

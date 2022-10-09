@@ -49,6 +49,7 @@
         align-items: center;
     }
     .spinner {
+        border-radius: inherit;
         background-color: inherit;
         z-index: 2;
         width: 100%;
