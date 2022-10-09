@@ -12,6 +12,7 @@ using Infrastructure.DTOs;
 namespace Web.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class AccountController : ControllerBase
 {
@@ -35,6 +36,7 @@ public class AccountController : ControllerBase
         _context = context;
     }
 
+    [AllowAnonymous]
     [HttpPost("register")]
     public async Task<IActionResult> RegisterUser(RegisterDto user)
     {
@@ -61,6 +63,7 @@ public class AccountController : ControllerBase
         return BadRequest(result.Errors.ElementAt(0).Description.ToString()); //return one of the errors
     }
 
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDto creds)
     {
@@ -77,28 +80,33 @@ public class AccountController : ControllerBase
         return BadRequest("Invalid Password");
     }
 
-    [Authorize]
     [HttpGet("profile")]
     public async Task<Core.Profile?> Profile() 
     {
-        
-        var userId = _jwtTokenService.ExtractId();
-        if(userId == string.Empty)
+        var user = await _context.Users.FindAsync(_jwtTokenService.ExtractId());
+        if(user is null)
         {
             return null;
         }
 
-        Core.Profile? userProfile = new Core.Profile();
-        AppUser? user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
-        if(user == null){
-            return null;
-        } 
-
-        _mapper.Map<Core.AppUser, Core.Profile>(user, userProfile);
-        return userProfile; 
+        return _mapper.Map<Core.AppUser, Core.Profile>(user);
     }
 
-    [Authorize]
+    [HttpPatch("profile")]
+    public async Task<IActionResult> UpdateProfile(Core.Profile updatedProf)
+    {
+        var user = await _context.Users.FindAsync(_jwtTokenService.ExtractId());
+        if(user is null)
+        {
+            return BadRequest("User does not exist");
+        }
+        
+        var res=await _userManager.UpdateAsync(_mapper.Map<Core.Profile, AppUser>
+                                      (updatedProf, user));
+        return res.Succeeded ? Ok() :
+        BadRequest(res.Errors);
+    }
+
     [HttpGet("transactions")]
     public async Task<IEnumerable<TransactionDto>> Transactions()
     {

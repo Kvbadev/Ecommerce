@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { push } from 'svelte-spa-router';
-  import { select_option } from 'svelte/internal';
-  import { initShoppingCart } from '../../../Stores/ShoppingCartExtensions';
+  import { agent } from '../../../Utils/agent';
+import { push } from 'svelte-spa-router';
+import { initShoppingCart } from '../../../Stores/ShoppingCartExtensions';
 import {jwtToken, userProfile} from '../../../Stores/stores'
-  import Loader from '../../Common/Loader.svelte';
+import Loader from '../../Common/Loader.svelte';
 
 let clientInfo = {
     firstname: $userProfile.firstname,
@@ -17,7 +17,7 @@ changed = false;
 $: if(prevForm !== JSON.stringify(clientInfo)) changed = true; else changed = false;
 
 
-async function SignOut(){
+async function SignOutCancel(){
     if(editmode){
         editmode = false;
         clientInfo = JSON.parse(prevForm);
@@ -33,21 +33,18 @@ function getInputValues() {
     return JSON.stringify(clientInfo);
 }
 async function onSubmit() {
-    await new Promise(res => setTimeout(res, 2000));
+    await agent.Account.updateProfile(clientInfo);
+    userProfile.set(await agent.Account.getProfile());
 }
 async function edit(){
-
     if(!editmode){
         editmode = true;
         prevForm = getInputValues();
-        console.log(prevForm);
         return;
     }
-    
     submitting = true;
     await onSubmit();
-    submitting = false;
-    editmode = false;
+    submitting = editmode = false;
 }
 
 </script>
@@ -78,7 +75,7 @@ async function edit(){
         </div>
     </div>
     <div class="buttons">
-        <button class={`${editmode ? 'cancel':'signout'}`} type="button" on:click={SignOut}>
+        <button class={`${editmode ? 'cancel':'signout'}`} type="button" on:click={SignOutCancel}>
             {#if editmode}
             Cancel
             {:else}

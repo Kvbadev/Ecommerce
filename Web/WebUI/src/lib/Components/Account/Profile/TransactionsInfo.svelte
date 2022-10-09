@@ -3,7 +3,6 @@ import { agent } from "../../../Utils/agent";
 import Loader from "../../Common/Loader.svelte";
 import CartProduct from "../../ShoppingCart/CartProduct.svelte";
 import { link } from "svelte-spa-router";
-//TODO: fix left margin as it is smaller than the right one
 </script>
 
 <div class="container">
@@ -78,7 +77,7 @@ import { link } from "svelte-spa-router";
     .element {
         border: solid black 0.2rem;
         border-radius: 1rem;
-        margin: 1rem 0 1rem 1rem;
+        margin: 1rem 0;
         max-height: 100%;
         display: flex;
         flex-direction: column;
