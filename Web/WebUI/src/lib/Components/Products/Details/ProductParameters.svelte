@@ -19,7 +19,7 @@ import type Product from "src/lib/Models/product";
     .container {
         overflow: auto;
         grid-area: params;
-        height: 50rem;
+        height: auto;
         display: flex;
         justify-content: center;
         align-items: center;

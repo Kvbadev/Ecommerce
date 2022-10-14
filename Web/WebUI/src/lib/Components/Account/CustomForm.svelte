@@ -92,8 +92,6 @@ import { get } from "svelte/store";
         <form class="form" on:submit|preventDefault={onSubmit}>
             <h1>{type==='Signup'?'Sign Up!':'Log In!'}</h1>
             <div class="fields" on:keyup={onInput}>
-            <!-- TODO: change input sizes not to be reactive -->
-            <!-- TODO: change loader not to cover button's border-->
             {#each fields as field, i}
                 {#if field === 'email'}
                     <FormField name={field} regex={new RegExp(/^\S+@\S+\.\S+$/)} bind:isOk={isOk[i]} minLen={4} maxLen={50}/>
