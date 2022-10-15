@@ -5,6 +5,7 @@ import { toast } from '@zerodevx/svelte-toast';
 import type Profile from "../Models/profile";
 import type  User  from "../Models/user";
 import type Transaction from "../Models/transaction";
+import AuthResponse from "../Models/authResponse";
 
 const apiUrl = "https://localhost:5000/api";
 
@@ -77,7 +78,8 @@ export const agent = {
         logIn: async (user: User) => authFetch<[number, string]>(apiUrl+"/Account/login", 'POST', user, true),
         getProfile: () => authFetch<null | Profile>(apiUrl+'/Account/profile', 'GET', null),
         getTransactions: () => authFetch<Array<Transaction>>(apiUrl+'/Account/transactions', 'GET', null),
-        updateProfile: (profile: Partial<Profile>) => authFetch<string>(apiUrl+'/Account/profile', "PATCH", profile)
+        updateProfile: (profile: Partial<Profile>) => authFetch<string>(apiUrl+'/Account/profile', "PATCH", profile),
+        refreshTokens: (refreshToken: string) => authFetch<AuthResponse>(apiUrl+'/token/refresh', 'PATCH', refreshToken)
     },
     ShoppingCart: {
         GetCart: () => getCart(apiUrl+"/ShoppingCart"),
@@ -87,6 +89,7 @@ export const agent = {
     }, 
     PaymentGateway: {
         GetToken: () => authFetch<string>(apiUrl+"/Payment/token", 'GET', null),
+
         BuyCart: (nonce: string, deviceData: string) => 
         authFetch<string>(apiUrl+`/Payment/buy?nonce=${nonce}`, 'POST', deviceData),
 

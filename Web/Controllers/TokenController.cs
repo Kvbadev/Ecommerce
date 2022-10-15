@@ -1,5 +1,6 @@
 using Data;
 using Infrastructure.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Web.Services;
 
@@ -17,20 +18,19 @@ public class TokenController: ControllerBase
         _context = context;
     }
 
-    [Route("refresh"), HttpGet]
-    public async Task<IActionResult> Refresh(AuthResponse tokens)
+    [Route("refresh"), HttpPatch]
+    public async Task<IActionResult> Refresh([FromBody]AuthResponse req)
     {
-        if(tokens.AccessToken == string.Empty || tokens.RefreshToken == string.Empty)
-        {
-            return BadRequest("Invalid tokens");
-        }
         var user = await _context.Users.
-                         FindAsync(_jwt.ExtractId(tokens.AccessToken!));
+                         FindAsync(_jwt.ExtractId(req.AccessToken ?? ""));
 
-        if(user is null || user.RefreshToken != tokens.RefreshToken ||
-                user.RefreshTokenExpiry <= DateTime.UtcNow)
+        if(user is null)
         {
-            return BadRequest("Something went wrong");
+            return BadRequest("Invalid user");
+        } 
+        if(user.RefreshToken != req.RefreshToken || user.RefreshTokenExpiry <= DateTime.UtcNow)
+        {
+            return BadRequest("Invalid refresh token");
         }
 
         var refresh = _jwt.GenerateRefreshToken();

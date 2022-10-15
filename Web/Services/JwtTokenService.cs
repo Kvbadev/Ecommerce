@@ -24,6 +24,7 @@ public class JwtTokenService : IJwtTokenService
         var key = Encoding.ASCII.GetBytes(_configuration["JwtKey"]);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
+            //cannot remove audience here even though it is alredy set in program.cs because then the system breaks
             Audience = "https://localhost:5000",
             Issuer = "https://localhost:5000",
             Subject = new System.Security.Claims.ClaimsIdentity(new Claim[]
