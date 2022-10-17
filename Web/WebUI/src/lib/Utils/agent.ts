@@ -37,11 +37,6 @@ async function getCart(url: string): Promise<Cart | null> {
 async function resendFetch(url: string, method, headers, body) {
     await agent.Account.refreshTokens();
     return await fetch(url, {method: method, headers: {...headers}, body: body !== null ? JSON.stringify(body):null});
-    if(!res.ok) {
-        toast.push("Your user account has problems reaching desired content");
-        return null;
-    }
-    return res;
 }
 
 async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PATCH', body?: any, validation:boolean=false): Promise<T>{
