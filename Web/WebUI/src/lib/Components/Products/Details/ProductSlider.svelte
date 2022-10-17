@@ -1,5 +1,4 @@
 <script lang="ts">
-    //TODO: make them slider smaller
 import { faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {fade} from 'svelte/transition';
 
@@ -19,27 +18,18 @@ const onChange = (newIndex) => {
 
 <div class="container">
     <div class="slider">
-        <!-- <span class="button left" on:click={() => index = --index%(0-maxPhotos)}> -->
         <span class="button left" on:click={() => onChange(index-1)}>
             <Fa icon={faAngleLeft} size={"7x"} color={'rgba(0, 0, 0, 0.7)'}/>
         </span>
 
         <span in:fade class="big-image">
-            <!-- <img src={photos.at(index)} alt="Product photos"/> -->
             {#each photos as photo, i}
-                <!-- {#if i===index} -->
                 <img src={photo} alt={`Product ${photo}`} 
-                style={`left: ${(((i-index)+maxPhotos)%maxPhotos)*100}%;`}
+                    style={`left: ${(((i-index)+maxPhotos)%maxPhotos)*100}%;`}
                 /> 
-                <!-- {:else}
-                <img src={photo} alt={`Product ${photo}`} 
-                style={`left: ${(((i-index)+maxPhotos)%maxPhotos)*100}%;`}
-                /> 
-                {/if} -->
             {/each}
         </span>
 
-        <!-- <span class="button right" on:click={() => index = ++index%maxPhotos}> -->
         <span class="button right" on:click={() => onChange((index+1)%maxPhotos)}>
             <Fa icon={faAngleRight} size={"7x"} color={'rgba(0, 0, 0, 0.7)'}/>
         </span>  
@@ -59,10 +49,12 @@ const onChange = (newIndex) => {
         position: relative;
         background-color: white;
         border: black 0.15rem solid;
-        width: 60%;
-        height: 90%;
+        width: 28vw;
+        height: 23vw;
     }                
     .big-image img {
+        width: 100%;
+        height: 100%;
         position: absolute;
         transition: 500ms all ease-out;
     }
@@ -110,9 +102,6 @@ const onChange = (newIndex) => {
         align-items: center;
         justify-content: space-evenly;
     }
-    .slider img {
-        width: 100%;
-        height: 100%;
-    }
+
 
 </style>

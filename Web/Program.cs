@@ -107,13 +107,14 @@ using (var scope = app.Services.CreateScope())
     await Seed.SeedData(context);
 }
 
+app.UseCors();
+
 app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.UseHttpsRedirection();
 
-app.UseCors();
 
 app.MapControllers();
 
