@@ -127,6 +127,7 @@ public class AccountController : ControllerBase
     [HttpGet("transactions")]
     public async Task<IEnumerable<TransactionDto>> Transactions()
     {
+        var id = _jwtTokenService.ExtractId();
         var user = await _context.Users.Include(x => x.Transactions)
         .ThenInclude(x => x.Products).ThenInclude(x => x.Product)
         .FirstAsync(x => x.Id == _jwtTokenService.ExtractId());

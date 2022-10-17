@@ -5,7 +5,9 @@ import { toast } from '@zerodevx/svelte-toast';
 import type Profile from "../Models/profile";
 import type  User  from "../Models/user";
 import type Transaction from "../Models/transaction";
-import AuthResponse from "../Models/authResponse";
+import type AuthResponse from "../Models/authResponse";
+import { jwtToken, refreshToken } from "../Stores/stores";
+import { get } from "svelte/store";
 
 const apiUrl = "https://localhost:5000/api";
 
@@ -32,6 +34,16 @@ async function getCart(url: string): Promise<Cart | null> {
     return cart;
 }
 
+async function resendFetch(url: string, method, headers, body) {
+    await agent.Account.refreshTokens();
+    return await fetch(url, {method: method, headers: {...headers}, body: body !== null ? JSON.stringify(body):null});
+    if(!res.ok) {
+        toast.push("Your user account has problems reaching desired content");
+        return null;
+    }
+    return res;
+}
+
 async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PATCH', body?: any, validation:boolean=false): Promise<T>{
     const jwt = localStorage.getItem("jwt");
 
@@ -40,38 +52,74 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PAT
     method.startsWith('P') ? headers["Content-Type"] = 'application/json' : null; //starts with P so post patch and put
     jwt ? headers["Authorization"] = `Bearer ${jwt}` : null;
 
-    try{
-        const response = await fetch(url, {
-            method: method,
-            headers: {...headers},
-            body: body !== null ? JSON.stringify(body) : null
-        }).then(async (response) => {
-            if(!response.ok){
-                toast.push(response.statusText.length > 60 ? 'Server could not handle your request' : response.statusText);
+    const response = await fetch(url, {
+        method: method,
+        headers: {...headers},
+        body: body !== null ? JSON.stringify(body) : null
+    }).then(async (resp) => {
+        console.log(resp.url);
+        if(!resp.ok){
+            console.log('log');
+            if(resp.status === 401 && !validation){
+                console.log('401');
+                await agent.Account.refreshTokens();
+
+                const jwt = localStorage.getItem("jwt");
+                jwt ? headers["Authorization"] = `Bearer ${jwt}` : null;
+
+                resp = await resendFetch(url, method, headers, body);
+
+            } else if(!validation) {
+                toast.push(resp.statusText.length > 60 ? 'Server could not handle your request' : resp.statusText);
             }
-            if(validation){
-                return [response.status, await response.text()] as T;
-            }
-            const contentType = response.headers.get('content-type');
-            const text = await response?.text();
-            if(text.length && contentType.indexOf('application/json') !== -1 ){
-                return JSON.parse(text) as T;
-            } else if(text.length) {
-                return text as T;
-            }
-            return null;
-        });
-        return response;
-    } catch (e) {
-        console.log(e);
+        }
+        console.log(resp);
+        if(validation){
+            return [resp.status, await resp.text()] as T;
+        }
+        const contentType = resp.headers.get('content-type');
+        const text = await resp?.text();
+        if(text.length && contentType.indexOf('application/json') !== -1 ){
+            return JSON.parse(text) as T;
+        } else if(text.length) {
+            return text as T;
+        }
         return null;
+    });
+    return response;
+
+}
+
+const refresh = async () => {
+    const access = get(jwtToken) ?? localStorage.getItem("jwt");
+    const refresh = get(refreshToken) ?? localStorage.getItem("refresh");
+    console.log(access, refresh);
+    if(access && refresh){
+        const res = await fetch(apiUrl+'/token/refresh', {
+            method: 'PATCH',
+            body: JSON.stringify({accessToken:access, refreshToken:refresh}),
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then(async res => {
+            console.log(res);
+            return await res.text();
+        }).then(text => JSON.parse(text))
+        .catch(err => console.log(err));
+
+        console.log(res);
+
+        refreshToken.set(res.refreshToken);
+        jwtToken.set(res.accessToken);
+        localStorage.setItem("jwt", res.accessToken);
+        localStorage.setItem("refresh", res.refreshToken);
     }
 }
 
 export const agent = {
     Products: {
         getAll: () => getProducts(apiUrl+"/products"),
-        getOne: (id: string) => authFetch<Product>(apiUrl+"/products/"+id, 'GET', null),
+        getOne: (id: string) => authFetch<Product>(apiUrl+`/products/${id}`, 'GET', null),
     },
     Account: {
         signUp: (user: User) => authFetch<[number, string]>(apiUrl+"/Account/register", 'POST', user, true),
@@ -79,7 +127,7 @@ export const agent = {
         getProfile: () => authFetch<null | Profile>(apiUrl+'/Account/profile', 'GET', null),
         getTransactions: () => authFetch<Array<Transaction>>(apiUrl+'/Account/transactions', 'GET', null),
         updateProfile: (profile: Partial<Profile>) => authFetch<string>(apiUrl+'/Account/profile', "PATCH", profile),
-        refreshTokens: (refreshToken: string) => authFetch<AuthResponse>(apiUrl+'/token/refresh', 'PATCH', refreshToken)
+        refreshTokens: () => refresh(),
     },
     ShoppingCart: {
         GetCart: () => getCart(apiUrl+"/ShoppingCart"),

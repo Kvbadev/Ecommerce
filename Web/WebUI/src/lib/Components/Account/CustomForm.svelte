@@ -4,11 +4,12 @@
     import { agent } from "../../Utils/agent";
     import { link, push } from "svelte-spa-router";
     import FormField from "./FormField.svelte";
-    import { jwtToken, userProfile, shoppingCart} from "../../Stores/stores";
+    import { jwtToken, userProfile, shoppingCart, refreshToken} from "../../Stores/stores";
     import Loader from "../Common/Loader.svelte";
     import { initShoppingCart} from "../../Stores/ShoppingCartExtensions";
     import Modal from "./CartModal.svelte";
 import { get } from "svelte/store";
+  import type AuthResponse from "src/lib/Models/authResponse";
     
     export let fields = ['firstname', 'lastname', 'username','email', 'password'];
     export let type: 'Login' | 'Signup';
@@ -37,8 +38,9 @@ import { get } from "svelte/store";
         }
         return data as User;
     }
-    
-    async function onSubmit (e) {
+
+    async function onSubmit (e: Event) {
+        e.preventDefault();
         loading = true;
 
         const userData = getFormData(e.target);
@@ -52,9 +54,15 @@ import { get } from "svelte/store";
             } else {
                 serverError = '';
 
+                const res:AuthResponse = JSON.parse(message);
+
                 //set jwt in localstorage and in stores
-                jwtToken.set(message);
-                localStorage.setItem("jwt", message);
+                jwtToken.set(res.accessToken);
+                localStorage.setItem("jwt", res.accessToken);
+
+                refreshToken.set(res.refreshToken);
+                localStorage.setItem("refresh", res.refreshToken);
+
                 userProfile.set(await agent.Account.getProfile());
                 
                 if($shoppingCart.items.length && type === 'Login'){
@@ -92,6 +100,7 @@ import { get } from "svelte/store";
         <form class="form" on:submit|preventDefault={onSubmit}>
             <h1>{type==='Signup'?'Sign Up!':'Log In!'}</h1>
             <div class="fields" on:keyup={onInput}>
+            <!-- TODO: bug when you press enter to submit, it mark input as dirty and you can submit again -->
             {#each fields as field, i}
                 {#if field === 'email'}
                     <FormField name={field} regex={new RegExp(/^\S+@\S+\.\S+$/)} bind:isOk={isOk[i]} minLen={4} maxLen={50}/>

@@ -23,6 +23,7 @@ import type Product from "src/lib/Models/product";
         display: flex;
         justify-content: center;
         align-items: center;
+        padding: 2rem 0;
         background-color: aliceblue;
         /* overflow: hidden; */
     }
