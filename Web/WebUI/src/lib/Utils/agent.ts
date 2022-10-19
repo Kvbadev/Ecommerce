@@ -52,9 +52,7 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PAT
         headers: {...headers},
         body: body !== null ? JSON.stringify(body) : null
     }).then(async (resp) => {
-        console.log(resp.url);
         if(!resp.ok){
-            console.log('log');
             if(resp.status === 401 && !validation){
                 console.log('401');
                 await agent.Account.refreshTokens();
@@ -68,7 +66,6 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PAT
                 toast.push(resp.statusText.length > 60 ? 'Server could not handle your request' : resp.statusText);
             }
         }
-        console.log(resp);
         if(validation){
             return [resp.status, await resp.text()] as T;
         }
@@ -85,24 +82,20 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PAT
 
 }
 
-const refresh = async () => {
+const refresh = async (url: string) => {
     const access = get(jwtToken) ?? localStorage.getItem("jwt");
     const refresh = get(refreshToken) ?? localStorage.getItem("refresh");
-    console.log(access, refresh);
     if(access && refresh){
-        const res = await fetch(apiUrl+'/token/refresh', {
+        const res = await fetch(url, {
             method: 'PATCH',
             body: JSON.stringify({accessToken:access, refreshToken:refresh}),
             headers: {
                 'Content-Type': 'application/json',
             }
         }).then(async res => {
-            console.log(res);
             return await res.text();
         }).then(text => JSON.parse(text))
         .catch(err => console.log(err));
-
-        console.log(res);
 
         refreshToken.set(res.refreshToken);
         jwtToken.set(res.accessToken);
@@ -122,7 +115,7 @@ export const agent = {
         getProfile: () => authFetch<null | Profile>(apiUrl+'/Account/profile', 'GET', null),
         getTransactions: () => authFetch<Array<Transaction>>(apiUrl+'/Account/transactions', 'GET', null),
         updateProfile: (profile: Partial<Profile>) => authFetch<string>(apiUrl+'/Account/profile', "PATCH", profile),
-        refreshTokens: () => refresh(),
+        refreshTokens: () => refresh(apiUrl+'/token/refresh'),
     },
     ShoppingCart: {
         GetCart: () => getCart(apiUrl+"/ShoppingCart"),
@@ -131,12 +124,14 @@ export const agent = {
         setCart: (cart: Cart) => authFetch<string>(apiUrl+"/ShoppingCart", 'POST', cart)
     }, 
     PaymentGateway: {
-        GetToken: () => authFetch<string>(apiUrl+"/Payment/token", 'GET', null),
+        getToken: () => authFetch<string>(apiUrl+"/Payment/token", 'GET', null),
 
-        BuyCart: (nonce: string, deviceData: string) => 
+        getPrice: (oneTimeProd) => authFetch<string>(apiUrl+"/Payment/price", 'POST', oneTimeProd ?? {}),
+
+        buyCart: (nonce: string, deviceData: string) => 
         authFetch<string>(apiUrl+`/Payment/buy?nonce=${nonce}`, 'POST', deviceData),
 
-        BuyProduct: (nonce: string, deviceData: string, product: CartItem) => {
+        buyProduct: (nonce: string, deviceData: string, product: CartItem) => {
         return authFetch<string>(
         apiUrl+`/Payment/buy?nonce=${nonce}&id=${product.id}&quantity=${product.quantity}`,
         'POST', deviceData)

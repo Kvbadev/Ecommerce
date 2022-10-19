@@ -2,8 +2,8 @@
   import { shoppingCart, oneTimeProduct} from "../../Stores/stores";
   import CartProduct from "../ShoppingCart/CartProduct.svelte";
   
-  const prods = $shoppingCart.count ? $shoppingCart.items : $oneTimeProduct ?
-                [$oneTimeProduct] : [];
+  const prods = $oneTimeProduct ? [$oneTimeProduct] : $shoppingCart.count ? 
+                $shoppingCart.items : [];
   
 </script>
 

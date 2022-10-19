@@ -12,11 +12,9 @@ import { SvelteToast, toast } from '@zerodevx/svelte-toast';
 onMount(async () => {
 
   const jwt = localStorage.getItem("jwt");
-  const refresh = localStorage.getItem("refresh");
   
   if(jwt){
     let profile = await agent.Account.getProfile();
-    console.log(profile);
 
     if(profile) {
       jwtToken.set(jwt);
