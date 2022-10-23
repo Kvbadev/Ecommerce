@@ -19,7 +19,9 @@ import { get } from "svelte/store";
     let loading = false;
     let showModal = false;
 
-    const onInput = () => {
+    const onInput = (ev: KeyboardEvent) => {
+        // if(ev.key === 'Enter' || ev.key === 'Shift' || ev.key === 'Control') return;
+        if(!(/^.$/u.test(ev.key)) && ev.key !== 'Backspace') return;
         if(serverError) serverError='';
         canSubmit = true;
         isOk.forEach(val => {
@@ -99,8 +101,7 @@ import { get } from "svelte/store";
         <div class="container">
         <form class="form" on:submit|preventDefault={onSubmit}>
             <h1>{type==='Signup'?'Sign Up!':'Log In!'}</h1>
-            <div class="fields" on:keyup={onInput}>
-            <!-- TODO: bug when you press enter to submit, it mark input as dirty and you can submit again -->
+            <div class="fields" on:keyup={(e) => onInput(e)}>
             {#each fields as field, i}
                 {#if field === 'email'}
                     <FormField name={field} regex={new RegExp(/^\S+@\S+\.\S+$/)} bind:isOk={isOk[i]} minLen={4} maxLen={50}/>

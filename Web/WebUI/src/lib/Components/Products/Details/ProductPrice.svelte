@@ -28,6 +28,7 @@ import QuantityInput from "./QuantityInput.svelte";
     .container {
         grid-area: price;
         display: grid;
+        place-content: space-between;
         /* grid-auto-columns: 0.5fr; */
         grid-auto-rows: 14rem;
         grid-template-columns: 3fr 2fr;

@@ -2,6 +2,7 @@ using AutoMapper;
 using Braintree;
 using Core;
 using Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Web.Services;
@@ -9,6 +10,7 @@ using Web.Services;
 namespace Web.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class PaymentController : ControllerBase
 {
@@ -34,6 +36,23 @@ public class PaymentController : ControllerBase
 
         var token = _paymentService.GenerateToken(id);
         return Ok(token);
+    }
+
+    [HttpPost("price")]
+    public async Task<IActionResult> GetPrice(ProductSimplified? prod)
+    {
+        if(prod?.Id == Guid.Empty)
+        {
+            var cart = await _context.ShoppingCarts
+                .FirstOrDefaultAsync(x => x.AppUserId==_tokenService.ExtractId());
+            return cart != null ? Ok(cart.FinalPrice) : BadRequest("User not found");
+        }
+        var product = await _context.Products.FindAsync(prod!.Id);
+        if(product is null || prod.Quantity <= 0)
+        {
+            return BadRequest("Invalid quantity or Id");
+        }
+        return Ok(prod.Quantity * product.Price);
     }
 
     [HttpPost("buy")] //example: buy?nonce=test&id=id&quantity=quantity

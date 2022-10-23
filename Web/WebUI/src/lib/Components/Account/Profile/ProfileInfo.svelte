@@ -2,7 +2,7 @@
   import { agent } from '../../../Utils/agent';
 import { push } from 'svelte-spa-router';
 import { initShoppingCart } from '../../../Stores/ShoppingCartExtensions';
-import {jwtToken, userProfile} from '../../../Stores/stores'
+import {jwtToken, refreshToken, userProfile} from '../../../Stores/stores'
 import Loader from '../../Common/Loader.svelte';
 
 let clientInfo = {
@@ -24,7 +24,9 @@ async function SignOutCancel(){
         return;
     }
     localStorage.removeItem("jwt");
+    localStorage.removeItem("refresh");
     jwtToken.set('');
+    refreshToken.set('');
     userProfile.set(null);
     initShoppingCart(null);
     push('/');

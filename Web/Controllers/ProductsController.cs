@@ -17,6 +17,7 @@ public class ProductsController : ControllerBase
         _context = context;
     }
 
+    //test
     [HttpGet]
     public async Task<List<Product>> GetProducts()
     {

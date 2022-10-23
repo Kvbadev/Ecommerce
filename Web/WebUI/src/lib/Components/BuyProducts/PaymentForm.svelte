@@ -18,11 +18,10 @@ let fields: {
     expirationDate: HTMLElement, 
     cvv: HTMLElement
 } = {} as any;
-//TODO: add paypal gateway 
-//TODO: add delivery (inpost and something foreign)
+
 
 let loading = true, submitting, getPayload, instance: HostedFields,
-canSubmit = false, deviceData;
+    canSubmit = false, deviceData;
 
 
 async function handleSubmit(event: MouseEvent) {
@@ -43,8 +42,8 @@ async function handleSubmit(event: MouseEvent) {
         return;
     }
     const res = !$oneTimeProduct?.id ?
-    await agent.PaymentGateway.BuyCart(payload.nonce, deviceData) :
-    await agent.PaymentGateway.BuyProduct(payload.nonce,  deviceData, get(oneTimeProduct));
+    await agent.PaymentGateway.buyCart(payload.nonce, deviceData) :
+    await agent.PaymentGateway.buyProduct(payload.nonce,  deviceData, get(oneTimeProduct));
 
     if(res === null){
         console.error("Could not finalize the transaction");
@@ -58,12 +57,11 @@ async function handleSubmit(event: MouseEvent) {
 }
 
 onMount(async () => {
-    const token = await agent.PaymentGateway.GetToken();
+    const token = await agent.PaymentGateway.getToken();
     if(token === null) return;
 
-
-    //return an instance of hostedFileds that are furher used to obtain a transaction nonce
     try{
+    //return an instance of hostedFileds that are furher used to obtain a transaction nonce
         instance = await client.create({
             authorization: token
         }).then(async cl => {
@@ -210,7 +208,6 @@ onMount(async () => {
         justify-content: center;
         align-items: center;
     }
-
     .form-div, .exp-cvv-div > div{
         width: 100%;
         height: 12rem;

@@ -34,7 +34,7 @@ public class TokenController: ControllerBase
         }
 
         var refresh = _jwt.GenerateRefreshToken();
-        var access = _jwt.GenerateAccessToken(user);
+        var access = await _jwt.GenerateAccessToken(user);
 
         user.RefreshToken = refresh;
 
