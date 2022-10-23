@@ -35,7 +35,7 @@ const buyNow = () => {
         font-family: Raleway;
         border: black 0.4rem solid;
         width: 50%;
-        height: 8rem;
+        height: 9rem;
         background-color: transparent;
         font-size: 3rem;
         text-align: center;

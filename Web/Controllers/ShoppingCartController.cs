@@ -116,7 +116,7 @@ public class ShoppingCartController : ControllerBase
         {
             return BadRequest("This user does not exist");
         }
-        var isValid = await VerifyCart(newCart);
+        var isValid = (await VerifyCart(newCart) && isTheSame(newCart, cart));
         if(isValid == false)
         {
             return BadRequest("Shopping cart supplied by the client was invalid");
@@ -150,6 +150,16 @@ public class ShoppingCartController : ControllerBase
         return price;
     }
 
+    private bool isTheSame(ShoppingCartDto cart, ShoppingCart actual)
+    {
+        var prods = _mapper.Map<CartProduct[], IEnumerable<ProductSimplified>>(actual.CartProducts.ToArray());
+        foreach(var it in cart.Items)
+        {
+            var tmp = prods.FirstOrDefault(x => x.Id == it.Id); 
+            if(tmp != null && tmp.Quantity == it.Quantity) return false;
+        }
+        return true;
+    }
     private async Task<bool> VerifyCart(ShoppingCartDto cart)
     {
         var products = await _context.Products.ToListAsync();

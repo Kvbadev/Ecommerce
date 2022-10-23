@@ -3,6 +3,8 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Core;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Web.ExtensionMethods;
 
@@ -11,27 +13,39 @@ public class JwtTokenService : IJwtTokenService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IConfiguration _configuration;
-    public JwtTokenService(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+    private readonly UserManager<AppUser> _userManager;
+    public JwtTokenService(IConfiguration configuration,
+        IHttpContextAccessor httpContextAccessor, UserManager<AppUser> userManager)
     {
+        _userManager = userManager;
         _configuration = configuration;
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public string GenerateAccessToken(AppUser user)
+    public async Task<string> GenerateAccessToken(AppUser user)
     {
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap = new Dictionary<string, string>();
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_configuration["JwtKey"]);
+
+        var MyClaims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
+            new Claim(ClaimTypes.Name, user.UserName)
+        };
+
+        //roles
+        foreach(var role in await _userManager.GetRolesAsync(user))
+        {
+            MyClaims.Add(new Claim(ClaimsIdentity.DefaultRoleClaimType, role));
+        }
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             //cannot remove audience here even though it is alredy set in program.cs because then the system breaks
             Audience = "https://localhost:5000",
             Issuer = "https://localhost:5000",
-            Subject = new System.Security.Claims.ClaimsIdentity(new Claim[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Name, user.UserName)
-            }),
+            Subject = new ClaimsIdentity(MyClaims),
             Expires = DateTime.UtcNow.AddMinutes(5),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
@@ -53,11 +67,11 @@ public class JwtTokenService : IJwtTokenService
     public string ExtractId()
     {
         string token = _httpContextAccessor.GetBearerToken();
-        if(token == string.Empty)
+        var handler = new JwtSecurityTokenHandler();
+        if(token == string.Empty || !handler.CanReadToken(token))
         {
             return string.Empty;
         }
-        var handler = new JwtSecurityTokenHandler();
         var jwtSecurityToken = handler.ReadJwtToken(token);
 
         var nameId = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value; //unfortunately claimtypes.nameidentifier does not seem to work
@@ -65,14 +79,15 @@ public class JwtTokenService : IJwtTokenService
     }
     public string ExtractId(string token)
     {
-        if(token == string.Empty)
+        var handler = new JwtSecurityTokenHandler();
+        if(token == string.Empty || !handler.CanReadToken(token))
         {
             return string.Empty;
         }
-        var handler = new JwtSecurityTokenHandler();
         var jwtSecurityToken = handler.ReadJwtToken(token);
 
         var nameId = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value; //unfortunately claimtypes.nameidentifier does not seem to work
         return nameId ?? string.Empty;
     }
+
 }

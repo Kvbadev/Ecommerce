@@ -63,12 +63,22 @@ builder.Services.AddAuthentication(opt =>
 });
 
 
+
+builder.Services.AddDbContext<DataContext>(options => 
+{
+    options.UseSqlite(builder.Configuration.GetConnectionString("Sqlite"));
+});
+
+
+
 builder.Services.AddIdentityCore<AppUser>(opt => 
 {
     opt.SignIn.RequireConfirmedAccount = false;
 })
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<DataContext>()
     .AddSignInManager<SignInManager<AppUser>>();
+
 
 builder.Services.AddControllers();
 
@@ -79,16 +89,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
+//has to be scoped because of usage of userManager to obtain user's roles
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 builder.Services.AddScoped<IPaymentService, PaymentService>();
-
-
-builder.Services.AddDbContext<DataContext>(options => 
-{
-    options.UseSqlite(builder.Configuration.GetConnectionString("Sqlite"));
-});
-
 var app = builder.Build();
 
 app.UseRouting();
@@ -103,8 +107,7 @@ if (app.Environment.IsDevelopment())
 
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<DataContext>();
-    await Seed.SeedData(context);
+    await Seed.SeedData(scope.ServiceProvider);
 }
 
 app.UseCors();

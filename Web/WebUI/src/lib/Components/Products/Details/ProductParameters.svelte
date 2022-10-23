@@ -13,7 +13,7 @@ import type Product from "src/lib/Models/product";
     h1 {
         font-family: 'Anek Telugu', sans-serif;
         font-size: 3.5rem;
-        width: 80%;
+        width: 85%;
         max-height: 100%;
     }
     .container {
@@ -23,8 +23,9 @@ import type Product from "src/lib/Models/product";
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 2rem 0;
-        background-color: aliceblue;
-        /* overflow: hidden; */
+        padding: 1rem 0;
+        margin: 0 1rem 1rem 0;
+        /* background-color: aliceblue; */
+        border: solid 0.2rem black;
     }
 </style>
