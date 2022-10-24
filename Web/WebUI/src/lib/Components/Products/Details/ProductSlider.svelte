@@ -19,7 +19,7 @@ const onChange = (newIndex) => {
 <div class="container">
     <div class="slider">
         <span class="button left" on:click={() => onChange(index-1)}>
-            <Fa icon={faAngleLeft} size={"7x"} color={'rgba(0, 0, 0, 0.7)'}/>
+            <Fa icon={faAngleLeft} size={"5x"} color={'rgba(0, 0, 0, 0.7)'}/>
         </span>
 
         <span in:fade class="big-image">
@@ -31,7 +31,7 @@ const onChange = (newIndex) => {
         </span>
 
         <span class="button right" on:click={() => onChange((index+1)%maxPhotos)}>
-            <Fa icon={faAngleRight} size={"7x"} color={'rgba(0, 0, 0, 0.7)'}/>
+            <Fa icon={faAngleRight} size={"5x"} color={'rgba(0, 0, 0, 0.7)'}/>
         </span>  
     </div>
     <div class="others">
@@ -48,9 +48,9 @@ const onChange = (newIndex) => {
         overflow: hidden;
         position: relative;
         background-color: white;
-        border: black 0.15rem solid;
-        width: 28vw;
-        height: 23vw;
+        /* border: black 0.15rem solid; */
+        width: 30vw;
+        height: 30vw;
     }                
     .big-image img {
         width: 100%;
@@ -77,7 +77,7 @@ const onChange = (newIndex) => {
         transition: all 500ms;
     }
     .main {
-        border: 0.3rem red solid;
+        border: 0.5rem rgb(217, 249, 15) solid;
     }
     .others img {
         width: 100%;
@@ -88,6 +88,7 @@ const onChange = (newIndex) => {
         padding: 1rem;
         grid-area: slider;
         width: 50vw;
+        min-width: 25rem;
         height: auto;
         /* background-color: brown; */
         display: flex;
@@ -97,7 +98,7 @@ const onChange = (newIndex) => {
     }
     .slider {
         width: 90%;
-        height: 60%;
+        height: 80%;
         display: flex;
         align-items: center;
         justify-content: space-evenly;

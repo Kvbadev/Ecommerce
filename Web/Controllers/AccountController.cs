@@ -12,7 +12,7 @@ using Infrastructure.DTOs;
 namespace Web.Controllers;
 
 [ApiController]
-[Authorize]
+[Authorize(Roles = "User")]
 [Route("api/[controller]")]
 public class AccountController : ControllerBase
 {
@@ -40,13 +40,14 @@ public class AccountController : ControllerBase
         _mapper.Map(user, newUser); 
 
         var result = await _userManager.CreateAsync(newUser, user.Password);
+        var tmp = await _userManager.AddToRoleAsync(newUser, "User");
 
         if(result.Succeeded)
         {
             newUser.ShoppingCart = new ShoppingCart();
             logger.LogInformation("New user {} has been created", user.Username);
 
-            var accessToken = _jwtTokenService.GenerateAccessToken(newUser);
+            var accessToken = await _jwtTokenService.GenerateAccessToken(newUser);
             var refreshToken = _jwtTokenService.GenerateRefreshToken();
 
             newUser.RefreshToken = refreshToken;
@@ -79,7 +80,7 @@ public class AccountController : ControllerBase
         var res = await manager.CheckPasswordSignInAsync(user, creds.Password, false);
 
         if(res.Succeeded){
-            var accessToken = _jwtTokenService.GenerateAccessToken(user);
+            var accessToken = await _jwtTokenService.GenerateAccessToken(user);
             var refreshToken = _jwtTokenService.GenerateRefreshToken();
 
             user.RefreshToken = refreshToken;

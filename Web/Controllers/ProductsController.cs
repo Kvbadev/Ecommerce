@@ -17,6 +17,7 @@ public class ProductsController : ControllerBase
         _context = context;
     }
 
+    //test
     [HttpGet]
     public async Task<List<Product>> GetProducts()
     {
@@ -27,5 +28,20 @@ public class ProductsController : ControllerBase
     public async Task<Product?> GetProduct(Guid id)
     {
         return await _context.Products.FindAsync(id); 
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Administrator")]
+    public async Task<IActionResult> DeleteProduct(Guid id)
+    {
+        var prod = await _context.Products.FindAsync(id);
+        if(prod != null)
+        {
+            _context.Products.Remove(prod);
+            var res = await _context.SaveChangesAsync() > 0;
+            return res ?
+            Ok() : BadRequest("Could not persist changes in the database");
+        }
+        return BadRequest("Invalid product ID");
     }
 }

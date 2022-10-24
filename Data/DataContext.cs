@@ -20,6 +20,7 @@ public class DataContext : IdentityDbContext<AppUser>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        //TODO: on product remove what happens with transaction
 
         builder.Entity<AppUser>()
             .HasOne(n => n.ShoppingCart)

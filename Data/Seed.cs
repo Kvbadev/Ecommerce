@@ -1,15 +1,30 @@
 using Core;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Data;
 
 public class Seed
 {
-    public static async Task SeedData(DataContext context)
+    public static async Task SeedData(IServiceProvider serviceProvider)
     {
+        var context = serviceProvider.GetRequiredService<DataContext>();
+        // var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
+        // var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+        // await roleManager.CreateAsync(new IdentityRole("Administrator"));
+        // await roleManager.CreateAsync(new IdentityRole("User"));
+
+        // var res = await userManager.AddToRoleAsync(context.Users
+        //                 .FirstOrDefault(x => x.UserName=="jakub"), "Administrator");
+
         if(context.Products.Any())
         {
             return;
         }
+
+        //testing roles
+
         var toAppend = new List<Product>
         {
             new Product
