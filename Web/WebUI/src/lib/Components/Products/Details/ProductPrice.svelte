@@ -26,6 +26,7 @@ import QuantityInput from "./QuantityInput.svelte";
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Raleway&display=swap');
     .container {
+        height: 36vh;
         grid-area: price;
         display: grid;
         place-content: space-between;
@@ -46,14 +47,14 @@ import QuantityInput from "./QuantityInput.svelte";
     .h2 {
         background-color: aliceblue;
         font-family: 'Rubik';
-        font-size: 2.5rem;
+        font-size: 3rem;
         display: grid;
         justify-content: center;
         align-content: center;
     }
     h2::after {
         content: attr(data-quantity);
-        font-size: 1.2rem;
+        font-size: 1.6rem;
         font-style: italic;
         color: gray;
         display: block;

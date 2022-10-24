@@ -54,12 +54,13 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PAT
         if(!resp.ok){
             if(resp.status === 401 && !validation){
                 console.log('401');
-                await agent.Account.refreshTokens();
+                const check = await agent.Account.refreshTokens();
+                if(check) {
+                    const jwt = localStorage.getItem("jwt");
+                    jwt ? headers["Authorization"] = `Bearer ${jwt}` : null;
 
-                const jwt = localStorage.getItem("jwt");
-                jwt ? headers["Authorization"] = `Bearer ${jwt}` : null;
-
-                resp = await resendFetch(url, method, headers, body);
+                    resp = await resendFetch(url, method, headers, body);
+                }
 
             } else if(!validation) {
                 toast.push(resp.statusText.length > 60 ? 'Server could not handle your request' : resp.statusText);
@@ -101,10 +102,11 @@ const refresh = async (url: string) => {
             jwtToken.set(res.accessToken);
             localStorage.setItem("jwt", res.accessToken);
             localStorage.setItem("refresh", res.refreshToken);
+            return true;
         }
     } catch(err) {
         console.error(err);
-        return null;
+        return false;
     }
 }
 

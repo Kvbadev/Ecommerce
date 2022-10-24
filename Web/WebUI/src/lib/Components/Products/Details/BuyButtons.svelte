@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { toast } from "@zerodevx/svelte-toast";
+
 
 import { push } from "svelte-spa-router";
 import { modifyCart } from "../../../Stores/ShoppingCartExtensions";
@@ -10,6 +12,11 @@ export let quantity: number;
 
 const OnCart = () => {
     modifyCart({quantity: quantity, id: params.id});
+    toast.push(`Product has been added to your cart :)`, {theme: {
+        '--toastBackground': '#00ff00',
+        '--toastHeight': '10rem',
+        '--toastWidth': '30rem'
+    }});
 }
 
 const buyNow = () => {
