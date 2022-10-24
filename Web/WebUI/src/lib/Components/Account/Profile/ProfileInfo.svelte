@@ -86,7 +86,7 @@ async function edit(){
         </button>
         <button class={`edit ${editmode ? !changed ? 'disabled' : 'submit':''}`} type="submit"
         on:click={edit} disabled={editmode && !changed}>
-            {editmode? 'Submit' : 'Edit'}
+            {editmode? 'Save' : 'Edit'}
             {#if editmode && submitting}
             <Loader inElement size={1} color={'#ffffff'}/>
             {/if}

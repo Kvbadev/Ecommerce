@@ -66,28 +66,43 @@ public class JwtTokenService : IJwtTokenService
 
     public string ExtractId()
     {
-        string token = _httpContextAccessor.GetBearerToken();
-        var handler = new JwtSecurityTokenHandler();
-        if(token == string.Empty || !handler.CanReadToken(token))
+        try
+        {
+            string token = _httpContextAccessor.GetBearerToken();
+            var handler = new JwtSecurityTokenHandler();
+            if(token == string.Empty || !handler.CanReadToken(token))
+            {
+                return string.Empty;
+            }
+            var jwtSecurityToken = handler.ReadJwtToken(token);
+
+            var nameId = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value; //unfortunately claimtypes.nameidentifier does not seem to work
+            return nameId ?? string.Empty;
+        }
+        catch(Exception) //usually when unable to read corrupted token
         {
             return string.Empty;
         }
-        var jwtSecurityToken = handler.ReadJwtToken(token);
-
-        var nameId = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value; //unfortunately claimtypes.nameidentifier does not seem to work
-        return nameId ?? string.Empty;
     }
     public string ExtractId(string token)
     {
-        var handler = new JwtSecurityTokenHandler();
-        if(token == string.Empty || !handler.CanReadToken(token))
+        try
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var can = handler.CanReadToken(token);
+            if(token == string.Empty || !handler.CanReadToken(token))
+            {
+                return string.Empty;
+            }
+            var jwtSecurityToken = handler.ReadJwtToken(token);
+            var nameId = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value; //unfortunately claimtypes.nameidentifier does not seem to work
+            return nameId ?? string.Empty;
+        }
+        catch(Exception) //usually when unable to read corrupted token
         {
             return string.Empty;
         }
-        var jwtSecurityToken = handler.ReadJwtToken(token);
 
-        var nameId = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value; //unfortunately claimtypes.nameidentifier does not seem to work
-        return nameId ?? string.Empty;
     }
 
 }

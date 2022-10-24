@@ -10,9 +10,9 @@ using Microsoft.IdentityModel.Tokens;
 using Web.Services;
 
 
-//TODO: if foreign key contraints failed - CHECK IF ID HASN'T CHANGED  
+//if foreign key contraints failed - CHECK IF ID HASN'T CHANGED  
 
-//TODO: add roles (admin, user)
+//TODO: add image hosting
 
 //TODO: add filters
 

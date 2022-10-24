@@ -48,9 +48,9 @@ const onChange = (newIndex) => {
         overflow: hidden;
         position: relative;
         background-color: white;
-        border: black 0.15rem solid;
-        width: 25vw;
-        height: 25vw;
+        /* border: black 0.15rem solid; */
+        width: 30vw;
+        height: 30vw;
     }                
     .big-image img {
         width: 100%;
@@ -77,7 +77,7 @@ const onChange = (newIndex) => {
         transition: all 500ms;
     }
     .main {
-        border: 0.3rem red solid;
+        border: 0.5rem rgb(217, 249, 15) solid;
     }
     .others img {
         width: 100%;
