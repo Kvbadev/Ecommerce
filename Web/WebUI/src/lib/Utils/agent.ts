@@ -35,7 +35,6 @@ async function getCart(url: string): Promise<Cart | null> {
 }
 
 async function resendFetch(url: string, method, headers, body) {
-    await agent.Account.refreshTokens();
     return await fetch(url, {method: method, headers: {...headers}, body: body !== null ? JSON.stringify(body):null});
 }
 
@@ -55,12 +54,13 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PAT
         if(!resp.ok){
             if(resp.status === 401 && !validation){
                 console.log('401');
-                await agent.Account.refreshTokens();
+                const check = await agent.Account.refreshTokens();
+                if(check) {
+                    const jwt = localStorage.getItem("jwt");
+                    jwt ? headers["Authorization"] = `Bearer ${jwt}` : null;
 
-                const jwt = localStorage.getItem("jwt");
-                jwt ? headers["Authorization"] = `Bearer ${jwt}` : null;
-
-                resp = await resendFetch(url, method, headers, body);
+                    resp = await resendFetch(url, method, headers, body);
+                }
 
             } else if(!validation) {
                 toast.push(resp.statusText.length > 60 ? 'Server could not handle your request' : resp.statusText);
@@ -85,22 +85,28 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PAT
 const refresh = async (url: string) => {
     const access = get(jwtToken) ?? localStorage.getItem("jwt");
     const refresh = get(refreshToken) ?? localStorage.getItem("refresh");
-    if(access && refresh){
-        const res = await fetch(url, {
-            method: 'PATCH',
-            body: JSON.stringify({accessToken:access, refreshToken:refresh}),
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        }).then(async res => {
-            return await res.text();
-        }).then(text => JSON.parse(text))
-        .catch(err => console.log(err));
+    try{
+        if(access && refresh){
+            const res = await fetch(url, {
+                method: 'PATCH',
+                body: JSON.stringify({accessToken:access, refreshToken:refresh}),
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }).then(async res => {
+                if(!res.ok) throw res.status;
+                return await res.text();
+            }).then(text => JSON.parse(text));
 
-        refreshToken.set(res.refreshToken);
-        jwtToken.set(res.accessToken);
-        localStorage.setItem("jwt", res.accessToken);
-        localStorage.setItem("refresh", res.refreshToken);
+            refreshToken.set(res.refreshToken);
+            jwtToken.set(res.accessToken);
+            localStorage.setItem("jwt", res.accessToken);
+            localStorage.setItem("refresh", res.refreshToken);
+            return true;
+        }
+    } catch(err) {
+        console.error(err);
+        return false;
     }
 }
 
@@ -125,7 +131,6 @@ export const agent = {
     }, 
     PaymentGateway: {
         getToken: () => authFetch<string>(apiUrl+"/Payment/token", 'GET', null),
-
         getPrice: (oneTimeProd) => authFetch<string>(apiUrl+"/Payment/price", 'POST', oneTimeProd ?? {}),
 
         buyCart: (nonce: string, deviceData: string) => 
