@@ -56,6 +56,8 @@ builder.Services.AddAuthentication(opt =>
             ValidateIssuer = false,
             ValidateAudience = true,
             ValidateIssuerSigningKey = true,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JwtKey"]))
         };
 });
@@ -105,13 +107,14 @@ using (var scope = app.Services.CreateScope())
     await Seed.SeedData(context);
 }
 
+app.UseCors();
+
 app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.UseHttpsRedirection();
 
-app.UseCors();
 
 app.MapControllers();
 

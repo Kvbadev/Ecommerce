@@ -16,4 +16,6 @@ public class AppUser : IdentityUser
     public DateTime CreationDate = DateTime.UtcNow;
     public ShoppingCart ShoppingCart { get; set; } = default!;
     public ICollection<Transaction> Transactions { get; set; } = default!;
+    public string RefreshToken { get; set; } = default!;
+    public DateTime RefreshTokenExpiry { get; set; }
 }

@@ -10,7 +10,7 @@ import Fa from "svelte-fa";
 import { faAngleDoubleLeft} from "@fortawesome/free-solid-svg-icons";
 
 
-if($location == '/buyNow') {
+if($location === '/buyNow') {
     onDestroy(() => oneTimeProduct.set(null))
 }
 </script>
