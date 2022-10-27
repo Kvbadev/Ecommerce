@@ -2,7 +2,11 @@
 import { agent } from "../../../Utils/agent";
 import Loader from "../../Common/Loader.svelte";
 import CartProduct from "../../ShoppingCart/CartProduct.svelte";
-import { link } from "svelte-spa-router";
+import { link, push } from "svelte-spa-router";
+import Fa from "svelte-fa";
+import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
+
+const onQuestion = (id: string) => push(`/help/${id}`);
 </script>
 
 <div class="container">
@@ -22,11 +26,19 @@ import { link } from "svelte-spa-router";
                 <a href={`/transaction/${t.id}`} use:link class="transaction-id">{t.id}</a>
             </div>
             <ul>
-            {#each t.products as prod}
-                <li class="item">
-                    <CartProduct prod={prod} simplified size={40}/>
-                </li>
-            {/each}
+            {#if t.products.length}
+                {#each t.products as prod}
+                    <li class="item">
+                        <CartProduct prod={prod} simplified size={40}/>
+                    </li>
+                {/each}
+                {:else}
+                    <li class="item">
+                        <h4>Products have been removed 
+                            <span on:click={()=>onQuestion(t.id)}><Fa icon={faQuestionCircle}/></span>
+                        </h4>
+                    </li>
+            {/if}
             </ul>
             <div class="div-info">
                 <h2>Price: {t.price}$</h2>
@@ -47,6 +59,14 @@ import { link } from "svelte-spa-router";
         font-size: 4rem;
         font-family: 'Anek Telugu' !important;
         place-content: center;
+    }
+    
+    h4 {
+        width: 100%;
+        font-size: 2rem;
+    }
+    h4 span {
+        cursor: pointer;
     }
     .container {
         width: 100%;

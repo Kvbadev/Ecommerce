@@ -1,7 +1,6 @@
 using System.Text;
 using Core;
 using Data;
-using Microsoft.Extensions.DependencyInjection;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -16,10 +15,11 @@ using Web.Services;
 
 //TODO: add filters
 
+//TODO: add admin dashboard
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddCors(options => 
 {
     options.AddDefaultPolicy(policy =>

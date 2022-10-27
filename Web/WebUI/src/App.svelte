@@ -8,6 +8,7 @@ import { jwtToken, products, userProfile } from './lib/Stores/stores';
 import { initShoppingCart } from './lib/Stores/ShoppingCartExtensions';
 import type Cart from './lib/Models/cart';
 import { SvelteToast, toast } from '@zerodevx/svelte-toast';
+import {location} from 'svelte-spa-router';
 
 onMount(async () => {
 
@@ -38,8 +39,9 @@ onMount(async () => {
 })
 </script>
 
-<main>
-  <Navbar />
-</main>
+<!--if admin then not show-->
+{#if $location !== '/admin'}
+  <Navbar/>
+{/if}
 <Router {routes} />
 <SvelteToast />
