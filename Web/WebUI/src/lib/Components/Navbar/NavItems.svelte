@@ -39,10 +39,17 @@ let cartColor = 'white';
     </div>
     
 <style>
-    @media only screen and (min-width: 768px){
-
+    @media only screen and (min-width: 320px) {
+        .group {
+            display: none;
+        }
     }
-    @media only screen and (min-width: 992px){
+    @media only screen and (min-width: 768px) {
+        .group {
+            display: none;
+        }
+    }
+    @media only screen and (min-width: 992px) {
         .group {
             display: flex;
             flex-direction: row;
