@@ -1,16 +1,30 @@
 <script lang="ts">
-  import { prop_dev } from "svelte/internal";
-  import type Product from "../../Models/product";
+  import { agent } from '../../Utils/agent';
   import {products} from '../../Stores/stores';
   import ImageModal from "./ImageModal.svelte";
+  import Loader from '../Common/Loader.svelte';
 
   let src = "";
+  let loading = ""; //equals id of product which button will be loading
 
   const imageModal = (newSrc: string):any => {
     src = newSrc;
   }
 
+  const onEdit = (e: MouseEvent, id: string) => {
+
+  }
+
+  const onRemove = async (id: string) => {
+    loading = id;
+    await agent.Products.remove(id);
+    loading = "";
+  }
+
+  //TODO: add request to get all products and pagination in main page
+
 </script>
+
 {#if src!==""}
   <ImageModal bind:src/>
 {/if}
@@ -29,8 +43,14 @@
           {#if prod[key] === prod.id}
             <p>{prod.id}</p>
             <div class="buttons">
-              <button class="edit">Edit</button>
-              <button class="remove">Remove</button>
+              <button class="edit" on:click={(e) => onEdit(e, prod.id)}>Edit</button>
+              <button class="remove" on:click={() => onRemove(prod.id)}>
+                {#if loading === prod.id}
+                  <Loader size={1} inElement color='white'/>
+                {:else}
+                Remove
+                {/if}
+              </button>
             </div>
           {:else if prod[key] === prod.description}
             {prod.description.slice(0, 30)+'...'}
@@ -46,10 +66,6 @@
           </div>
       {/each}
       </div>
-      <!-- <div class="buttons">
-        <button class="edit">Edit</button>
-        <button class="remove">Remove</button>
-      </div> -->
       {/each}
 </div>
 
@@ -118,6 +134,7 @@
     justify-content: flex-end;
   }
   .buttons * {
+    position: relative;
     cursor: pointer;
     border-top-right-radius: 0.7rem;
     border-bottom-left-radius: 0.7rem;

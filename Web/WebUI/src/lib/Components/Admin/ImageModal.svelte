@@ -15,6 +15,7 @@ import Fa from "svelte-fa";
     .container {
         position: absolute;
         width: 100vw;
+        z-index: 100;
         height: 100vh;
         display: grid;
         place-items: center;

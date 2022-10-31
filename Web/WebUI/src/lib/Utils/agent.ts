@@ -52,8 +52,8 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PAT
         body: body !== null ? JSON.stringify(body) : null
     }).then(async (resp) => {
         if(!resp.ok){
+            
             if(resp.status === 401 && !validation){
-                console.log('401');
                 const check = await agent.Account.refreshTokens();
                 if(check) {
                     const jwt = localStorage.getItem("jwt");
@@ -114,6 +114,7 @@ export const agent = {
     Products: {
         getAll: () => getProducts(apiUrl+"/products"),
         getOne: (id: string) => authFetch<Product>(apiUrl+`/products/${id}`, 'GET', null),
+        remove: (id: string) => authFetch<string>(apiUrl+`/products/${id}`, 'DELETE', null),
     },
     Account: {
         signUp: (user: User) => authFetch<[number, string]>(apiUrl+"/Account/register", 'POST', user, true),
@@ -122,6 +123,7 @@ export const agent = {
         getTransactions: () => authFetch<Array<Transaction>>(apiUrl+'/Account/transactions', 'GET', null),
         updateProfile: (profile: Partial<Profile>) => authFetch<string>(apiUrl+'/Account/profile', "PATCH", profile),
         refreshTokens: () => refresh(apiUrl+'/token/refresh'),
+        isAdmin: () => authFetch<boolean>(apiUrl+'/Account/isAdmin', 'GET',null),
     },
     ShoppingCart: {
         GetCart: () => getCart(apiUrl+"/ShoppingCart"),

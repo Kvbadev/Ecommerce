@@ -143,4 +143,19 @@ public class AccountController : ControllerBase
         return transactions.Any() ? transactions : 
         Enumerable.Empty<TransactionDto>();
     }
+
+    [Authorize]
+    [HttpGet("isAdmin")]
+    public async Task<bool> isAdmin()
+    {
+        var user = await _context.Users.FindAsync(_jwtTokenService.ExtractId());
+        if(user is null)
+        {
+            return false;
+        }
+        return await _userManager.IsInRoleAsync(user, "Administrator") ?
+        true :
+        false;
+
+    }
 }
