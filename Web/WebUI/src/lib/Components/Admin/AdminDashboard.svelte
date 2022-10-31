@@ -3,21 +3,35 @@
   import SideNav from "./SideNav.svelte";
   import {products} from '../../Stores/stores';
   import ProductManagement from './ProductManagement.svelte';
+  import { onMount } from "svelte";
+  import { agent } from "../../Utils/agent";
+  import { push } from "svelte-spa-router";
 
 
 
+  let isPermitted = false;
   let page:0|1 = 0; //products 
+  onMount(async () => {
+    isPermitted = await agent.Account.isAdmin();
+    if(!isPermitted) setTimeout(() => push('/'), 2000);
+  })
 
 </script>
 
-<div class="container">
-<SideNav bind:page num={2} icons={[faBox, faUser, faSignOut]}/>
+{#if isPermitted}
 
-{#if page === 0 && $products}
-  <ProductManagement />
+  <div class="container">
+  <SideNav bind:page num={2} icons={[faBox, faUser, faSignOut]}/>
+
+  {#if page === 0 && $products}
+    <ProductManagement />
+  {/if}
+  </div>
+
+{:else}
+<h1>You are not permitted to use Administrator Dashboard</h1>
 {/if}
   
-</div>
 
 <style>
   .container {
