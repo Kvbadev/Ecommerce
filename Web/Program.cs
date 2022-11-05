@@ -15,7 +15,6 @@ using Web.Services;
 
 //TODO: add filters
 
-//TODO: add admin dashboard
 
 var builder = WebApplication.CreateBuilder(args);
 

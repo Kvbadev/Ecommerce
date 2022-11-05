@@ -3,21 +3,27 @@
   import {products} from '../../Stores/stores';
   import ImageModal from "./ImageModal.svelte";
   import Loader from '../Common/Loader.svelte';
+  import EditModal from './EditModal.svelte';
 
   let src = "";
   let loading = ""; //equals id of product which button will be loading
+  let edit = "";
 
   const imageModal = (newSrc: string):any => {
     src = newSrc;
+    
   }
 
   const onEdit = (e: MouseEvent, id: string) => {
-
+    edit = id;
   }
+
+  $: if(src || edit) document.body.style.overflow = 'hidden'; else document.body.style.overflow = 'scroll'; 
 
   const onRemove = async (id: string) => {
     loading = id;
     await agent.Products.remove(id);
+    products.set($products.filter(x => x.id !== id));
     loading = "";
   }
 
@@ -29,6 +35,10 @@
   <ImageModal bind:src/>
 {/if}
 
+{#if edit!==""}
+  <EditModal bind:edit />
+{/if}
+
 <div class="table">
 
     <div class="headers">
@@ -38,7 +48,7 @@
     </div>
       {#each $products as prod}
       <div class="row">
-      {#each Object.keys($products[0]).filter(x => x!=='mainPhoto') as key}
+      {#each Object.keys($products[0])?.filter(x => x!=='mainPhoto') as key}
           <div class="data">
           {#if prod[key] === prod.id}
             <p>{prod.id}</p>
@@ -118,6 +128,8 @@
     height: 8rem;
     display: flex;
     border-right: 0.1rem solid black;
+    background-color: white;
+    padding: 0;
     justify-content: center;
     align-items: center;
     font-family: 'Rubik';
