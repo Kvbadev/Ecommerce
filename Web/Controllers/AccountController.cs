@@ -20,38 +20,39 @@ public class AccountController : ControllerBase
     private readonly UserManager<AppUser> _userManager;
     private readonly IMapper _mapper;
     private readonly IJwtTokenService _jwtTokenService;
+    private readonly ILogger _logger;
     public AccountController(DataContext context, UserManager<AppUser> userManager, IMapper mapper,
-            ILogger<AccountController> logger, IConfiguration configuration, SignInManager<AppUser> signInManager,
-            IJwtTokenService jwtTokenService)
+           IConfiguration configuration, SignInManager<AppUser> signInManager,
+           ILogger<AccountController> logger, IJwtTokenService jwtTokenService)
     {
         _jwtTokenService = jwtTokenService;
         _mapper = mapper;
         _userManager = userManager;
         _context = context;
+        _logger = logger;
     }
 
     [AllowAnonymous]
     [HttpPost("register")]
-    public async Task<IActionResult> RegisterUser(RegisterDto user,
-        [FromServices]ILogger logger)
+    public async Task<IActionResult> RegisterUser(RegisterDto user)
     {
 
         var newUser = new AppUser();
         _mapper.Map(user, newUser); 
 
+        newUser.CreationDate = DateTime.UtcNow;
+        newUser.RefreshToken = _jwtTokenService.GenerateRefreshToken();
+        newUser.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+
         var result = await _userManager.CreateAsync(newUser, user.Password);
-        var tmp = await _userManager.AddToRoleAsync(newUser, "User");
+        await _userManager.AddToRoleAsync(newUser, "User");
+
 
         if(result.Succeeded)
         {
             newUser.ShoppingCart = new ShoppingCart();
-            logger.LogInformation("New user {} has been created", user.Username);
-
+            // _logger.LogInformation("New user {} has been created", user.Username);
             var accessToken = await _jwtTokenService.GenerateAccessToken(newUser);
-            var refreshToken = _jwtTokenService.GenerateRefreshToken();
-
-            newUser.RefreshToken = refreshToken;
-            newUser.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
 
             var res = await _context.SaveChangesAsync() > 0;
 
@@ -59,7 +60,7 @@ public class AccountController : ControllerBase
             {
                 return Ok(new AuthResponse{
                     AccessToken = accessToken,
-                    RefreshToken = refreshToken
+                    RefreshToken = newUser.RefreshToken
                 });
             }
             return BadRequest("Could not register a new user");
@@ -156,6 +157,32 @@ public class AccountController : ControllerBase
         return await _userManager.IsInRoleAsync(user, "Administrator") ?
         true :
         false;
-
     }
+
+    [Authorize(Roles = "Administrator")]
+    [HttpGet("clients")]
+    public async Task<IEnumerable<ClientDto>> GetClients()
+    {
+        var users = await _context.Users.Include(x => x.Transactions).ToArrayAsync();
+        if(users.Length is 0)
+        {
+            return Enumerable.Empty<ClientDto>();
+        }
+
+        var clients = _mapper.Map<AppUser[], IEnumerable<ClientDto>>(users);
+
+        var test = _context.Users.FirstOrDefault(x => x.UserName == "jakub");
+        var trans = test!.Transactions;
+        var data = trans.Aggregate(0M,(a,b) => a + b.Price);
+
+        foreach(var c in clients)
+        {
+            c.Privileges = await _userManager.GetRolesAsync
+                (_context.Users.FirstOrDefault(x => x.UserName == c.Username)!)
+                ?? Enumerable.Empty<string>();
+        }
+
+        return clients;
+    }
+
 }

@@ -9,19 +9,27 @@ public class Seed
     public static async Task SeedData(IServiceProvider serviceProvider)
     {
         var context = serviceProvider.GetRequiredService<DataContext>();
-        // var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
-        // var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-        // await roleManager.CreateAsync(new IdentityRole("Administrator"));
-        // await roleManager.CreateAsync(new IdentityRole("User"));
-
-        // var res = await userManager.AddToRoleAsync(context.Users
-        //                 .FirstOrDefault(x => x.UserName=="jakub"), "Administrator");
-
-        if(context.Products.Any())
+        var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
+        var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        
+        if(await roleManager.RoleExistsAsync("Administrator") is false)
         {
-            return;
+            await roleManager.CreateAsync(new IdentityRole("Administrator"));
         }
+        else if(context.Users.Any())
+        {
+            await userManager.AddToRoleAsync(context.Users
+                        .FirstOrDefault(x => x.UserName=="jakub")!, "Administrator");
+        }
+        if(await roleManager.RoleExistsAsync("User") is false)
+        {
+            await roleManager.CreateAsync(new IdentityRole("User"));
+        }
+
+        // if(context.Products.Any())
+        // {
+        //     return;
+        // }
 
         //testing roles
 
@@ -68,9 +76,23 @@ public class Seed
                 Name = "Wall Clock",
                 Description = "The wall decor clock comes with self-adhesive numbers and auxiliary scale ruler, also there is an installation video for your reference. So one can easily to install and enjoy the DIY fun of making your own unique house decorations for living room.",
                 Price = 45.00M
+            },
+            new Product
+            {
+                Name = "Test Product",
+                Description = "lorem ipsum",
+                Price = 500.00M
             }
         };
-        await context.AddRangeAsync(toAppend);
-        await context.SaveChangesAsync();
+        foreach(var e in toAppend) 
+        {
+            if(context.Products.FirstOrDefault(x => x.Name == e.Name) == null)
+            {
+                context.Products.Add(e);
+            }
+        }
+
+        var res = await context.SaveChangesAsync();
+        System.Console.WriteLine("Save changes? : {0}",res);
     }
 }

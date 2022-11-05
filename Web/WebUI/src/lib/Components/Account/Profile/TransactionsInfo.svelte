@@ -150,9 +150,9 @@ const onQuestion = (id: string) => push(`/help/${id}`);
     }
     h1 {
         font-family: 'Raleway';
-        font-size: 7rem;
+        font-size: 5rem;
         background-color: rgb(201, 216, 228);
-        height: 20%;
+        height: 20.3%;
         display: grid;
         place-content: center;
     }

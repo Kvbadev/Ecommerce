@@ -17,9 +17,10 @@ import type Product from "src/lib/Models/product";
         max-height: 100%;
     }
     .container {
-        overflow: hidden;
+        overflow: auto;
         grid-area: params;
-        height: calc(56vh - 4.2vw);
+        min-height: 40rem;
+        height: max-content;
         display: flex;
         justify-content: center;
         align-items: center;

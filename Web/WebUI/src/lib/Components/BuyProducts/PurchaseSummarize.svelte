@@ -28,8 +28,7 @@
   }
   .list {
     width: 80%;
-    /* height: 100%; */
-    height: auto;
+    height: 100%;
     border-radius: 2rem;
     border: 0.2rem solid rgb(255, 255, 255);
     background-color: rgba(202, 202, 202, 0.15);
