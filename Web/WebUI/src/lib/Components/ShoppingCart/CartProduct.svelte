@@ -7,7 +7,6 @@ import {products} from '../../Stores/stores';
 import {shoppingCart} from '../../Stores/stores';
 import QuantityInput from "../Products/Details/QuantityInput.svelte";
   import { link } from "svelte-spa-router";
-  import Loader from "../Common/Loader.svelte";
 
 export let prod: CartItem;
 export let simplified = false;
@@ -33,12 +32,12 @@ async function removeItem() {
         <h4>{prod.quantity}x</h4>
     </div>
     <div id="photo">
-        <img alt="Product" class="main-photo" src="{product.mainPhoto}"/>
+        <img alt="Product" class="main-photo" src="{product?.mainPhoto}"/>
     </div>
     <div class="main-info" id="main-info">
-        <p><a href={`/product/${product.id}`} use:link>{product.name}</a></p>
+        <p><a href={`/product/${product?.id}`} use:link>{product?.name}</a></p>
         {#if !simplified}
-        <p class="little-price">{product.price}$</p>
+            <p class="little-price">{product?.price}$</p>
         {/if}
     </div>
     {#if !simplified}

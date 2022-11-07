@@ -1,5 +1,6 @@
 using Core;
 using Data;
+using Infrastructure.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -43,5 +44,23 @@ public class ProductsController : ControllerBase
             Ok() : BadRequest("Could not persist changes in the database");
         }
         return BadRequest("Invalid product ID");
+    }
+
+    [Authorize(Roles = "Administrator")]
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> UpdateProduct([FromBody]ProductDto prod, Guid id)
+    {
+        var change = await _context.Products.FindAsync(id);
+        if(change is null)
+        {
+            return BadRequest("Product does not exist");
+        }
+        change.Name = prod.Name ?? change.Name;
+        change.Description = prod.Description ?? change.Description;
+        change.Price = prod.Price == decimal.Zero ? change.Price : prod.Price;
+
+        var res =  await _context.SaveChangesAsync() > 0;
+        return res ? Ok() : 
+        BadRequest("Could not persist changes in the database");
     }
 }
