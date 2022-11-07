@@ -17,14 +17,16 @@ import type Product from "src/lib/Models/product";
         max-height: 100%;
     }
     .container {
-        overflow: hidden;
+        overflow: auto;
         grid-area: params;
-        height: calc(62vh - 4.2vw);
+        min-height: 40rem;
+        height: max-content;
         display: flex;
         justify-content: center;
         align-items: center;
         padding: 1rem 0;
         margin: 0 1rem 1rem 0;
+        margin-top: 5%;
         border: solid 0.2rem black;
     }
 </style>

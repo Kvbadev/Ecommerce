@@ -8,6 +8,7 @@ import type Transaction from "../Models/transaction";
 import type AuthResponse from "../Models/authResponse";
 import { jwtToken, refreshToken } from "../Stores/stores";
 import { get } from "svelte/store";
+import type Client from "../Models/client";
 
 const apiUrl = "https://localhost:5000/api";
 
@@ -52,8 +53,8 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PAT
         body: body !== null ? JSON.stringify(body) : null
     }).then(async (resp) => {
         if(!resp.ok){
+            
             if(resp.status === 401 && !validation){
-                console.log('401');
                 const check = await agent.Account.refreshTokens();
                 if(check) {
                     const jwt = localStorage.getItem("jwt");
@@ -114,6 +115,8 @@ export const agent = {
     Products: {
         getAll: () => getProducts(apiUrl+"/products"),
         getOne: (id: string) => authFetch<Product>(apiUrl+`/products/${id}`, 'GET', null),
+        remove: (id: string) => authFetch<string>(apiUrl+`/products/${id}`, 'DELETE', null),
+        edit: (id: string, prod: Partial<Product>) => authFetch<string>(apiUrl+`/products/${id}`, 'PATCH', prod)
     },
     Account: {
         signUp: (user: User) => authFetch<[number, string]>(apiUrl+"/Account/register", 'POST', user, true),
@@ -122,6 +125,7 @@ export const agent = {
         getTransactions: () => authFetch<Array<Transaction>>(apiUrl+'/Account/transactions', 'GET', null),
         updateProfile: (profile: Partial<Profile>) => authFetch<string>(apiUrl+'/Account/profile', "PATCH", profile),
         refreshTokens: () => refresh(apiUrl+'/token/refresh'),
+        isAdmin: () => authFetch<boolean>(apiUrl+'/Account/isAdmin', 'GET',null),
     },
     ShoppingCart: {
         GetCart: () => getCart(apiUrl+"/ShoppingCart"),
@@ -141,5 +145,9 @@ export const agent = {
         apiUrl+`/Payment/buy?nonce=${nonce}&id=${product.id}&quantity=${product.quantity}`,
         'POST', deviceData)
         }
+    },
+    Admin: {
+        getClients: () => authFetch<Client[]>(apiUrl+'/Account/clients', 'GET', null),
+        updateRoles: (roles: Array<string>, user: Client) => authFetch<string>(apiUrl+`/Roles/update/${user.username}`, 'PATCH', roles)
     }
 }

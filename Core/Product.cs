@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Core;
 
 public class Product
@@ -6,5 +8,7 @@ public class Product
     public string Name { get; set; } = default!;
     public string Description { get; set; } = default!;
     public decimal Price { get; set; }
+
+    [JsonIgnore]
     public ICollection<CartProduct> CartProducts { get; set; } = default!;
 }

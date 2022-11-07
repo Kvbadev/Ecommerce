@@ -1,8 +1,12 @@
 <script lang="ts">
-    import NavItems from "./NavItems.svelte";
+    import { faBars, faHamburger } from "@fortawesome/free-solid-svg-icons";
+import Fa from "svelte-fa";
+import NavItems from "./NavItems.svelte";
 </script>
-
-<!-- TODO: implement media queries at least to the navbar -->
+<!-- <div class="hamburger"> -->
+    <!--TODO: implement hamburger-->
+    <!-- <Fa icon={faBars} size={'4x'} /> -->
+<!-- </div> -->
 <nav>
     <ul class="nav-items">
         <NavItems />
@@ -11,6 +15,11 @@
 <div class="margin"></div>
 
 <style>
+    .hamburger {
+        position: fixed;
+        left: 95%;
+        top: 1%;
+    }
     nav {
         font-family: "Raleway", sans-serif;
         width: 100vw;

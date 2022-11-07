@@ -49,6 +49,14 @@ public class MappingProfiles: AutoMapper.Profile
         CreateMap<Transaction, TransactionDto>()
             .ForMember(d => d.Products, o => o.MapFrom(s => s.Products))
             .ForMember(d => d.Success, o=>o.MapFrom(s => !s.Failure));
+        
+        CreateMap<AppUser, ClientDto>()
+            .ForMember(d => d.CreatedAt, o=>o.MapFrom(s => s.CreationDate))
+            .ForMember(d => d.Username, o=>o.MapFrom(s => s.UserName))
+            .ForPath(d => d.MoneySpent, o=>o.MapFrom(s => 
+                s.Transactions.Aggregate(0M,(a,b) => a + b.Price)
+            ))
+            .ForMember(d => d.Privileges, o=>o.Ignore());
     }
 
 }
