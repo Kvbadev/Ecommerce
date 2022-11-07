@@ -6,17 +6,18 @@ import Fa from "svelte-fa";
   import Loader from "../Common/Loader.svelte";
   import { agent } from "../../Utils/agent";
   import { onMount } from "svelte";
+  import { get } from "svelte/store";
 
     export let edit = "";
 
-    let prod = {};
+    let prod = {}, dirty=false;
     let submitting = false;
     const up = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
     const save = async () => {
         submitting = true;
         const tmp = {};
-        for(const pr in ($products[0])){
+        for(const pr in $products[0]){
             if(pr !== 'mainPhoto' && pr !== 'photos' && pr !== 'id')
                 tmp[pr] = prod[pr];
         }
@@ -29,7 +30,7 @@ import Fa from "svelte-fa";
     }
 
     onMount(async () => {
-        prod = $products.find(x => x.id === edit);
+        prod = get(products).find(x => x.id === edit);
     })
 </script>
 
@@ -40,13 +41,18 @@ import Fa from "svelte-fa";
         <form on:submit|preventDefault={save}>
             {#each Object.keys($products[0]).filter(x => x!=='mainPhoto' && x!=='id') as key}
                 <div class={key}>
-                    {up(key)}: <input class="key" bind:value={prod[key]} >
+                    {up(key)}: 
+                    {#if key==='price'}
+                    <input type="number" on:click|once={() => dirty=true} class="key" bind:value={prod[key]} >
+                    {:else}
+                    <input class="key" on:click|once={() => dirty=true} bind:value={prod[key]} >
+                    {/if}
                 </div>
             {/each}
         </form>
         <div class="buttons">
         <button class='cancel' type="button" on:click={() => edit = ""}>Cancel</button>
-        <button class='save' type="submit" on:click={save}>
+        <button class={dirty ? 'save' : 'disable'} type="submit" on:click={save} disabled={!dirty}>
             {#if submitting}
             <Loader inElement size={1} color={'#ffffff'}/>
             {:else}
@@ -92,6 +98,10 @@ import Fa from "svelte-fa";
     .save {
         position: relative;
         background-color: green!important;
+    }
+    .disable {
+
+        background-color: gray!important;
     }
     input {
         text-align: center;

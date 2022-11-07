@@ -126,7 +126,6 @@ export const agent = {
         updateProfile: (profile: Partial<Profile>) => authFetch<string>(apiUrl+'/Account/profile', "PATCH", profile),
         refreshTokens: () => refresh(apiUrl+'/token/refresh'),
         isAdmin: () => authFetch<boolean>(apiUrl+'/Account/isAdmin', 'GET',null),
-        getClients: () => authFetch<Client[]>(apiUrl+'/Account/clients', 'GET', null)
     },
     ShoppingCart: {
         GetCart: () => getCart(apiUrl+"/ShoppingCart"),
@@ -146,5 +145,9 @@ export const agent = {
         apiUrl+`/Payment/buy?nonce=${nonce}&id=${product.id}&quantity=${product.quantity}`,
         'POST', deviceData)
         }
+    },
+    Admin: {
+        getClients: () => authFetch<Client[]>(apiUrl+'/Account/clients', 'GET', null),
+        updateRoles: (roles: Array<string>, user: Client) => authFetch<string>(apiUrl+`/Roles/update/${user.username}`, 'PATCH', roles)
     }
 }
