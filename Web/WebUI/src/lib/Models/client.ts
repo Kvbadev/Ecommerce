@@ -1,6 +1,6 @@
 export default interface Client {
     username: string;
-    privileges: string;
+    privileges: Array<string>;
     money_spent: number;
     createdAt: string;
 }
