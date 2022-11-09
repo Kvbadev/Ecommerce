@@ -26,26 +26,46 @@ public class Seed
             await roleManager.CreateAsync(new IdentityRole("User"));
         }
 
-        // if(context.Products.Any())
-        // {
-        //     return;
-        // }
-
-        //testing roles
-
+        var photoUrls = new List<string>
+        {
+            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924502/Ecommerce/wall_clock1_x2ti5q.png",
+            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924493/Ecommerce/alarm_clock1_uejsot.png",
+            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924497/Ecommerce/military_thermos1_kinwgp.png",
+            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924496/Ecommerce/air_humidifier1_b35cmf.png",
+            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924500/Ecommerce/bluetooth_speaker1_y01oma.png",
+            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924500/Ecommerce/plasma_lighter1_gvxnrx.png",
+            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924503/Ecommerce/portable_water_cup1_a1xc6l.png",
+            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924504/Ecommerce/portable_water_cup2_dfgixt.png",
+            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924505/Ecommerce/wall_clock3_nc1pww.png",
+            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924503/Ecommerce/portable_water_cup3_pnvvyj.png",
+            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924503/Ecommerce/wall_clock2_ldcg4b.png",
+            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924502/Ecommerce/plasma_lighter2_i29tzg.png",
+            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924501/Ecommerce/bluetooth_speaker2_ym8hvt.png",
+            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924500/Ecommerce/plasma_lighter3_xbotcp.png",
+            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924499/Ecommerce/bluetooth_speaker3_kzcjn0.png",
+            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924498/Ecommerce/military_thermos3_nzugdl.png",
+            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924498/Ecommerce/military_thermos2_zoccqm.png",
+            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924495/Ecommerce/air_humidifier2_rojyv6.png",
+            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924494/Ecommerce/air_humidifier3_wqdh4d.png",
+            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924493/Ecommerce/alarm_clock2_oaw4bj.png",
+            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924492/Ecommerce/alarm_clock3_z3e8mk.png"
+        };
+    
         var toAppend = new List<Product>
         {
             new Product
             {
                 Name = "Portable Water Cup",
                 Description = "Impeccable, no water is spilled if I put it on head, plus it fits perfect in the side pocket of the backpack. He arrived in a couple of weeks, all right.",
-                Price = 15.50M
+                Price = 15.50M,
+               
             },
             new Product
             {
                 Name = "Plasma Lighter",
                 Description = "Really portable, windproof and most importantly reachargable usb lighter is going to be perfect if You smoke or want to start",
-                Price = 20.75M
+                Price = 20.75M,
+              
             },
             new Product
             {
@@ -76,16 +96,20 @@ public class Seed
                 Name = "Wall Clock",
                 Description = "The wall decor clock comes with self-adhesive numbers and auxiliary scale ruler, also there is an installation video for your reference. So one can easily to install and enjoy the DIY fun of making your own unique house decorations for living room.",
                 Price = 45.00M
-            },
-            new Product
-            {
-                Name = "Test Product",
-                Description = "lorem ipsum",
-                Price = 500.00M
             }
         };
         foreach(var e in toAppend) 
         {
+            e.Photos = new List<Photo>(photoUrls.Where(x => x
+                .Contains(e.Name.Replace(' ', '_').ToLower()))
+                .Select(val => 
+                {
+                    return new Photo
+                    {
+                        Url = val,
+                    };
+                }));
+
             if(context.Products.FirstOrDefault(x => x.Name == e.Name) == null)
             {
                 context.Products.Add(e);
@@ -93,6 +117,5 @@ public class Seed
         }
 
         var res = await context.SaveChangesAsync();
-        System.Console.WriteLine("Save changes? : {0}",res);
     }
 }

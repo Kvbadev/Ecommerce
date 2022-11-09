@@ -32,7 +32,7 @@ async function removeItem() {
         <h4>{prod.quantity}x</h4>
     </div>
     <div id="photo">
-        <img alt="Product" class="main-photo" src="{product?.mainPhoto}"/>
+        <img alt="Product" class="main-photo" src="{product?.photos.at(0)}"/>
     </div>
     <div class="main-info" id="main-info">
         <p><a href={`/product/${product?.id}`} use:link>{product?.name}</a></p>

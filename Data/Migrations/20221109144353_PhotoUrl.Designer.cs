@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221104052809_getterAndSetter")]
-    partial class getterAndSetter
+    [Migration("20221109144353_PhotoUrl")]
+    partial class PhotoUrl
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -29,9 +29,6 @@ namespace Data.Migrations
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreationDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
@@ -141,6 +138,26 @@ namespace Data.Migrations
                     b.HasIndex("TransactionId");
 
                     b.ToTable("CountableProduct");
+                });
+
+            modelBuilder.Entity("Core.Photo", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("ProductId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("Photo");
                 });
 
             modelBuilder.Entity("Core.Product", b =>
@@ -377,6 +394,16 @@ namespace Data.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("Core.Photo", b =>
+                {
+                    b.HasOne("Core.Product", "Product")
+                        .WithMany("Photos")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Core.ShoppingCart", b =>
                 {
                     b.HasOne("Core.AppUser", "AppUser")
@@ -461,6 +488,8 @@ namespace Data.Migrations
             modelBuilder.Entity("Core.Product", b =>
                 {
                     b.Navigation("CartProducts");
+
+                    b.Navigation("Photos");
                 });
 
             modelBuilder.Entity("Core.ShoppingCart", b =>
