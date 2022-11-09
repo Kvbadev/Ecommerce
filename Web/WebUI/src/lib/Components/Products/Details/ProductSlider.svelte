@@ -5,8 +5,7 @@ import {fade} from 'svelte/transition';
 import Fa from "svelte-fa";
 import type Product from "../../../Models/product";
 export let product: Product;
-const photos = [product.mainPhoto, ...product.photos];
-export let maxPhotos = photos.length;
+export let maxPhotos = product.photos.length;
 let index = 0;
 
 const onChange = (newIndex) => {
@@ -23,7 +22,7 @@ const onChange = (newIndex) => {
         </span>
 
         <span in:fade class="big-image">
-            {#each photos as photo, i}
+            {#each product.photos as photo, i}
                 <img src={photo} alt={`Product ${photo}`} 
                     style={`left: ${(((i-index)+maxPhotos)%maxPhotos)*100}%;`}
                 /> 
@@ -35,8 +34,8 @@ const onChange = (newIndex) => {
         </span>  
     </div>
     <div class="others">
-        {#each photos as photo, i}
-            <div class="image {photos.at(index) === photo ? 'main':''}">
+        {#each product.photos as photo, i}
+            <div class="image {product.photos.at(index) === photo ? 'main':''}">
                 <img on:click={() => {index=i}} src={photo} alt="Product"/>
             </div>
         {/each}

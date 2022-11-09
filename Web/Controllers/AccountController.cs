@@ -73,7 +73,7 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> Login(LoginDto creds,
         [FromServices]SignInManager<AppUser> manager)
     {
-        var user = await _context.AppUsers.FirstOrDefaultAsync(x => x.UserName == creds.Username);
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == creds.Username);
         if(user == null){
             return Unauthorized("This username does not exist");
         }

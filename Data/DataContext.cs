@@ -10,7 +10,6 @@ public class DataContext : IdentityDbContext<AppUser>
     {
     }
     public virtual DbSet<Product> Products { get; set; } = default!;
-    public virtual DbSet<AppUser> AppUsers {get; set;} = default!;
     public virtual DbSet<CartProduct> CartProducts { get; set; } = default!;
 
     public virtual DbSet<ShoppingCart> ShoppingCarts {get; set;} = default!;
@@ -30,6 +29,10 @@ public class DataContext : IdentityDbContext<AppUser>
         builder.Entity<AppUser>()
             .HasMany(n => n.Transactions)
             .WithOne(n => n.AppUser)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<Product>()
+            .HasMany(n => n.Photos)
+            .WithOne(x => x.Product)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<CartProduct>()

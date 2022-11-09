@@ -7,18 +7,20 @@ import Fa from "svelte-fa";
   import { agent } from "../../Utils/agent";
   import { onMount } from "svelte";
   import { get } from "svelte/store";
+  import type Product from "../../Models/product";
 
     export let edit = "";
 
-    let prod = {}, dirty=false;
+    let prod = {} as Product|any, dirty=false;
     let submitting = false;
     const up = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
     const save = async () => {
         submitting = true;
         const tmp = {};
+        prod.photos = prod.photos.split(',');
         for(const pr in $products[0]){
-            if(pr !== 'mainPhoto' && pr !== 'photos' && pr !== 'id')
+            if(pr !== 'id')
                 tmp[pr] = prod[pr];
         }
 
@@ -39,13 +41,17 @@ import Fa from "svelte-fa";
     <div class="items" on:click={e => e.stopImmediatePropagation()}>
         <h1>{$products.find(x => x.id === edit)?.name}</h1>
         <form on:submit|preventDefault={save}>
-            {#each Object.keys($products[0]).filter(x => x!=='mainPhoto' && x!=='id') as key}
+            {#each Object.keys($products[0]).filter(x => x!=='id') as key}
                 <div class={key}>
                     {up(key)}: 
                     {#if key==='price'}
-                    <input type="number" on:click|once={() => dirty=true} class="key" bind:value={prod[key]} >
+                    <input type="number" on:input|once={() => dirty=true} class="key" bind:value={prod[key]} >
+                    {:else if key==='Photos'}
+                    <input on:input|once={() => dirty=true} class="key" 
+                    bind:value={prod[key]}
+                    >
                     {:else}
-                    <input class="key" on:click|once={() => dirty=true} bind:value={prod[key]} >
+                    <input class="key" on:input|once={() => dirty=true} bind:value={prod[key]} >
                     {/if}
                 </div>
             {/each}

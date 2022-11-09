@@ -3,6 +3,5 @@ export default interface Product {
     name: string;
     description: string;
     price: number;
-    mainPhoto: string;
-    photos: Array<string>;
+    photos: Array<string> | string;
 }

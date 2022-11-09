@@ -27,8 +27,6 @@
     loading = "";
   }
 
-  //TODO: add request to get all products and pagination in main page
-
 </script>
 
 {#if src!==""}
@@ -42,13 +40,13 @@
 <div class="table">
 
     <div class="headers">
-      {#each Object.keys($products[0]).filter(x => x!=='mainPhoto') as key}
+      {#each Object.keys($products[0]) as key}
       <div class="header">{key}</div>
       {/each}
     </div>
       {#each $products as prod}
       <div class="row">
-      {#each Object.keys($products[0])?.filter(x => x!=='mainPhoto') as key}
+      {#each Object.keys($products[0]) as key}
           <div class="data">
           {#if prod[key] === prod.id}
             <p>{prod.id}</p>
@@ -66,8 +64,8 @@
             {prod.description.slice(0, 30)+'...'}
           {:else if prod[key] === prod.price}
             {prod.price}$
-          {:else if prod[key] === prod.photos || prod[key] === prod.mainPhoto}
-          {#each [...prod[key], prod.mainPhoto] as photo}
+          {:else if prod[key] === prod.photos}
+          {#each prod[key] as photo}
             <img src={photo} alt="product minature" on:click={() => imageModal(photo)}/>
           {/each}
           {:else}
