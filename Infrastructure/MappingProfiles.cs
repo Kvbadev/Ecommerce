@@ -12,6 +12,17 @@ public class MappingProfiles: AutoMapper.Profile
             .ForMember(x => x.CreationDate, y => y.AddTransform(t => DateTime.UtcNow));
 
         CreateMap<AppUser, Core.Profile>();
+
+        CreateMap<Product, ProductDto>()
+            .ForMember(d => d.Photos, o => o.MapFrom(s => s.Photos.Select(x => x.Url)));
+        CreateMap<ProductDto, Product>()
+            .ForMember(d => d.CartProducts, o=> o.Ignore())
+            .ForMember(d => d.Id, o=> o.Ignore())
+            .ForMember(d => d.Photos, o=> o.MapFrom(s => s.Photos.Select(x => 
+                new Photo
+                {
+                    Url = x
+                })));
         
         CreateMap<Product, CartProduct>()
             .ForPath(d => d.Product.Id, o => o.MapFrom(x => x.Id))

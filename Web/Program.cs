@@ -8,13 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Web.Services;
 
-
-//if foreign key contraints failed - CHECK IF ID HASN'T CHANGED  
-
-//TODO: add image hosting
-
-//TODO: add filters
-
+//TODO: add filters and pagination
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,7 +24,6 @@ builder.Services.AddCors(options =>
 builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 
 builder.Services.AddLogging();
-
 
 
 builder.Services.Configure<IdentityOptions>(opt => 

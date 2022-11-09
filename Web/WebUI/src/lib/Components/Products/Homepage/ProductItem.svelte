@@ -7,7 +7,7 @@ import ItemPhoto from "../../Products/Homepage/ItemPhoto.svelte";
     const max_desc_len = 150;
 
     const photoProps = {
-        src: product.mainPhoto,
+        src: product.photos.find(x => x[1]),
         alt: product.name
     }
 </script>
@@ -48,13 +48,14 @@ import ItemPhoto from "../../Products/Homepage/ItemPhoto.svelte";
         backdrop-filter: blur(2rem);
         -webkit-backdrop-filter: blur(1rem);
         -moz-backdrop-filter: blur(1rem); 
-        border: 0.1rem solid rgba(0, 0, 0, 0.3);
+        border: 0.1rem solid black;
 
         transition: 0.5s ease-in-out;
     }
 
     li:hover {
-        box-shadow: 0px 3px 18px 3px rgba(66, 68, 90, 1);
+        background-color: rgb(249, 249, 249);
+        border: 0.1rem solid rgba(0, 0, 0, 0.3);
     }
 
     a {

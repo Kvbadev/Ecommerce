@@ -12,22 +12,6 @@ import type Client from "../Models/client";
 
 const apiUrl = "https://localhost:5000/api";
 
-async function getProducts(url: string): Promise<Array<Product>> {
-    let prods = await authFetch<Array<Product>>(apiUrl+"/products", 'GET', null);
-    prods = prods.map((v,i) => {
-        v.mainPhoto = `/PlaceholderPhotos/${v.name.replaceAll(' ', '_')
-            .toLowerCase()}1.png`;
-
-        v.photos = Array.from(Array(4)).slice(2).map((n,i) => {
-            return `/PlaceholderPhotos/${v.name.replaceAll(' ', '_')
-        .toLowerCase()}${i+2}.png`;
-        });
-
-        return v;
-    })
-    return prods;
-}
-
 async function getCart(url: string): Promise<Cart | null> {
     const cart = await authFetch<Cart>(url, 'GET', null);
     if(cart?.items?.length === 0) return null;
@@ -113,7 +97,7 @@ const refresh = async (url: string) => {
 
 export const agent = {
     Products: {
-        getAll: () => getProducts(apiUrl+"/products"),
+        getAll: () => authFetch<Array<Product>>(apiUrl+"/products", 'GET', null),
         getOne: (id: string) => authFetch<Product>(apiUrl+`/products/${id}`, 'GET', null),
         remove: (id: string) => authFetch<string>(apiUrl+`/products/${id}`, 'DELETE', null),
         edit: (id: string, prod: Partial<Product>) => authFetch<string>(apiUrl+`/products/${id}`, 'PATCH', prod)

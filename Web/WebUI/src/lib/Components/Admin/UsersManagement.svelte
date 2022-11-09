@@ -4,7 +4,7 @@
   import Loader from "../Common/Loader.svelte";
   import type Client from "src/lib/Models/client";
   import Fa from "svelte-fa";
-  import { faHouseMedicalCircleXmark, faMehRollingEyes, faRemove, faSackXmark, faUserEdit, faUserLock, faXmark, faXmarkCircle, faXmarksLines } from "@fortawesome/free-solid-svg-icons";
+  import { faHouseMedicalCircleXmark, faMehRollingEyes, faRemove, faSackXmark, faUserEdit, faUserLock, faXmark, faXmarkCircle, faXmarksLines, faXmarkSquare } from "@fortawesome/free-solid-svg-icons";
   import { xlink_attr } from "svelte/internal";
 
 
@@ -44,7 +44,7 @@ onMount(async () => {
       <div class="data">
         {#if key === 'privileges'}
         {#each cl[key] as role}
-          <span on:click={() => removeRole(cl,role)}><p>{role}</p><Fa icon={faXmark} color="#ff0000" size="1.1x"/></span>
+          <span on:click={() => removeRole(cl,role)}><p>{role}</p><Fa icon={faRemove} color="#7f7134" size="1"/></span>
         {/each}
         {:else}
         {cl[key]}{#if key == 'moneySpent'}$

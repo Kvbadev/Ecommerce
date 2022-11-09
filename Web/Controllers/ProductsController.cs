@@ -1,3 +1,5 @@
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Core;
 using Data;
 using Infrastructure.DTOs;
@@ -13,16 +15,20 @@ namespace Web.Controllers;
 public class ProductsController : ControllerBase
 {
     private readonly DataContext _context;
-    public ProductsController(DataContext context)
+    private readonly IMapper _mapper;
+    public ProductsController(DataContext context, IMapper mapper)
     {
+        _mapper = mapper;
         _context = context;
     }
 
     //test
     [HttpGet]
-    public async Task<List<Product>> GetProducts()
+    public async Task<IEnumerable<ProductDto>> GetProducts()
     {
-        return await _context.Products.ToListAsync();
+        //project to productDto with string array instead of photos and main photo 
+        return await _context.Products
+            .ProjectTo<ProductDto>(_mapper.ConfigurationProvider).ToListAsync();
     }
 
     [HttpGet("{id}")]
@@ -50,17 +56,16 @@ public class ProductsController : ControllerBase
     [HttpPatch("{id}")]
     public async Task<IActionResult> UpdateProduct([FromBody]ProductDto prod, Guid id)
     {
-        var change = await _context.Products.FindAsync(id);
+        var change = await _context.Products.Include(x => x.Photos).FirstAsync(x => x.Id == id);
         if(change is null)
         {
             return BadRequest("Product does not exist");
         }
-        change.Name = prod.Name ?? change.Name;
-        change.Description = prod.Description ?? change.Description;
-        change.Price = prod.Price == decimal.Zero ? change.Price : prod.Price;
+        _mapper.Map(prod, change);
 
-        var res =  await _context.SaveChangesAsync() > 0;
-        return res ? Ok() : 
+        var res =  await _context.SaveChangesAsync(); 
+
+        return res > 0 ? Ok() : 
         BadRequest("Could not persist changes in the database");
     }
 }
