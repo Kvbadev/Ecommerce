@@ -16,10 +16,12 @@ public class Seed
         {
             await roleManager.CreateAsync(new IdentityRole("Administrator"));
         }
-        else if(context.Users.Any())
+        else if(await userManager.FindByNameAsync("Administrator") == null)
         {
+            await userManager.CreateAsync(new AppUser("Administrator"), "Pa$$w0rd");
+
             await userManager.AddToRoleAsync(context.Users
-                        .FirstOrDefault(x => x.UserName=="jakub")!, "Administrator");
+                        .FirstOrDefault(x => x.UserName=="Administrator")!, "Administrator");
         }
         if(await roleManager.RoleExistsAsync("User") is false)
         {

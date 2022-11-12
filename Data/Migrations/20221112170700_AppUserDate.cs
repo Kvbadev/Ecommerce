@@ -4,7 +4,7 @@
 
 namespace Data.Migrations
 {
-    public partial class transactionFix : Migration
+    public partial class AppUserDate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

@@ -98,6 +98,9 @@ let cartColor = 'white';
             color: white;
             transition: color 0.5s;
         }
+        .item-4 {
+            width: auto;
+        }
         .item-3 {
             width: auto;
         }
@@ -107,15 +110,6 @@ let cartColor = 'white';
         .group-2:last-child {
             color: #7e7603;
         }
-        @keyframes test {
-            from {
-                transform: rotate(0);
-            }
-            to {
-                transform: rotate(90deg);
-            }
-        }
-
     }
 </style>
     

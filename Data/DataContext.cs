@@ -15,6 +15,7 @@ public class DataContext : IdentityDbContext<AppUser>
     public virtual DbSet<ShoppingCart> ShoppingCarts {get; set;} = default!;
 
     public virtual DbSet<Transaction> Transactions { get; set; } = default!;
+    public virtual DbSet<Photo> Photos { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -30,6 +31,7 @@ public class DataContext : IdentityDbContext<AppUser>
             .HasMany(n => n.Transactions)
             .WithOne(n => n.AppUser)
             .OnDelete(DeleteBehavior.Cascade);
+
         builder.Entity<Product>()
             .HasMany(n => n.Photos)
             .WithOne(x => x.Product)
@@ -45,6 +47,11 @@ public class DataContext : IdentityDbContext<AppUser>
             .HasOne(cp => cp.ShoppingCart)
             .WithMany(p => p.CartProducts)
             .HasForeignKey(fk => fk.ShoppingCartId);
+
+        builder.Entity<Photo>()
+            .HasOne(p => p.Product)
+            .WithMany(p => p.Photos)
+            .OnDelete(DeleteBehavior.Cascade);
         
     }
 }

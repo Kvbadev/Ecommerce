@@ -10,7 +10,7 @@ public class RegisterDto
     [Required]
     public string? Lastname { get; set; }
 
-    [Required, MinLength(4, ErrorMessage = "Your username should be more than 4 characters"), MaxLength(16, ErrorMessage = "Your username should be less than 16 characters")]
+    [Required, MinLength(4, ErrorMessage = "Your username should be more than 4 characters"), MaxLength(20, ErrorMessage = "Your username should be less than 16 characters")]
     public string? Username { get; set; }
     
     [Required, RegularExpression(@"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$", ErrorMessage = "This is not a correct email address")]

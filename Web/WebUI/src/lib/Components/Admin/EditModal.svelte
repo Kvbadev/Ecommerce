@@ -18,7 +18,7 @@ import Fa from "svelte-fa";
     const save = async () => {
         submitting = true;
         const tmp = {};
-        prod.photos = prod.photos.split(',');
+        prod.photos = typeof prod.photos === typeof "" ? prod.photos.split(',') : prod.photos;
         for(const pr in $products[0]){
             if(pr !== 'id')
                 tmp[pr] = prod[pr];

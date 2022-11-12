@@ -148,7 +148,7 @@ onMount(async () => {
     <form class="form">
         <span>
         {#if loading}
-        <Loader inElement size={3} color='#000000'/>
+        <Loader inElement size={3} color='#ffffff'/>
         {/if}
         <div class="cardholder-name-div form-div">
             <label for="cardholer-name" 

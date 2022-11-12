@@ -10,7 +10,7 @@ using Web.Services;
 namespace Web.Controllers;
 
 [ApiController]
-[Authorize(Roles = "User")]
+[Authorize(Roles = "User,Administrator")]
 [Route("api/[controller]")]
 public class PaymentController : ControllerBase
 {

@@ -12,7 +12,7 @@ using Infrastructure.DTOs;
 namespace Web.Controllers;
 
 [ApiController]
-[Authorize(Roles = "User")]
+[Authorize(Roles = "User,Administrator")]
 [Route("api/[controller]")]
 public class AccountController : ControllerBase
 {
@@ -170,10 +170,6 @@ public class AccountController : ControllerBase
         }
 
         var clients = _mapper.Map<AppUser[], IEnumerable<ClientDto>>(users);
-
-        var test = _context.Users.FirstOrDefault(x => x.UserName == "jakub");
-        var trans = test!.Transactions;
-        var data = trans.Aggregate(0M,(a,b) => a + b.Price);
 
         foreach(var c in clients)
         {

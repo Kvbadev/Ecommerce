@@ -11,7 +11,7 @@ namespace Web.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "User")]
+[Authorize(Roles = "User,Administrator")]
 public class ShoppingCartController : ControllerBase
 {
     private readonly DataContext _context;

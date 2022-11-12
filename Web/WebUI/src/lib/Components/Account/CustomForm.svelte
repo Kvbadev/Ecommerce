@@ -106,7 +106,7 @@ import { get } from "svelte/store";
                 {#if field === 'email'}
                     <FormField name={field} regex={new RegExp(/^\S+@\S+\.\S+$/)} bind:isOk={isOk[i]} minLen={4} maxLen={50}/>
                 {:else}
-                    <FormField name={field} minLen={5} maxLen={12} bind:isOk={isOk[i]} />
+                    <FormField name={field} minLen={5} maxLen={20} bind:isOk={isOk[i]} />
                 {/if}
             {/each}
             </div>
