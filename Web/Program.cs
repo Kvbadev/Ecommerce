@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json;
 using Core;
 using Data;
 using Infrastructure;
@@ -8,7 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Web.Services;
 
-//TODO: add filters and pagination
+//TODO: add pagination
+//TODO: security things
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +28,7 @@ builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 builder.Services.AddLogging();
 
 
+//Identity: password
 builder.Services.Configure<IdentityOptions>(opt => 
 {
     opt.Password.RequireDigit = true;
@@ -33,8 +36,7 @@ builder.Services.Configure<IdentityOptions>(opt =>
     opt.Password.RequiredLength = 6;
 });
 
-
-
+//Authentiaction & Authorization
 builder.Services.AddAuthentication(opt => 
 {
     // opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -95,6 +97,19 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+   
+}
+else
+{
+    //Exception Middleware
+    app.UseExceptionHandler(exHandler => 
+    {
+        exHandler.Run(async context => 
+        {
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            await context.Response.WriteAsJsonAsync($"Server Error: {context.Response.StatusCode}");
+        });
+    });
 }
 
 using (var scope = app.Services.CreateScope())
