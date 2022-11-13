@@ -188,7 +188,7 @@ onMount(async () => {
                 on:click={(e) => handleSubmit(e)}>
 
                 {#if submitting}
-                <Loader inElement size={1} color="#000000"/>
+                <Loader inElement size={1} color="#ffffff"/>
                 {:else}
                 Submit
                 {/if}

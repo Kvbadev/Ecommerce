@@ -40,7 +40,6 @@ public class AccountController : ControllerBase
         var newUser = new AppUser();
         _mapper.Map(user, newUser); 
 
-        newUser.CreationDate = DateTime.UtcNow;
         newUser.RefreshToken = _jwtTokenService.GenerateRefreshToken();
         newUser.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
 
@@ -50,22 +49,15 @@ public class AccountController : ControllerBase
 
         if(result.Succeeded)
         {
-            newUser.ShoppingCart = new ShoppingCart();
-            // _logger.LogInformation("New user {} has been created", user.Username);
+            _logger.LogInformation("New user {} has been created", user.Username);
             var accessToken = await _jwtTokenService.GenerateAccessToken(newUser);
 
-            var res = await _context.SaveChangesAsync() > 0;
-
-            if(res)
-            {
-                return Ok(new AuthResponse{
-                    AccessToken = accessToken,
-                    RefreshToken = newUser.RefreshToken
-                });
-            }
-            return BadRequest("Could not register a new user");
+            return Ok(new AuthResponse{
+                AccessToken = accessToken,
+                RefreshToken = newUser.RefreshToken
+            });
         }
-        return BadRequest(result.Errors.ElementAt(0).Description.ToString()); //return one of the errors
+        return BadRequest("Could not register a new user");
     }
 
     [AllowAnonymous]
