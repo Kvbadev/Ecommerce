@@ -3,13 +3,13 @@ using System.Text.Json;
 using Core;
 using Data;
 using Infrastructure;
+using Infrastructure.Photos;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Web.Services;
 
-//TODO: add pagination
 //TODO: security things
 
 var builder = WebApplication.CreateBuilder(args);
@@ -114,7 +114,9 @@ else
 
 using (var scope = app.Services.CreateScope())
 {
-    await Seed.SeedData(scope.ServiceProvider);
+    var helper = new CloudinaryHelper(builder.Configuration);
+    var photos = await helper.GetAllPhotosUrls();
+    await Seed.SeedData(scope.ServiceProvider, photos);
 }
 
 app.UseCors();

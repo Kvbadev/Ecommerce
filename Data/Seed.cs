@@ -6,7 +6,7 @@ namespace Data;
 
 public class Seed
 {
-    public static async Task SeedData(IServiceProvider serviceProvider)
+    public static async Task SeedData(IServiceProvider serviceProvider, IEnumerable<string> photos)
     {
         var context = serviceProvider.GetRequiredService<DataContext>();
         var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
@@ -28,30 +28,30 @@ public class Seed
             await roleManager.CreateAsync(new IdentityRole("User"));
         }
 
-        var photoUrls = new List<string>
-        {
-            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924502/Ecommerce/wall_clock1_x2ti5q.png",
-            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924493/Ecommerce/alarm_clock1_uejsot.png",
-            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924497/Ecommerce/military_thermos1_kinwgp.png",
-            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924496/Ecommerce/air_humidifier1_b35cmf.png",
-            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924500/Ecommerce/bluetooth_speaker1_y01oma.png",
-            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924500/Ecommerce/plasma_lighter1_gvxnrx.png",
-            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924503/Ecommerce/portable_water_cup1_a1xc6l.png",
-            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924504/Ecommerce/portable_water_cup2_dfgixt.png",
-            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924505/Ecommerce/wall_clock3_nc1pww.png",
-            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924503/Ecommerce/portable_water_cup3_pnvvyj.png",
-            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924503/Ecommerce/wall_clock2_ldcg4b.png",
-            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924502/Ecommerce/plasma_lighter2_i29tzg.png",
-            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924501/Ecommerce/bluetooth_speaker2_ym8hvt.png",
-            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924500/Ecommerce/plasma_lighter3_xbotcp.png",
-            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924499/Ecommerce/bluetooth_speaker3_kzcjn0.png",
-            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924498/Ecommerce/military_thermos3_nzugdl.png",
-            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924498/Ecommerce/military_thermos2_zoccqm.png",
-            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924495/Ecommerce/air_humidifier2_rojyv6.png",
-            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924494/Ecommerce/air_humidifier3_wqdh4d.png",
-            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924493/Ecommerce/alarm_clock2_oaw4bj.png",
-            "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924492/Ecommerce/alarm_clock3_z3e8mk.png"
-        };
+        // var photoUrls = new List<string>
+        // {
+        //     "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924502/Ecommerce/wall_clock1_x2ti5q.png",
+        //     "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924493/Ecommerce/alarm_clock1_uejsot.png",
+        //     "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924497/Ecommerce/military_thermos1_kinwgp.png",
+        //     "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924496/Ecommerce/air_humidifier1_b35cmf.png",
+        //     "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924500/Ecommerce/bluetooth_speaker1_y01oma.png",
+        //     "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924500/Ecommerce/plasma_lighter1_gvxnrx.png",
+        //     "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924503/Ecommerce/portable_water_cup1_a1xc6l.png",
+        //     "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924504/Ecommerce/portable_water_cup2_dfgixt.png",
+        //     "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924505/Ecommerce/wall_clock3_nc1pww.png",
+        //     "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924503/Ecommerce/portable_water_cup3_pnvvyj.png",
+        //     "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924503/Ecommerce/wall_clock2_ldcg4b.png",
+        //     "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924502/Ecommerce/plasma_lighter2_i29tzg.png",
+        //     "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924501/Ecommerce/bluetooth_speaker2_ym8hvt.png",
+        //     "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924500/Ecommerce/plasma_lighter3_xbotcp.png",
+        //     "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924499/Ecommerce/bluetooth_speaker3_kzcjn0.png",
+        //     "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924498/Ecommerce/military_thermos3_nzugdl.png",
+        //     "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924498/Ecommerce/military_thermos2_zoccqm.png",
+        //     "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924495/Ecommerce/air_humidifier2_rojyv6.png",
+        //     "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924494/Ecommerce/air_humidifier3_wqdh4d.png",
+        //     "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924493/Ecommerce/alarm_clock2_oaw4bj.png",
+        //     "https://res.cloudinary.com/djn9w0fe3/image/upload/v1667924492/Ecommerce/alarm_clock3_z3e8mk.png"
+        // };
     
         var toAppend = new List<Product>
         {
@@ -102,7 +102,7 @@ public class Seed
         };
         foreach(var e in toAppend) 
         {
-            e.Photos = new List<Photo>(photoUrls.Where(x => x
+            e.Photos = new List<Photo>(photos.Where(x => x
                 .Contains(e.Name.Replace(' ', '_').ToLower()))
                 .Select(val => 
                 {
