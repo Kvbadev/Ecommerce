@@ -14,8 +14,8 @@ public class AppUser : IdentityUser
     public string Firstname { get; set; } = string.Empty;
     public string Lastname { get; set; } = string.Empty;
     public  DateTime CreationDate { get; set; } = DateTime.UtcNow;
-    public ShoppingCart ShoppingCart { get; set; } = default!;
-    public ICollection<Transaction> Transactions { get; set; } = default!;
+    public ShoppingCart ShoppingCart { get; set; } = new ShoppingCart();
+    public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
     public string RefreshToken { get; set; } = string.Empty;
     public DateTime RefreshTokenExpiry { get; set; }
 }

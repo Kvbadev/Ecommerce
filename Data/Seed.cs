@@ -18,10 +18,14 @@ public class Seed
         }
         else if(await userManager.FindByNameAsync("Administrator") == null)
         {
-            await userManager.CreateAsync(new AppUser("Administrator"), "Pa$$w0rd");
+            var outcome = await userManager.CreateAsync(new AppUser("Administrator"), "Pa$$w0rd");
+            if(outcome.Succeeded)
+            {
+                var user = context.Users.FirstOrDefault(x => x.UserName=="Administrator")!;
+                await userManager.AddToRoleAsync(user,"Administrator");
+                            
+            }
 
-            await userManager.AddToRoleAsync(context.Users
-                        .FirstOrDefault(x => x.UserName=="Administrator")!, "Administrator");
         }
         if(await roleManager.RoleExistsAsync("User") is false)
         {
