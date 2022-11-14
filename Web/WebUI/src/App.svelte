@@ -4,7 +4,7 @@ import { routes } from './routes';
 import Router from 'svelte-spa-router'
 import { onMount } from 'svelte';
 import { agent } from './lib/Utils/agent';
-import { jwtToken, products, userProfile } from './lib/Stores/stores';
+import { jwtToken, products, userProfile, shoppingCart } from './lib/Stores/stores';
 import { initShoppingCart } from './lib/Stores/ShoppingCartExtensions';
 import type Cart from './lib/Models/cart';
 import { SvelteToast, toast } from '@zerodevx/svelte-toast';

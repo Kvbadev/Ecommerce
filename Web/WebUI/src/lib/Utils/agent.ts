@@ -100,7 +100,8 @@ export const agent = {
         getAll: () => authFetch<Array<Product>>(apiUrl+"/products", 'GET', null),
         getOne: (id: string) => authFetch<Product>(apiUrl+`/products/${id}`, 'GET', null),
         remove: (id: string) => authFetch<string>(apiUrl+`/products/${id}`, 'DELETE', null),
-        edit: (id: string, prod: Partial<Product>) => authFetch<string>(apiUrl+`/products/${id}`, 'PATCH', prod)
+        edit: (id: string, prod: Partial<Product>) => authFetch<string>(apiUrl+`/products/${id}`, 'PATCH', prod),
+        create: (prod: Partial<Product>) => authFetch<Product>(apiUrl+`/products`, 'POST', prod)
     },
     Account: {
         signUp: (user: User) => authFetch<[number, string]>(apiUrl+"/Account/register", 'POST', user, true),

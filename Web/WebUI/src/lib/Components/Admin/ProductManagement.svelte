@@ -60,7 +60,7 @@
                 {/if}
               </button>
             </div>
-          {:else if prod[key] === prod.description}
+          {:else if key === 'description'}
             {prod.description.slice(0, 30)+'...'}
           {:else if prod[key] === prod.price}
             {prod.price}$
@@ -75,10 +75,22 @@
       {/each}
       </div>
       {/each}
+<button class="create" on:click={() => edit = 'new'}>Create</button>
 </div>
 
 <style>
- 
+  .create {
+    cursor: pointer;
+    width: 24rem;
+    height: 4rem;
+    margin: 1rem;
+    border: none;
+    border-radius: 1rem 0;
+    background-color: rgb(120, 183, 26);
+    font-family: 'Raleway';
+    font-size: 2rem;
+    color: white;
+  }
   .data img{
     border-radius: 1rem;
     cursor: pointer;
