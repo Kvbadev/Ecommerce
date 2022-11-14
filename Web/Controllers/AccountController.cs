@@ -57,7 +57,9 @@ public class AccountController : ControllerBase
                 RefreshToken = newUser.RefreshToken
             });
         }
-        return BadRequest("Could not register a new user");
+        // return BadRequest("
+        return BadRequest(result.Errors.ElementAt(0)?.Description ??
+        "Could not register a new user");
     }
 
     [AllowAnonymous]

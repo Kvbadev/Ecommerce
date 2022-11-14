@@ -32,9 +32,9 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<Product?> GetProduct(Guid id)
+    public async Task<ProductDto?> GetProduct(Guid id)
     {
-        return await _context.Products.FindAsync(id); 
+        return _mapper.Map<Product, ProductDto>(await _context.Products.FindAsync(id)??null!); 
     }
 
     [HttpDelete("{id}")]
@@ -67,5 +67,23 @@ public class ProductsController : ControllerBase
 
         return res > 0 ? Ok() : 
         BadRequest("Could not persist changes in the database");
+    }
+
+    [Authorize(Roles = "Administrator")]
+    [HttpPost]
+    public async Task<IActionResult> CreateProduct([FromBody]ProductDto prod)
+    {
+        var product = _mapper.Map<ProductDto, Product>(prod);
+
+        _context.Products.Add(product);
+
+        var res = await _context.SaveChangesAsync();
+        if(res <= 0)
+        {
+            BadRequest("Could not persist changes");
+        }
+        prod.Id = product.Id;
+
+        return Ok(prod);
     }
 }
