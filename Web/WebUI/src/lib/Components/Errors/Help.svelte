@@ -1,5 +1,5 @@
 <script lang="ts">
-    export let params = {} as any;
+    export const params = {} as any;
 </script>
 
 <div class="container">

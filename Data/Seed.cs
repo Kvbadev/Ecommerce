@@ -16,7 +16,7 @@ public class Seed
         {
             await roleManager.CreateAsync(new IdentityRole("Administrator"));
         }
-        else if(await userManager.FindByNameAsync("Administrator") == null)
+        if(await userManager.FindByNameAsync("Administrator") == null)
         {
             var outcome = await userManager.CreateAsync(new AppUser("Administrator"), "Pa$$w0rd");
             if(outcome.Succeeded)
