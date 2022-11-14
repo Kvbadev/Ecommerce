@@ -18,28 +18,38 @@ import Fa from "svelte-fa";
     const save = async () => {
         submitting = true;
         const tmp = {};
-        prod.photos = typeof prod.photos === typeof "" ? prod.photos.split(',') : prod.photos;
+        prod.photos = typeof prod.photos === typeof "" ?
+            prod.photos.replace(/ /g,'').split(',') : prod.photos;
+
         for(const pr in $products[0]){
             if(pr !== 'id')
                 tmp[pr] = prod[pr];
         }
-
-        await agent.Products.edit(edit, tmp);
-        $products = [...$products]
+        if(edit === 'new')
+        {
+            const newProd = await agent.Products.create(tmp); 
+            $products = [...$products, newProd] //refresh store
+        } 
+        else
+        {
+            await agent.Products.edit(edit, tmp);
+            $products = [...$products] //refresh store
+        }
 
         submitting = false;
         edit = "";
     }
 
     onMount(async () => {
-        prod = get(products).find(x => x.id === edit);
+        if(edit !== 'new')
+            prod = get(products).find(x => x.id === edit);
     })
 </script>
 
 <div class="container" in:fade on:click={() => edit=""}>
     <span on:click={() => edit=""}><Fa icon={faClose} color="black" size="3x"/></span>
     <div class="items" on:click={e => e.stopImmediatePropagation()}>
-        <h1>{$products.find(x => x.id === edit)?.name}</h1>
+        <h1>{edit === 'new' ? 'New Product' : $products.find(x => x.id === edit)?.name}</h1>
         <form on:submit|preventDefault={save}>
             {#each Object.keys($products[0]).filter(x => x!=='id') as key}
                 <div class={key}>
@@ -111,6 +121,12 @@ import Fa from "svelte-fa";
     }
     input {
         text-align: center;
+        transition: all 0.3s;
+    }
+    input:focus {
+        border-left: 0.4rem blue solid;
+        /* border: none; */
+        outline: none;
     }
 
     .description {

@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221113142026_AppUserInitializer")]
-    partial class AppUserInitializer
+    [Migration("20221114072154_all")]
+    partial class all
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
