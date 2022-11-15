@@ -40,7 +40,7 @@ onMount(async () => {
 </script>
 
 <!--if admin then not show-->
-{#if $location !== '/admin'}
+{#if $location.toLowerCase() !== '/admin'}
   <Navbar/>
 {/if}
 <Router {routes} />
