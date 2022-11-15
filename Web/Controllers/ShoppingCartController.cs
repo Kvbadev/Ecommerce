@@ -40,7 +40,7 @@ public class ShoppingCartController : ControllerBase
 
         var cart = new ShoppingCartDto();
         _mapper.Map<ShoppingCart, ShoppingCartDto>(user.ShoppingCart, cart);
-
+        //TODO
         return cart;
     }
 
