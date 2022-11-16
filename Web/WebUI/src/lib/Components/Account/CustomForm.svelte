@@ -86,7 +86,7 @@ import { get } from "svelte/store";
             
         } catch(err) {
             loading = canSubmit = false;
-            console.log(err ?? '');
+            console.log(err);
         }
     }
     

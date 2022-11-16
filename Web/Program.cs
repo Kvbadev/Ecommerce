@@ -1,14 +1,15 @@
 using System.Text;
-using System.Text.Json;
 using Core;
 using Data;
 using Infrastructure;
 using Infrastructure.Photos;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Web.Services;
+
 
 //TODO: security things
 
@@ -91,6 +92,11 @@ var app = builder.Build();
 
 app.UseRouting();
 
+//Security headers
+app.UseXContentTypeOptions();
+app.UseReferrerPolicy(o => o.NoReferrer());
+app.UseXXssProtection(o => o.EnabledWithBlockMode());
+app.UseXfo(o => o.Deny());
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -37,8 +37,7 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> RegisterUser(RegisterDto user)
     {
 
-        var newUser = new AppUser();
-        _mapper.Map(user, newUser); 
+        var newUser = _mapper.Map<RegisterDto, AppUser>(user); 
 
         newUser.RefreshToken = _jwtTokenService.GenerateRefreshToken();
         newUser.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
@@ -115,7 +114,7 @@ public class AccountController : ControllerBase
         }
         
         var res=await _userManager.UpdateAsync(_mapper.Map<Core.Profile, AppUser>
-                                      (updatedProf, user));
+                                      (updatedProf));
         return res.Succeeded ? Ok() :
         BadRequest(res.Errors);
     }
