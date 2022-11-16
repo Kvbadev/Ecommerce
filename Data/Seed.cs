@@ -119,7 +119,6 @@ public class Seed
             if(context.Products.FirstOrDefault(x => x.Name == e.Name) == null)
             {
                 context.Products.Add(e);
-                //TODO: cascade deletion with shoppingcart prods
             }
         }
 

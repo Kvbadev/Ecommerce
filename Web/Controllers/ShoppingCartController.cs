@@ -38,10 +38,7 @@ public class ShoppingCartController : ControllerBase
             return null;
         }
 
-        var cart = new ShoppingCartDto();
-        _mapper.Map<ShoppingCart, ShoppingCartDto>(user.ShoppingCart, cart);
-        //TODO
-        return cart;
+        return _mapper.Map<ShoppingCart, ShoppingCartDto>(user.ShoppingCart);
     }
 
     //Method to add/delete products from user's cart

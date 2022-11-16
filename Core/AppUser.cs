@@ -9,6 +9,7 @@ public class AppUser : IdentityUser
 
     public AppUser(string userName) : base(userName)
     {
+        Firstname = Lastname = Email = userName;
     }
 
     public string Firstname { get; set; } = string.Empty;
