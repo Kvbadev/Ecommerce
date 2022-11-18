@@ -83,9 +83,6 @@ public class ShoppingCartController : DefaultController
             user.ShoppingCart.CartProducts.Add(newProd);
         }
 
-        user.ShoppingCart.FinalPrice = CalculatePrice(user.ShoppingCart);
-        user.ShoppingCart.Count = CalculateCount(user.ShoppingCart);
-       
         var res = await _context.SaveChangesAsync() > 0;
 
         return res ?
@@ -100,8 +97,6 @@ public class ShoppingCartController : DefaultController
             .FirstOrDefault(x => x.AppUserId == _jwtTokenService.ExtractId())!;
         
         cart.CartProducts = new List<CartProduct>();
-        cart.FinalPrice = 0;
-        cart.Count = 0;
 
         await _context.SaveChangesAsync();
 
