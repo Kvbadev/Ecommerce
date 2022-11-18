@@ -18,7 +18,7 @@ public class MappingProfiles: AutoMapper.Profile
         CreateMap<ProductDto, Product>()
             .ForMember(d => d.CartProducts, o=> o.Ignore())
             .ForMember(d => d.Id, o=> o.Ignore())
-            .ForMember(d => d.Photos, o=> o.MapFrom(s => s.Photos.Select(x => 
+            .ForMember(d => d.Photos, o=> o.MapFrom(s => s.Photos!.Select(x => 
                 new Photo
                 {
                     Url = x

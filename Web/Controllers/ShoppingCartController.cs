@@ -1,6 +1,7 @@
 using AutoMapper;
 using Core;
 using Data;
+using FluentValidation;
 using Infrastructure.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,11 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Web.Services;
 
 namespace Web.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-[Authorize(Roles = "User,Administrator")]
-public class ShoppingCartController : ControllerBase
+public class ShoppingCartController : DefaultController
 {
     private readonly DataContext _context;
     private readonly IJwtTokenService _jwtTokenService;
@@ -76,6 +73,13 @@ public class ShoppingCartController : ControllerBase
                 Product = _context.Products.Find(product.Id)!,
                 ProductQuantity = product.Quantity
             };
+
+            var message = await ValidateEntity<CartProduct>(newProd);
+            if(message != string.Empty)
+            {
+                return BadRequest(message);
+            }
+
             user.ShoppingCart.CartProducts.Add(newProd);
         }
 
