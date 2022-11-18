@@ -2,6 +2,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Core;
 using Data;
+using FluentValidation;
 using Infrastructure.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,10 +10,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Web.Controllers;
 
-// [Authorize]
-[Route("api/[controller]")]
-[ApiController]
-public class ProductsController : ControllerBase
+[AllowAnonymous]
+public class ProductsController : DefaultController
 {
     private readonly DataContext _context;
     private readonly IMapper _mapper;
@@ -61,8 +60,14 @@ public class ProductsController : ControllerBase
         {
             return BadRequest("Product does not exist");
         }
-        _mapper.Map(prod, change);
+        var updatedProd = _mapper.Map<ProductDto, Product>(prod);
+        var message = await ValidateEntity<Product>(updatedProd);
+        if(message != string.Empty)
+        {
+            return BadRequest(message);
+        }
 
+        change = updatedProd;
         var res =  await _context.SaveChangesAsync(); 
 
         return res > 0 ? Ok() : 
@@ -75,8 +80,13 @@ public class ProductsController : ControllerBase
     {
         var product = _mapper.Map<ProductDto, Product>(prod);
 
-        _context.Products.Add(product);
+        var message = await ValidateEntity(product);
+        if(message != string.Empty)
+        {
+            return BadRequest(message);
+        }
 
+        _context.Products.Add(product);
         var res = await _context.SaveChangesAsync();
         if(res <= 0)
         {

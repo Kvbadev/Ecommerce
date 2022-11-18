@@ -19,10 +19,9 @@ import NavItems from "./NavItems.svelte";
         top: 0;
         position: fixed;
         z-index: 2;
-        background-color: rgb(190, 190, 190)        /* background: #d85818;
-        background: -webkit-linear-gradient(top left, #d85818, #f9d14d);
-        background: -moz-linear-gradient(top left, #d85818, #f9d14d);
-        background: linear-gradient(to bottom right, #d85818, #f9d14d); */
+        backdrop-filter: blur(4rem);
+        -webkit-backdrop-filter: blur(4rem);
+        background-color: rgba(138, 138, 138, 0.6);
     }
     ul {
         width: 100%;
