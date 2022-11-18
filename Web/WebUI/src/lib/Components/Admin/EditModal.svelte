@@ -18,22 +18,27 @@ import Fa from "svelte-fa";
     const save = async () => {
         submitting = true;
         const tmp = {};
-        prod.photos = typeof prod.photos === typeof "" ?
-            prod.photos.replace(/ /g,'').split(',') : prod.photos;
+        try{
+            prod.photos = typeof prod.photos === typeof "" ?
+                prod.photos.replace(/ /g,'').split(',') : prod.photos;
 
-        for(const pr in $products[0]){
-            if(pr !== 'id')
-                tmp[pr] = prod[pr];
-        }
-        if(edit === 'new')
+            for(const pr in $products[0]){
+                if(pr !== 'id')
+                    tmp[pr] = prod[pr];
+            }
+            if(edit === 'new')
+            {
+                const newProd = await agent.Products.create(tmp); 
+                $products = [...$products, newProd] //refresh store
+            } 
+            else
+            {
+                await agent.Products.edit(edit, tmp);
+                $products = [...$products] //refresh store
+            }
+        } catch(e)
         {
-            const newProd = await agent.Products.create(tmp); 
-            $products = [...$products, newProd] //refresh store
-        } 
-        else
-        {
-            await agent.Products.edit(edit, tmp);
-            $products = [...$products] //refresh store
+            console.error(e);
         }
 
         submitting = false;

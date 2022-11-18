@@ -11,10 +11,7 @@ using Infrastructure.DTOs;
 
 namespace Web.Controllers;
 
-[ApiController]
-[Authorize(Roles = "User,Administrator")]
-[Route("api/[controller]")]
-public class AccountController : ControllerBase
+public class AccountController : DefaultController
 {
     private readonly DataContext _context;
     private readonly UserManager<AppUser> _userManager;
@@ -37,27 +34,31 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> RegisterUser(RegisterDto user)
     {
 
-        var newUser = new AppUser();
-        _mapper.Map(user, newUser); 
+        var updatedUser = _mapper.Map<RegisterDto, AppUser>(user); 
 
-        newUser.RefreshToken = _jwtTokenService.GenerateRefreshToken();
-        newUser.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+        updatedUser.RefreshToken = _jwtTokenService.GenerateRefreshToken();
+        updatedUser.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
 
-        var result = await _userManager.CreateAsync(newUser, user.Password);
-        await _userManager.AddToRoleAsync(newUser, "User");
+        var message = await ValidateEntity(updatedUser);
+        if(message != string.Empty)
+        {
+            return BadRequest(message);
+        }
+
+        var result = await _userManager.CreateAsync(updatedUser, user.Password);
+        await _userManager.AddToRoleAsync(updatedUser, "User");
 
 
         if(result.Succeeded)
         {
             _logger.LogInformation("New user {} has been created", user.Username);
-            var accessToken = await _jwtTokenService.GenerateAccessToken(newUser);
+            var accessToken = await _jwtTokenService.GenerateAccessToken(updatedUser);
 
             return Ok(new AuthResponse{
                 AccessToken = accessToken,
-                RefreshToken = newUser.RefreshToken
+                RefreshToken = updatedUser.RefreshToken
             });
         }
-        // return BadRequest("
         return BadRequest(result.Errors.ElementAt(0)?.Description ??
         "Could not register a new user");
     }
@@ -113,9 +114,16 @@ public class AccountController : ControllerBase
         {
             return BadRequest("User does not exist");
         }
+        var updatedUser = _mapper.Map<Core.Profile, AppUser>(updatedProf);
+
+        var message = await ValidateEntity<AppUser>(updatedUser);
+        if(message != string.Empty)
+        {
+            return BadRequest(message);
+        }
         
-        var res=await _userManager.UpdateAsync(_mapper.Map<Core.Profile, AppUser>
-                                      (updatedProf, user));
+        var res = await _userManager.UpdateAsync(updatedUser);
+
         return res.Succeeded ? Ok() :
         BadRequest(res.Errors);
     }
@@ -139,7 +147,6 @@ public class AccountController : ControllerBase
         Enumerable.Empty<TransactionDto>();
     }
 
-    [Authorize]
     [HttpGet("isAdmin")]
     public async Task<bool> isAdmin()
     {

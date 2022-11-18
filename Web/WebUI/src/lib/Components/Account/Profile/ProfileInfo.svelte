@@ -35,8 +35,13 @@ function getInputValues() {
     return JSON.stringify(clientInfo);
 }
 async function onSubmit() {
-    await agent.Account.updateProfile(clientInfo);
-    userProfile.set(await agent.Account.getProfile());
+    try{
+        await agent.Account.updateProfile(clientInfo);
+        userProfile.set(await agent.Account.getProfile());
+    } catch(e)
+    {
+        console.error(e);
+    }
 }
 async function edit(){
     if(!editmode){

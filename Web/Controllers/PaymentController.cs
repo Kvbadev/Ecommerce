@@ -2,6 +2,7 @@ using AutoMapper;
 using Braintree;
 using Core;
 using Data;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,10 +10,7 @@ using Web.Services;
 
 namespace Web.Controllers;
 
-[ApiController]
-[Authorize(Roles = "User,Administrator")]
-[Route("api/[controller]")]
-public class PaymentController : ControllerBase
+public class PaymentController : DefaultController
 {
     private readonly IJwtTokenService _tokenService;
     private readonly DataContext _context;
@@ -57,7 +55,8 @@ public class PaymentController : ControllerBase
 
     [HttpPost("buy")] //example: buy?nonce=test&id=id&quantity=quantity
     public async Task<IActionResult> Buy([FromServices]IMapper mapper, string nonce,
-        Guid id, int quantity, [FromBody]string devData)
+        Guid id, int quantity, [FromBody]string devData,
+        [FromServices]IValidator<Core.Transaction> validator)
     {
         Result<Braintree.Transaction> res;
         Core.Transaction transaction;
@@ -77,12 +76,12 @@ public class PaymentController : ControllerBase
 
             transaction = new Core.Transaction
             {
-                // Products = user.ShoppingCart.CartProducts.Select(x => x.Product)
-                //     .ToList() ?? new List<CountableProduct>(),
-                Products = new List<CountableProduct>().Concat(
-                    mapper.Map<CartProduct[], ICollection<CountableProduct>>(user.ShoppingCart.CartProducts.ToArray())
-                ).ToList(),
-                Price = user.ShoppingCart.FinalPrice 
+                Products = new List<CountableProduct>(
+                    mapper.Map<CartProduct[], ICollection<CountableProduct>>
+                        (user.ShoppingCart.CartProducts.ToArray())
+                ),
+                Price = user.ShoppingCart.FinalPrice,
+                Failure = !res.IsSuccess()
             };
         }
         else //buy only the product provided in the request
@@ -104,12 +103,19 @@ public class PaymentController : ControllerBase
             transaction = new Core.Transaction
             {
                 Products = new List<CountableProduct>(1){localProduct},
-                Price = prod.Price * quantity
+                Price = prod.Price * quantity,
+                Failure = !res.IsSuccess()
             };
 
         }
         transaction.AppUser = user; //is it necessary?
-        transaction.Failure = !res.IsSuccess();
+
+        var message = await ValidateEntity(transaction);
+
+        if(message != string.Empty)
+        {
+            return BadRequest(message);
+        }
 
         _context.Transactions.Add(transaction);
         var result = await _context.SaveChangesAsync() > 0;

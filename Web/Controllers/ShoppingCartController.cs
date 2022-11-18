@@ -1,6 +1,7 @@
 using AutoMapper;
 using Core;
 using Data;
+using FluentValidation;
 using Infrastructure.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,11 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Web.Services;
 
 namespace Web.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-[Authorize(Roles = "User,Administrator")]
-public class ShoppingCartController : ControllerBase
+public class ShoppingCartController : DefaultController
 {
     private readonly DataContext _context;
     private readonly IJwtTokenService _jwtTokenService;
@@ -38,10 +35,7 @@ public class ShoppingCartController : ControllerBase
             return null;
         }
 
-        var cart = new ShoppingCartDto();
-        _mapper.Map<ShoppingCart, ShoppingCartDto>(user.ShoppingCart, cart);
-        //TODO
-        return cart;
+        return _mapper.Map<ShoppingCart, ShoppingCartDto>(user.ShoppingCart);
     }
 
     //Method to add/delete products from user's cart
@@ -79,12 +73,16 @@ public class ShoppingCartController : ControllerBase
                 Product = _context.Products.Find(product.Id)!,
                 ProductQuantity = product.Quantity
             };
+
+            var message = await ValidateEntity<CartProduct>(newProd);
+            if(message != string.Empty)
+            {
+                return BadRequest(message);
+            }
+
             user.ShoppingCart.CartProducts.Add(newProd);
         }
 
-        user.ShoppingCart.FinalPrice = CalculatePrice(user.ShoppingCart);
-        user.ShoppingCart.Count = CalculateCount(user.ShoppingCart);
-       
         var res = await _context.SaveChangesAsync() > 0;
 
         return res ?
@@ -99,8 +97,6 @@ public class ShoppingCartController : ControllerBase
             .FirstOrDefault(x => x.AppUserId == _jwtTokenService.ExtractId())!;
         
         cart.CartProducts = new List<CartProduct>();
-        cart.FinalPrice = 0;
-        cart.Count = 0;
 
         await _context.SaveChangesAsync();
 

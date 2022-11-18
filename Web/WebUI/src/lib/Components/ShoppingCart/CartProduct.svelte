@@ -16,7 +16,6 @@ let product;
 $: {
     if($shoppingCart && $products){ //if statement used to update on shoppingcart's change
         product = $products.find(x => x.id === prod.id)
-        console.log(product);
     }
 };
 

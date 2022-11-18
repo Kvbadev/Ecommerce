@@ -20,7 +20,6 @@ import { get } from "svelte/store";
     let showModal = false;
 
     const onInput = (ev: KeyboardEvent) => {
-        // if(ev.key === 'Enter' || ev.key === 'Shift' || ev.key === 'Control') return;
         if(!(/^.$/u.test(ev.key)) && ev.key !== 'Backspace') return;
         if(serverError) serverError='';
         canSubmit = true;
@@ -48,7 +47,8 @@ import { get } from "svelte/store";
         const userData = getFormData(e.target);
         try{
             //get status code and error message / jwt token
-            const [status, message] = type === "Signup" ? await agent.Account.signUp(userData) : await agent.Account.logIn(userData);
+            const [status, message] = type === "Signup" ?
+            await agent.Account.signUp(userData) : await agent.Account.logIn(userData);
 
             if(status !== 200){
                 serverError = message.length > 100 ? `Server error: ${status}` : message;
@@ -86,7 +86,7 @@ import { get } from "svelte/store";
             
         } catch(err) {
             loading = canSubmit = false;
-            console.log(err ?? '');
+            console.log(err);
         }
     }
     
@@ -105,8 +105,10 @@ import { get } from "svelte/store";
             {#each fields as field, i}
                 {#if field === 'email'}
                     <FormField name={field} regex={new RegExp(/^\S+@\S+\.\S+$/)} bind:isOk={isOk[i]} minLen={4} maxLen={50}/>
+                {:else if field === 'username'}
+                    <FormField name={field} minLen={4} maxLen={16} bind:isOk={isOk[i]} />
                 {:else}
-                    <FormField name={field} minLen={5} maxLen={20} bind:isOk={isOk[i]} />
+                    <FormField name={field} minLen={2} maxLen={20} bind:isOk={isOk[i]} />
                 {/if}
             {/each}
             </div>
