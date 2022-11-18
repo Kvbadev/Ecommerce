@@ -1,17 +1,21 @@
 using System.Text;
 using Core;
 using Data;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Infrastructure;
 using Infrastructure.Photos;
+using Infrastructure.Validation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Web.Services;
 
 
-//TODO: security things
+//TODO: facebook and google login
+
+//TODO: fluent validation
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,11 +63,16 @@ builder.Services.AddAuthentication(opt =>
 
 
 
+//Database
 builder.Services.AddDbContext<DataContext>(options => 
 {
     options.UseSqlite(builder.Configuration.GetConnectionString("Sqlite"));
 });
 
+//Fluent Validation
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<ProductValidator>();
 
 
 builder.Services.AddIdentityCore<AppUser>(opt => 
@@ -97,6 +106,14 @@ app.UseXContentTypeOptions();
 app.UseReferrerPolicy(o => o.NoReferrer());
 app.UseXXssProtection(o => o.EnabledWithBlockMode());
 app.UseXfo(o => o.Deny());
+app.UseCspReportOnly(o => o.BlockAllMixedContent()
+    .StyleSources(s => s.Self())
+    .FontSources(s => s.Self())
+    .FormActions(s => s.Self())
+    .FrameAncestors(s => s.Self())
+    .ImageSources(s => s.Self())
+    .ScriptSources(s => s.Self())
+);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

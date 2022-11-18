@@ -71,17 +71,18 @@ const onChange = (newIndex) => {
         cursor: pointer;
         border: 0.3rem gray solid;
         margin: 0 2rem;
-        width: 90%;
-        height: 90%;
+        width: 12rem;
+        height: 12rem;
         transition: all 500ms;
+    }
+    .image > img {
+        width: 100%;
+        height: 100%;
     }
     .main {
         border: 0.5rem rgb(217, 249, 15) solid;
     }
-    .others img {
-        width: 100%;
-        height: 100%;
-    }
+
     .container{
         box-sizing: border-box;
         padding: 1rem;

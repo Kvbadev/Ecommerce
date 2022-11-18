@@ -36,8 +36,8 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PAT
         headers: {...headers},
         body: body !== null ? JSON.stringify(body) : null
     }).then(async (resp) => {
+        const mes_text = await resp.text();
         if(!resp.ok){
-            
             if(resp.status === 401 && !validation){
                 const check = await agent.Account.refreshTokens();
                 if(check) {
@@ -48,20 +48,25 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PAT
                 }
 
             } else if(!validation) {
-                toast.push(resp.statusText.length > 60 ? 'Server could not handle your request' : resp.statusText);
+                toast.push(mes_text.length > 100 ? 'Server could not handle your request' : mes_text, {
+                    theme: {
+                        '--toastWidth' : '40rem',
+                        '--toastHeight': '10rem',
+                        '--toastBackground': '#F56262',
+                    }
+                });
+                throw mes_text;
             }
         }
         if(validation){
-            return [resp.status, await resp.text()] as T;
+            return [resp.status, mes_text] as T;
         }
         const contentType = resp.headers.get('content-type');
-        const text = await resp?.text();
-        if(text.length && contentType.indexOf('application/json') !== -1 ){
-            return JSON.parse(text) as T;
-        } else if(text.length) {
-            return text as T;
+        if(mes_text.length && contentType.indexOf('application/json') !== -1 ){
+            return JSON.parse(mes_text) as T;
+        } else if(mes_text.length) {
+            return mes_text as T;
         }
-        return null;
     });
     return response;
 
