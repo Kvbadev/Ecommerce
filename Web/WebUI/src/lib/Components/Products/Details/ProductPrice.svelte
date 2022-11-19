@@ -7,8 +7,6 @@ import QuantityInput from "./QuantityInput.svelte";
 
     export let multiplier: number = 1;
 
-    export let params;
-
 </script>
 
 <div class="container">
@@ -19,7 +17,7 @@ import QuantityInput from "./QuantityInput.svelte";
         <h2 data-quantity={`${multiplier} ${multiplier == 1 ? "product":"products"}`}>{(product.price * multiplier).toFixed(2)}$</h2>
     </span>
     <!-- <div class="buy-buttons"></div> -->
-    <BuyButtons params={params} quantity={multiplier}/>
+    <BuyButtons prod={product} quantity={multiplier}/>
     <QuantityInput bind:quantity={multiplier}/>
 </div>
 

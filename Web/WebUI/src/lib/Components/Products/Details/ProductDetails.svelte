@@ -5,19 +5,28 @@ import ProductParameters from "./ProductParameters.svelte";
 import ProductSlider from "./ProductSlider.svelte";
 import Loader from "../../Common/Loader.svelte";
 import ProductPrice from "./ProductPrice.svelte";
+  import { onMount } from "svelte";
+  import { agent } from "../../../Utils/agent";
 
 export let params = {} as any;
-let product;
+let product = null;
+
+    onMount(async () => {
+        product = $products?.find(x => x.id === params.id)
+        if(!product) {
+            product = await agent.Products.getOne(params.id);
+        }
+    })
 
 
 </script>
 
-{#if (product = $products?.find(x => x.id === params.id)) == undefined}
+{#if !product}
     <Loader />
 {:else}
 <div class="container">
     <ProductSlider product={product} />
-    <ProductPrice params={params} product={product} />
+    <ProductPrice product={product} />
     <ProductParameters product={product} />
 </div> 
 {/if}
