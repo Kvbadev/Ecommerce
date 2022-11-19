@@ -36,15 +36,17 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PAT
         headers: {...headers},
         body: body !== null ? JSON.stringify(body) : null
     }).then(async (resp) => {
-        const mes_text = await resp.text();
+        let mes_text = await resp.text();
         if(!resp.ok){
             if(resp.status === 401 && !validation){
                 const check = await agent.Account.refreshTokens();
                 if(check) {
                     const jwt = localStorage.getItem("jwt");
+                    
                     jwt ? headers["Authorization"] = `Bearer ${jwt}` : null;
 
                     resp = await resendFetch(url, method, headers, body);
+                    mes_text = await resp.text();
                 }
 
             } else if(!validation) {
@@ -61,6 +63,7 @@ async function authFetch<T>(url: string, method:'POST'|'GET'|'PUT'|'DELETE'|'PAT
         if(validation){
             return [resp.status, mes_text] as T;
         }
+        
         const contentType = resp.headers.get('content-type');
         if(mes_text.length && contentType.indexOf('application/json') !== -1 ){
             return JSON.parse(mes_text) as T;
@@ -77,7 +80,7 @@ const refresh = async (url: string) => {
     const refresh = get(refreshToken) ?? localStorage.getItem("refresh");
     try{
         if(access && refresh){
-            const res = await fetch(url, {
+            const res: AuthResponse = await fetch(url, {
                 method: 'PATCH',
                 body: JSON.stringify({accessToken:access, refreshToken:refresh}),
                 headers: {
@@ -90,6 +93,7 @@ const refresh = async (url: string) => {
 
             refreshToken.set(res.refreshToken);
             jwtToken.set(res.accessToken);
+            
             localStorage.setItem("jwt", res.accessToken);
             localStorage.setItem("refresh", res.refreshToken);
             return true;
@@ -119,7 +123,7 @@ export const agent = {
     },
     ShoppingCart: {
         GetCart: () => getCart(apiUrl+"/ShoppingCart"),
-        updateCart: (item: CartItem) => authFetch<string>(apiUrl+"/ShoppingCart/update", 'PATCH', item),
+        updateCart: (item: {id: string, quantity: number}) => authFetch<string>(apiUrl+"/ShoppingCart/update", 'PATCH', item),
         clearCart: () => authFetch<string>(apiUrl+"/ShoppingCart", 'DELETE', null),
         setCart: (cart: Cart) => authFetch<string>(apiUrl+"/ShoppingCart", 'POST', cart)
     }, 
@@ -132,7 +136,7 @@ export const agent = {
 
         buyProduct: (nonce: string, deviceData: string, product: CartItem) => {
         return authFetch<string>(
-        apiUrl+`/Payment/buy?nonce=${nonce}&id=${product.id}&quantity=${product.quantity}`,
+        apiUrl+`/Payment/buy?nonce=${nonce}&id=${product.product.id}&quantity=${product.quantity}`,
         'POST', deviceData)
         }
     },

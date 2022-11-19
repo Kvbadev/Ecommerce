@@ -34,8 +34,6 @@ onMount(async () => {
   } else {
       initShoppingCart(JSON.parse(localStorage.getItem("cart"))||null);
   }
-  products.set(await agent.Products.getAll());
-
 })
 </script>
 

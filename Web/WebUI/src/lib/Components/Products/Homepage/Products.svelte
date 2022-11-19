@@ -1,7 +1,12 @@
 <script lang="ts">
-    import { products } from "../../../Stores/stores";
+    import { initProducts, products } from "../../../Stores/stores";
     import ProductItem from "./ProductItem.svelte";
     import Loader from "../../Common/Loader.svelte";
+    import { onMount } from "svelte";
+
+    onMount(async () => {
+        if(!$products) await initProducts();
+    })
 </script>
     {#if !$products}
         <Loader />
