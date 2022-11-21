@@ -4,46 +4,43 @@ import type { CartItem } from "src/lib/Models/cart";
 import { modifyCart } from "../../Stores/ShoppingCartExtensions";
 import Fa from "svelte-fa";
 import {products} from '../../Stores/stores';
-import {shoppingCart} from '../../Stores/stores';
+// import {shoppingCart} from '../../Stores/stores';
 import QuantityInput from "../Products/Details/QuantityInput.svelte";
   import { link } from "svelte-spa-router";
+  import { onMount } from "svelte";
+  import { agent } from "../../Utils/agent";
 
 export let prod: CartItem;
 export let simplified = false;
 export let size = 62.5;
-let product;
 
-$: {
-    if($shoppingCart && $products){ //if statement used to update on shoppingcart's change
-        product = $products.find(x => x.id === prod.id)
-    }
-};
-
+onMount(async () => {
+})
 async function removeItem() {
     await modifyCart({...prod,quantity: -prod.quantity}, true);
 }
 
 
 </script>
-{#if $products} <!--Weird bug when opening profile without this if-->
+<!--{#if $products} <!--Weird bug when opening profile without this if-->
 
 <div class="container" style={`font-size: ${size}%`}>
-    {#if product }
+    {#if prod }
         <div id="count">
             <h4>{prod.quantity}x</h4>
         </div>
         <div id="photo">
-            <img alt="Product" class="main-photo" src="{product?.photos.at(0)}"/>
+            <img alt="Product" class="main-photo" src="{prod.product?.photos.at(0)}"/>
         </div>
         <div class="main-info" id="main-info">
-            <p><a href={`/product/${product?.id}`} use:link>{product?.name}</a></p>
+            <p><a href={`/product/${prod.product?.id}`} use:link>{prod.product?.name}</a></p>
             {#if !simplified}
-                <p class="little-price">{product?.price}$</p>
+                <p class="little-price">{prod.product?.price}$</p>
             {/if}
         </div>
         {#if !simplified}
         <div class="quantity">
-            <QuantityInput bind:quantity={prod.quantity} ModifyCart productID={prod.id}/>
+            <QuantityInput bind:quantity={prod.quantity} ModifyCart product={prod}/>
         </div>
         <div class="remove">
             <span on:click={removeItem}>
@@ -52,7 +49,7 @@ async function removeItem() {
         </div>
         {/if}
         <div class="price">
-            <p>{(product.price*prod.quantity).toFixed(2)}$</p>
+            <p>{(prod.product.price*prod.quantity).toFixed(2)}$</p>
         </div>
     {:else}
     <li class="item">
@@ -62,7 +59,7 @@ async function removeItem() {
     </li>
     {/if}
 </div>
-{/if}
+<!-- {/if} -->
 
 <style>
     .container {

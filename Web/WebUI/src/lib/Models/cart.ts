@@ -1,6 +1,8 @@
+import type Product from "./product";
+
 export interface CartItem{
     quantity: number;
-    id: string;
+    product: Product;
 }
 export default interface Cart {
     items: Array<CartItem>;

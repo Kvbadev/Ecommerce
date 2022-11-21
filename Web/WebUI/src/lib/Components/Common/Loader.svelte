@@ -7,6 +7,7 @@
     export let size = 10;
     export let color = "#ff8655";
     export let inElement = false;
+    export let bg = null;
 
     let timeout;
 
@@ -20,7 +21,7 @@
 </script>
 
 {#if inElement}
-    <div class="spinner">
+    <div class="spinner" style="{bg ? 'background-color: '+bg : ''}">
         <span class="rotation">
             <Fa icon={faCircleNotch} size={`${size}x`} color={color} spin />
         </span>

@@ -33,7 +33,10 @@ public class ProductsController : DefaultController
     [HttpGet("{id}")]
     public async Task<ProductDto?> GetProduct(Guid id)
     {
-        return _mapper.Map<Product, ProductDto>(await _context.Products.FindAsync(id)??null!); 
+        var prod = await _context.Products.Include(x => x.Photos)
+            .FirstOrDefaultAsync(x => x.Id == id);
+        
+        return prod == null ? null : _mapper.Map<Product, ProductDto>(prod);
     }
 
     [HttpDelete("{id}")]

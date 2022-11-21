@@ -6,30 +6,33 @@ import { products, shoppingCart, userProfile } from "./stores";
 
 export const modifyCart = async (item: CartItem, localChanges: boolean = false) => {
     if(get(userProfile)?.username && !localChanges){
-        await agent.ShoppingCart.updateCart(item);
+        await agent.ShoppingCart.updateCart({id: item.product.id, quantity: item.quantity});
     }
+
     shoppingCart.update((v) => {
-        let itemInCart = v.items.find(x => x.id === item.id);
+        let itemInCart = v.items.find(x => x.product.id === item.product.id);
         if(itemInCart){
             itemInCart.quantity += item.quantity;
+            //TODO
         } else {
             v.items.push(item);
         }
         //if quantity < 0 then remove element
         if((itemInCart ?? item).quantity <= 0){
-            v.items = v.items.filter(x => x.id !== item.id);
+            v.items = v.items.filter(x => x.product.id !== item.product.id);
         }
 
-        v.count = v.items.reduce((acc, items) => acc+items.quantity, 0);
+        v.count = v.items.reduce((acc, it) => acc+it.quantity, 0);
 
-        v.sum = parseFloat(v.items.reduce((acc, items) => {
-            return acc+(get(products).find(x => x.id === items.id)?.price*items.quantity);
+        v.sum = parseFloat(v.items.reduce((acc, it) => {
+            return acc + (it.product.price * it.quantity);
         }, 0).toFixed(2));
 
         return v;
     });
     localStorage.setItem("cart", JSON.stringify(get(shoppingCart)));
 }
+
 
 export const initShoppingCart = (cart?: Cart) => {
     if(cart){

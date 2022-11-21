@@ -38,6 +38,14 @@ public class MappingProfiles: AutoMapper.Profile
             .ForMember(d => d.FinalPrice, o => o.MapFrom(s => s.Sum))
             .ForMember(d => d.CartProducts, o => o.MapFrom(s => s.Items))
             .ForMember(d => d.Count, o => o.MapFrom(s => s.Count));
+
+        CreateMap<CartProduct,ShoppingCartItem>()
+            .ForMember(x => x.Quantity, o => o.MapFrom(s => s.ProductQuantity));
+
+        CreateMap<ShoppingCartItem, CartProduct>()
+            .ForMember(x => x.ProductId, o => o.MapFrom(x => x.Product.Id))
+            .ForMember(x => x.Product, o => o.Ignore())
+            .ForMember(x => x.ProductQuantity, o => o.MapFrom(s => s.Quantity));
         
         CreateMap<CartProduct, ProductSimplified>()
             .ForMember(d => d.Id, o => o.MapFrom(s => s.ProductId))
