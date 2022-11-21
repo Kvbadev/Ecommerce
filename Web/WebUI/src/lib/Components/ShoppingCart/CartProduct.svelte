@@ -1,15 +1,13 @@
 <script lang="ts">
+
 import { faQuestionCircle, faRemove } from "@fortawesome/free-solid-svg-icons";
-import type { CartItem } from "src/lib/Models/cart";
 import { modifyCart } from "../../Stores/ShoppingCartExtensions";
 import Fa from "svelte-fa";
-import {products} from '../../Stores/stores';
 import QuantityInput from "../Products/Details/QuantityInput.svelte";
-  import { link } from "svelte-spa-router";
-  import { onMount } from "svelte";
-  import { agent } from "../../Utils/agent";
+import { link } from "svelte-spa-router";
+import { onMount } from "svelte";
 
-export let prod: CartItem;
+export let prod; //CartItem
 export let simplified = false;
 export let size = 62.5;
 

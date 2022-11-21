@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Core;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -103,6 +104,29 @@ public class JwtTokenService : IJwtTokenService
             return string.Empty;
         }
 
+    }
+    public async Task<GoogleJsonWebSignature.Payload?> VerifyToken(string token)
+    {
+        try{
+            //throw on invalid token
+            var payload = await GoogleJsonWebSignature.ValidateAsync(token);
+            return payload;
+        }
+        catch(Exception ex)
+        {
+            if(ex.InnerException is InvalidJwtException)
+            {
+                return null;
+            }
+            else throw ex;
+        }
+    }
+    
+    public string GetClaims(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var jwt = handler.ReadJwtToken(token);
+        return "";
     }
 
 }

@@ -4,6 +4,8 @@
     let inpValue = '', errors = [], isDirty = false;
     export let errorReg = `${name} is not valid`;
     export let errorLen = `${name} length should be smaller than ${maxLen} and bigger than ${minLen}`;
+    
+    $: inpValue?.length > 0 ? isDirty=true : isDirty=false;
 
     $: {
         if(minLen && maxLen){
@@ -28,15 +30,13 @@
     {#if name === 'password'}
     <input
         type="password" name={name} placeholder={name[0].toUpperCase()+name.slice(1)}
-        bind:value={inpValue} on:blur={() => isDirty=true}
+        bind:value={inpValue} 
         class:error="{errors.length&&isDirty}"
     />
     {:else}
     <input
         type="text" name={name} placeholder={name[0].toUpperCase()+name.slice(1)}
-        bind:value={inpValue} on:blur={() => {
-            isDirty=true; 
-        }} 
+        bind:value={inpValue} 
         class:error="{errors.length&&isDirty}"
     />
     {/if}

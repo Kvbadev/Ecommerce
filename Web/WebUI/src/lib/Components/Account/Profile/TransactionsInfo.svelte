@@ -5,11 +5,8 @@ import CartProduct from "../../ShoppingCart/CartProduct.svelte";
 import { link, push } from "svelte-spa-router";
 import Fa from "svelte-fa";
 import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
-  import { onMount } from "svelte";
 
 const onQuestion = (id: string) => push(`/help/${id}`);
-onMount(async() => {
-})
 </script>
 
 <div class="container">
@@ -18,7 +15,7 @@ onMount(async() => {
     {#await agent.Account.getTransactions()}
         <Loader inElement color={'#000000'} size={5}/>
     {:then value} 
-    {#if !value.length}
+    {#if !value?.length}
         <h3>We are waiting for Your first order :</h3>
     {:else}
         <ul class="list">
@@ -29,8 +26,8 @@ onMount(async() => {
                 <a href={`/transaction/${t.id}`} use:link class="transaction-id">{t.id}</a>
             </div>
             <ul>
-            {#if t.products.length}
-                {#each t.products as prod}
+            {#if t?.products.length}
+                {#each t?.products as prod}
                     <li class="item">
                         <CartProduct prod={prod} simplified size={40}/>
                     </li>
