@@ -131,7 +131,7 @@ public class ShoppingCartController : DefaultController
         foreach(var it in cart.Items)
         {
             var tmp = prods.FirstOrDefault(x => x.Id == it.Product.Id); 
-            if(tmp != null && tmp.Quantity == it.Quantity) return false;
+            if(tmp != null && tmp.Quantity != it.Quantity) return false;
         }
         return true;
     }

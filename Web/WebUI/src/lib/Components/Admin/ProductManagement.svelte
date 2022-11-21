@@ -66,7 +66,12 @@
             {prod.price}$
           {:else if prod[key] === prod.photos}
           {#each prod[key] as photo}
-            <img src={photo} alt="product minature" on:click={() => imageModal(photo)}/>
+            <div class="photo">
+            {#if photo?.loaded !== true}
+              <Loader inElement size={1} bg="white" color={'#000000'}/>
+            {/if}
+            <img src={photo} alt="product minature" on:click={() => imageModal(photo)} on:load={() => {photo = new String(photo); photo.loaded = true}}/>
+            </div>
           {/each}
           {:else}
             {prod[key]}
@@ -90,6 +95,9 @@
     font-family: 'Raleway';
     font-size: 2rem;
     color: white;
+  }
+  .photo {
+    position: relative;
   }
   .data img{
     border-radius: 1rem;

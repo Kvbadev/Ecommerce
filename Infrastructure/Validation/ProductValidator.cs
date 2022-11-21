@@ -9,7 +9,7 @@ public class ProductValidator : AbstractValidator<Product>
     {
         RuleFor(x => x.Name).Length(1, 255);
         RuleFor(x => x.Price).GreaterThan(0M);
-        RuleFor(x => x.Description).NotEmpty();
-        RuleFor(x => x.Photos).NotEmpty();
+        RuleFor(x => x.Description).Length(1, 1024);
+        RuleFor(x => x.Photos).Must(x => x.Count >= 1);
     }
 }
