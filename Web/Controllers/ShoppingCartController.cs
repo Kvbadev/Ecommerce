@@ -27,14 +27,13 @@ public class ShoppingCartController : DefaultController
     public async Task<ShoppingCartDto?> Get() 
     {
         var user = await _context.Users.Include(x => x.ShoppingCart).ThenInclude(x => x.CartProducts)
-            .ThenInclude(x => x.Product)
+            .ThenInclude(x => x.Product).ThenInclude(x => x.Photos)
             .FirstOrDefaultAsync(user => user.Id == _jwtTokenService.ExtractId());
 
         if(user == null)
         {
             return null;
         }
-
         return _mapper.Map<ShoppingCart, ShoppingCartDto>(user.ShoppingCart);
     }
 
@@ -98,61 +97,41 @@ public class ShoppingCartController : DefaultController
         
         cart.CartProducts = new List<CartProduct>();
 
-        await _context.SaveChangesAsync();
+        var res = await _context.SaveChangesAsync();
 
-        return NoContent();
+        return res > 0 ? Ok() : BadRequest("Could not persist changes");
     }
 
     [HttpPost]
     public async Task<IActionResult> SetNewCart(ShoppingCartDto newCart)
     {
-        ShoppingCart cart = _context.ShoppingCarts.Include(x => x.CartProducts)
-            .FirstOrDefault(x => x.AppUserId == _jwtTokenService.ExtractId())!;
-        if(cart == null)
+        var user = _context.Users.Include(x => x.ShoppingCart).ThenInclude(x => x.CartProducts)
+            .ThenInclude(x => x.Product).FirstOrDefault(x => x.Id == _jwtTokenService.ExtractId());
+
+        if(user == null)
         {
             return BadRequest("This user does not exist");
         }
-        var isValid = (await VerifyCart(newCart) && isTheSame(newCart, cart));
+        var isValid = (await VerifyCart(newCart) && !isTheSame(newCart, user.ShoppingCart));
         if(isValid == false)
         {
             return BadRequest("Shopping cart supplied by the client was invalid");
         }
 
-        _mapper.Map<ShoppingCartDto, ShoppingCart>(newCart, cart);
+        _mapper.Map(newCart, user.ShoppingCart);
+
         var res = await _context.SaveChangesAsync() > 0;
 
         return res ? Ok("New cart has been set") : 
         BadRequest("Could not persist changes in database");
    }
-
-
-    private int CalculateCount(ShoppingCart cart)
-    {
-        int count = 0;
-        foreach(var prod in cart.CartProducts)
-        {
-            count += prod.ProductQuantity;
-        }
-        return count;
-    }
-
-    private decimal CalculatePrice(ShoppingCart cart)
-    {
-        decimal price = 0M;
-        foreach(var prod in cart.CartProducts)
-        {
-            price += prod.ProductQuantity * prod.Product.Price;
-        }
-        return price;
-    }
-
     private bool isTheSame(ShoppingCartDto cart, ShoppingCart actual)
     {
         var prods = _mapper.Map<CartProduct[], IEnumerable<ProductSimplified>>(actual.CartProducts.ToArray());
         foreach(var it in cart.Items)
         {
-            var tmp = prods.FirstOrDefault(x => x.Id == it.Id); 
-            if(tmp != null && tmp.Quantity == it.Quantity) return false;
+            var tmp = prods.FirstOrDefault(x => x.Id == it.Product.Id); 
+            if(tmp != null && tmp.Quantity != it.Quantity) return false;
         }
         return true;
     }
@@ -166,7 +145,7 @@ public class ShoppingCartController : DefaultController
         int count = 0;
         foreach(var item in cart.Items)
         {
-            var prod = products.Find(x => x.Id == item.Id);
+            var prod = products.Find(x => x.Id == item.Product.Id);
             if(prod == null || item.Quantity == 0)
             {
                 return false;

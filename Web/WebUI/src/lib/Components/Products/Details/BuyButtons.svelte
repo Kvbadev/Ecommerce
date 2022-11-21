@@ -1,5 +1,6 @@
 <script lang="ts">
   import { toast } from "@zerodevx/svelte-toast";
+  import type Product from "src/lib/Models/product";
 
 
 import { push } from "svelte-spa-router";
@@ -7,11 +8,11 @@ import { modifyCart } from "../../../Stores/ShoppingCartExtensions";
 import {oneTimeProduct} from "../../../Stores/stores";
 
 
-export let params = {} as any;
+export let prod:Product = null
 export let quantity: number;
 
 const OnCart = () => {
-    modifyCart({quantity: quantity, id: params.id});
+    modifyCart({product: prod, quantity});
     toast.push(`Product has been added to your cart :)`, {theme: {
         '--toastBackground': '#00ff00',
         '--toastHeight': '10rem',
@@ -20,7 +21,7 @@ const OnCart = () => {
 }
 
 const buyNow = () => {
-    oneTimeProduct.set({id: params.id, quantity: quantity});
+    oneTimeProduct.set({product: prod, quantity});
     push('/buyNow');
 }
 

@@ -2,12 +2,13 @@
     import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
   import { modifyCart } from "../../../Stores/ShoppingCartExtensions";
     import Fa from "svelte-fa";
+  import type { CartItem } from "../../../Models/cart";
     export let quantity = 1;
-    export let productID = null;
+    export let product: CartItem = null;
     export let ModifyCart = false;
 
     async function updateCart(val) {
-        await modifyCart({id: productID, quantity: val}, true);
+        await modifyCart({...product, quantity: val}, true);
     }
 </script>
 

@@ -17,6 +17,10 @@ async function clearCart() {
 
 let changes: Cart | null = null;
 
+onMount(async () => {
+    
+})
+
 onDestroy(async () => {
     if( changes !== null && 
         JSON.stringify(changes) !== JSON.stringify($shoppingCart)){ 
@@ -35,7 +39,7 @@ $: if(changes === null && $shoppingCart !== null){
 
 </script>
 <div class="container">
-{#if !$shoppingCart || !$products}
+{#if !$shoppingCart}
     <Loader />
 {:else}
 

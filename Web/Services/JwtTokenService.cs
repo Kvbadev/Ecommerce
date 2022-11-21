@@ -46,7 +46,7 @@ public class JwtTokenService : IJwtTokenService
             Audience = "https://localhost:5000",
             Issuer = "https://localhost:5000",
             Subject = new ClaimsIdentity(MyClaims),
-            Expires = DateTime.UtcNow.AddMinutes(5),
+            Expires = DateTime.UtcNow.AddMinutes(10),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 

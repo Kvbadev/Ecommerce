@@ -5,6 +5,6 @@ namespace Infrastructure.DTOs;
 public class ShoppingCartDto
 {
     public int Count { get; set; }
-    public ICollection<ProductSimplified> Items { get; set; } = new List<ProductSimplified>();
+    public ICollection<ShoppingCartItem> Items { get; set; } = new List<ShoppingCartItem>();
     public decimal Sum { get; set; }
 }
