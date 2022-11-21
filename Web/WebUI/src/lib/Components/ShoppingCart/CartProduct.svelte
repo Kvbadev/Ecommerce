@@ -4,7 +4,6 @@ import type { CartItem } from "src/lib/Models/cart";
 import { modifyCart } from "../../Stores/ShoppingCartExtensions";
 import Fa from "svelte-fa";
 import {products} from '../../Stores/stores';
-// import {shoppingCart} from '../../Stores/stores';
 import QuantityInput from "../Products/Details/QuantityInput.svelte";
   import { link } from "svelte-spa-router";
   import { onMount } from "svelte";
@@ -22,7 +21,6 @@ async function removeItem() {
 
 
 </script>
-<!--{#if $products} <!--Weird bug when opening profile without this if-->
 
 <div class="container" style={`font-size: ${size}%`}>
     {#if prod }

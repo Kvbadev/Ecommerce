@@ -68,6 +68,14 @@ public class MappingProfiles: AutoMapper.Profile
         CreateMap<Transaction, TransactionDto>()
             .ForMember(d => d.Products, o => o.MapFrom(s => s.Products))
             .ForMember(d => d.Success, o=>o.MapFrom(s => !s.Failure));
+
+        CreateMap<CountableProduct, ShoppingCartItem>();
+
+        CreateMap<CountableProduct, ProductDto>()
+            .ForMember(x => x.Description, o=>o.MapFrom(s => s.Product.Description))
+            .ForMember(x => x.Name, o=>o.MapFrom(s => s.Product.Name))
+            .ForMember(x => x.Price, o=>o.MapFrom(s => s.Product.Price))
+            .ForMember(x => x.Photos, o=>o.MapFrom(s => s.Product.Photos.Select(x => x.Url)));
         
         CreateMap<AppUser, ClientDto>()
             .ForMember(d => d.CreatedAt, o=>o.MapFrom(s => s.CreationDate))
