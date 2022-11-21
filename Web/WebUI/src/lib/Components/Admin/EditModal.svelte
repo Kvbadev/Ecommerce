@@ -36,13 +36,15 @@ import Fa from "svelte-fa";
                 await agent.Products.edit(edit, tmp);
                 $products = [...$products] //refresh store
             }
+            submitting = false;
+            edit = "";
         } catch(e)
         {
             console.error(e);
+            submitting = false;
+            dirty = false;
         }
 
-        submitting = false;
-        edit = "";
     }
 
     onMount(async () => {

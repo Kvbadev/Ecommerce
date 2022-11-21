@@ -7,7 +7,7 @@ import ItemPhoto from "../../Products/Homepage/ItemPhoto.svelte";
     const max_desc_len = 150;
 
     const photoProps = {
-        src: product.photos.find(x => x[1]),
+        src: product.photos.at(0),
         alt: product.name
     }
 </script>
