@@ -4,7 +4,7 @@
 
 <div class="container">
     <p>This transaction includes some products that are no longer in our store.</p>
-    <p>In case you really need to obtain them, contact our customer service.</p>
+    <p>In order to get the information about them, contact our customer service.</p>
 </div>
 
 <style>

@@ -9,6 +9,7 @@ using Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Infrastructure.DTOs;
 using AutoMapper.QueryableExtensions;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Web.Controllers;
 
@@ -93,6 +94,51 @@ public class AccountController : DefaultController
             BadRequest("Could not persist changes");
         }
         return BadRequest("Invalid Password");
+    }
+
+    [AllowAnonymous]
+    [HttpPost("GoogleSign")]
+    public async Task<IActionResult> GoogleLogin([FromBody]string IdToken)
+    {
+        var credentials = await _jwtTokenService.VerifyToken(IdToken); //null on invalid
+        if(credentials == null) //TODO:check if aud is correct
+        {
+            return BadRequest("Invalid token");
+        }
+
+        var user = await _context.Users
+            .FirstOrDefaultAsync(x => x.Email == credentials.Email);
+
+        if(user == null)
+        {
+            var newUser = new AppUser {
+                UserName = credentials.GivenName+credentials.FamilyName,
+                Firstname = credentials.GivenName,
+                Lastname = credentials.FamilyName,
+                Email = credentials.Email
+            };
+
+            var message = await ValidateEntity(newUser);
+            if(message != string.Empty)
+            {
+                return BadRequest(message);
+            }
+
+            newUser.RefreshToken = _jwtTokenService.GenerateRefreshToken();
+            newUser.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+
+            var res = await _userManager.CreateAsync(newUser);
+            await _userManager.AddToRoleAsync(newUser, "User");
+
+            return res.Succeeded ? 
+            Ok(new AuthResponse{
+                AccessToken = await _jwtTokenService.GenerateAccessToken(newUser),
+                RefreshToken = newUser.RefreshToken
+            }) : 
+            BadRequest("Could not create a user");
+        }
+        return Ok();
+        //TODO: login method
     }
 
     [HttpGet("profile")]

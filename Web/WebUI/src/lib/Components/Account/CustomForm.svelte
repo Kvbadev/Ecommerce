@@ -2,9 +2,10 @@
 
     import type User from "../../Models/user";
     import { agent } from "../../Utils/agent";
+    import GoogleSignInButton from './GoogleSignInButton.svelte'
     import { link, push } from "svelte-spa-router";
     import FormField from "./FormField.svelte";
-    import { jwtToken, userProfile, shoppingCart, refreshToken} from "../../Stores/stores";
+    import { jwtToken, userProfile, shoppingCart, refreshToken, initUser} from "../../Stores/stores";
     import Loader from "../Common/Loader.svelte";
     import { initShoppingCart} from "../../Stores/ShoppingCartExtensions";
     import Modal from "./CartModal.svelte";
@@ -18,23 +19,14 @@
     let canSubmit = false;
     let loading = false;
     let showModal = false;
+    let serverError = "";
 
-    const onInput = (ev: KeyboardEvent) => {
-        if(!(/^.$/u.test(ev.key)) && ev.key !== 'Backspace') return;
+    $: canSubmit = isOk.every(x => x===true);
+
+    const onInput = () => {
         if(serverError) serverError='';
-        canSubmit = true;
-        isOk.forEach(val => {
-            if(!val) canSubmit=false;
-        })
     }
 
-    const onSignIn = (user) => {
-        const prof = user.getBasicProfile();
-        console.log("ID: ", prof.getId());
-        
-    }
-    
-    let serverError:string;
     
     function getFormData(form): User {
         const formData = new FormData(form);
@@ -64,30 +56,8 @@
 
                 const res:AuthResponse = JSON.parse(message);
 
-                //set jwt in localstorage and in stores
-                jwtToken.set(res.accessToken);
-                localStorage.setItem("jwt", res.accessToken);
-
-                refreshToken.set(res.refreshToken);
-                localStorage.setItem("refresh", res.refreshToken);
-
-                userProfile.set(await agent.Account.getProfile());
-                
-                if($shoppingCart.items.length && type === 'Login'){
-                    loading = false;
-                    showModal = true;
-                }
-                //if registering then persist a cart
-                else if($shoppingCart.items.length && type === "Signup"){
-                    loading = canSubmit = false;
-                    await agent.ShoppingCart.setCart(get(shoppingCart))
-                    push('/');
-
-                } else {
-                    initShoppingCart(await agent.ShoppingCart.GetCart());
-                    loading = canSubmit = false;
-                    push('/');
-                }
+                loading = false;
+                showModal = await initUser(res, type);
             }
             
         } catch(err) {
@@ -107,7 +77,7 @@
         <div class="container">
         <form class="form" on:submit|preventDefault={onSubmit}>
             <h1>{type==='Signup'?'Sign Up!':'Log In!'}</h1>
-            <div class="fields" on:keyup={(e) => onInput(e)}>
+            <div class="fields" on:input={(e) => onInput()}>
             {#each fields as field, i}
                 {#if field === 'email'}
                     <FormField name={field} regex={new RegExp(/^\S+@\S+\.\S+$/)} bind:isOk={isOk[i]} minLen={4} maxLen={50}/>
@@ -130,7 +100,7 @@
                     Submit
                 {/if}
             </button>
-            <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+            <GoogleSignInButton bind:showModal/>
 
         </form>
         <div class="links">
