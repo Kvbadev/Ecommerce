@@ -7,15 +7,12 @@
 
   export let showModal = false;
 
-  window.handleCredentialResponse = async (response) => {
+  window["handleCredentialResponse"] = async (response) => {
+    console.log(response);
     const res = await agent.Account.logInGoogle(response.credential);
-    initUser(res, 'Login');
+    showModal = await initUser(res, 'Login');
   }
-
-  window.onSignIn = (user) => {
-    console.log('sign',user)
-  }
-  const client_id = "1015971843735-a3lu16le9t9tsq9lh9i4hi33e1tkfu8h.apps.googleusercontent.com";
+  const client_id = import.meta.env.VITE_CLIENT_ID;
 
 </script>
 

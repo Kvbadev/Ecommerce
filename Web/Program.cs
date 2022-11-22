@@ -13,8 +13,6 @@ using Microsoft.IdentityModel.Tokens;
 using Web.Services;
 
 
-//TODO: facebook and google login
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
