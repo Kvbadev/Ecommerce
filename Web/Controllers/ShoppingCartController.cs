@@ -127,11 +127,11 @@ public class ShoppingCartController : DefaultController
    }
     private bool isTheSame(ShoppingCartDto cart, ShoppingCart actual)
     {
-        var prods = _mapper.Map<CartProduct[], IEnumerable<ProductSimplified>>(actual.CartProducts.ToArray());
-        foreach(var it in cart.Items)
+        // var prods = _mapper.Map<CartProduct[], IEnumerable<ProductSimplified>>(actual.CartProducts.ToArray());
+        foreach(var it in actual.CartProducts)
         {
-            var tmp = prods.FirstOrDefault(x => x.Id == it.Product.Id); 
-            if(tmp != null && tmp.Quantity != it.Quantity) return false;
+            var tmp = cart.Items.FirstOrDefault(x => x.Product.Id == it.ProductId);
+            if(tmp == null || tmp.Quantity != it.ProductQuantity) return false;
         }
         return true;
     }
