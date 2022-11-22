@@ -8,7 +8,7 @@
     import Loader from "../Common/Loader.svelte";
     import { initShoppingCart} from "../../Stores/ShoppingCartExtensions";
     import Modal from "./CartModal.svelte";
-import { get } from "svelte/store";
+    import { get } from "svelte/store";
   import type AuthResponse from "src/lib/Models/authResponse";
     
     export let fields = ['firstname', 'lastname', 'username','email', 'password'];
@@ -26,6 +26,12 @@ import { get } from "svelte/store";
         isOk.forEach(val => {
             if(!val) canSubmit=false;
         })
+    }
+
+    const onSignIn = (user) => {
+        const prof = user.getBasicProfile();
+        console.log("ID: ", prof.getId());
+        
     }
     
     let serverError:string;
@@ -124,6 +130,8 @@ import { get } from "svelte/store";
                     Submit
                 {/if}
             </button>
+            <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+
         </form>
         <div class="links">
             <a href={type === 'Signup'?"/Account/login":"/Account/signup"} use:link>{type === 'Signup' ? "You already have an account?" : "You don't have an account?"}</a>

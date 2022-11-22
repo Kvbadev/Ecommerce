@@ -11,12 +11,12 @@ export const modifyCart = async (item: CartItem, localChanges: boolean = false) 
 
     shoppingCart.update((v) => {
         let itemInCart = v.items.find(x => x.product.id === item.product.id);
-        if(itemInCart){
+
+        if(itemInCart)
             itemInCart.quantity += item.quantity;
-            //TODO
-        } else {
+        else 
             v.items.push(item);
-        }
+
         //if quantity < 0 then remove element
         if((itemInCart ?? item).quantity <= 0){
             v.items = v.items.filter(x => x.product.id !== item.product.id);

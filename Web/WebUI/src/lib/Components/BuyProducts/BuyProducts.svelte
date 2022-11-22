@@ -2,8 +2,8 @@
 import PaymentForm from "./PaymentForm.svelte";
 import PurchaseSummarize from "./PurchaseSummarize.svelte";
 import {link, location} from 'svelte-spa-router'
-import {userProfile} from '../../Stores/stores';
-import { onDestroy } from "svelte";
+import {initProducts, userProfile} from '../../Stores/stores';
+import { onDestroy, onMount } from "svelte";
 import { oneTimeProduct, products, shoppingCart } from "../../Stores/stores";
 import Loader from "../Common/Loader.svelte";
 import Fa from "svelte-fa";
@@ -13,6 +13,10 @@ import { faAngleDoubleLeft} from "@fortawesome/free-solid-svg-icons";
 if($location === '/buyNow') {
     onDestroy(() => oneTimeProduct.set(null))
 }
+onMount(async() => {
+    if(!$products) initProducts();
+});
+
 </script>
 
 <div class="container">

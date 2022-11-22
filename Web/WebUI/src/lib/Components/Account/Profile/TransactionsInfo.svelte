@@ -5,8 +5,11 @@ import CartProduct from "../../ShoppingCart/CartProduct.svelte";
 import { link, push } from "svelte-spa-router";
 import Fa from "svelte-fa";
 import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
+  import { onMount } from "svelte";
 
 const onQuestion = (id: string) => push(`/help/${id}`);
+onMount(async() => {
+})
 </script>
 
 <div class="container">
@@ -16,7 +19,7 @@ const onQuestion = (id: string) => push(`/help/${id}`);
         <Loader inElement color={'#000000'} size={5}/>
     {:then value} 
     {#if !value.length}
-        <h3>We are waiting for Your first order :)</h3>
+        <h3>We are waiting for Your first order :</h3>
     {:else}
         <ul class="list">
         {#each value as t}
