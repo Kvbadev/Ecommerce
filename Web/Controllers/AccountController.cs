@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Infrastructure.DTOs;
+using AutoMapper.QueryableExtensions;
 
 namespace Web.Controllers;
 
@@ -140,9 +141,9 @@ public class AccountController : DefaultController
         {
             return Enumerable.Empty<TransactionDto>();
         }
-        var transactions = _mapper.Map<Transaction[], IEnumerable<TransactionDto>>
-                            (user.Transactions.ToArray()).Where(x => x.Success);
-        
+        // var transactions = _mapper.Map<Transaction[], IEnumerable<TransactionDto>>
+        //                     (user.Transactions.ToArray()).Where(x => x.Success);
+        var transactions = _context.Transactions.ProjectTo<TransactionDto>(_mapper.ConfigurationProvider);
         return transactions.Any() ? transactions : 
         Enumerable.Empty<TransactionDto>();
     }
