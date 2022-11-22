@@ -115,6 +115,7 @@ export const agent = {
     Account: {
         signUp: (user: User) => authFetch<[number, string]>(apiUrl+"/Account/register", 'POST', user, true),
         logIn: async (user: User) => authFetch<[number, string]>(apiUrl+"/Account/login", 'POST', user, true),
+        logInGoogle: async (idToken: string) => authFetch<AuthResponse>(apiUrl+"/Account/GoogleSign", 'POST', idToken),
         getProfile: () => authFetch<null | Profile>(apiUrl+'/Account/profile', 'GET', null),
         getTransactions: () => authFetch<Array<Transaction>>(apiUrl+'/Account/transactions', 'GET', null),
         updateProfile: (profile: Partial<Profile>) => authFetch<string>(apiUrl+'/Account/profile', "PATCH", profile),

@@ -10,11 +10,13 @@ export let message = 'text';
 export let buttons: Array<{text: string, type: "good"|"bad"|"neutral"}> = [{text: "text", type: "good"}];
 export let showModal = false;
 
-function hideModal () {
+async function hideModal () {
+    initShoppingCart(await agent.ShoppingCart.GetCart());
+    push('/');
     showModal = false;
 }
 async function setNewCart() {
-    saveLocalCart();
+    await saveLocalCart();
 }
 async function onButton() {
     hideModal();
@@ -24,8 +26,8 @@ async function onButton() {
 
 </script>
 
-<div class="container" on:click={hideModal}>
-    <div class="close" on:click={hideModal}><Fa icon={faWindowClose} size="lg" /></div>
+<div class="container" on:click={async () => await hideModal()}>
+    <div class="close" on:click={async () => await hideModal()}><Fa icon={faWindowClose} size="lg" /></div>
     <div class="items" on:click={(e) => e.stopPropagation()}>
         <h1>{message}</h1>
         <div class="buttons">
@@ -34,7 +36,7 @@ async function onButton() {
                 if(btn.text.includes('Persist')){
                     await setNewCart();
                 }
-                onButton();
+                await onButton();
         }} type="button">{btn.text}</button>
         {/each}
         </div>

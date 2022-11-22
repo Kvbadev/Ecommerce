@@ -11,7 +11,6 @@ public class AppUserValidator : AbstractValidator<AppUser>
         RuleFor(x => x.Firstname).Length(2, 20);
         RuleFor(x => x.Lastname).Length(2, 20);
         RuleFor(x => x.Email).EmailAddress();
-        RuleFor(x => x.RefreshTokenExpiry).GreaterThan(DateTime.UtcNow);
         RuleFor(x => x.CreationDate).LessThanOrEqualTo(DateTime.UtcNow);
     }
 
