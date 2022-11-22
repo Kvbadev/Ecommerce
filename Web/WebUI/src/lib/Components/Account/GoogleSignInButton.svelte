@@ -8,7 +8,6 @@
   export let showModal = false;
 
   window["handleCredentialResponse"] = async (response) => {
-    console.log(response);
     const res = await agent.Account.logInGoogle(response.credential);
     showModal = await initUser(res, 'Login');
   }
