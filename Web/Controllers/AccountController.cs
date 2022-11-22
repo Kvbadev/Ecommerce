@@ -170,15 +170,15 @@ public class AccountController : DefaultController
         {
             return BadRequest("User does not exist");
         }
-        var updatedUser = _mapper.Map<Core.Profile, AppUser>(updatedProf);
+        _mapper.Map<Core.Profile, AppUser>(updatedProf,user);
 
-        var message = await ValidateEntity<AppUser>(updatedUser);
+        var message = await ValidateEntity<AppUser>(user);
         if(message != string.Empty)
         {
             return BadRequest(message);
         }
         
-        var res = await _userManager.UpdateAsync(updatedUser);
+        var res = await _userManager.UpdateAsync(user);
 
         return res.Succeeded ? Ok() :
         BadRequest(res.Errors);
