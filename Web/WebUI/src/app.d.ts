@@ -8,6 +8,5 @@ declare module '@paypal/paypal-js/index.es' {
 declare global{
      interface Window {
         handleCredentialResponse: (response: any) => void;
-        onSignIn: (response: any) => void;
      }
 }

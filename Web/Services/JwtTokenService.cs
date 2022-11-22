@@ -112,13 +112,9 @@ public class JwtTokenService : IJwtTokenService
             var payload = await GoogleJsonWebSignature.ValidateAsync(token);
             return payload;
         }
-        catch(Exception ex)
+        catch(Exception)
         {
-            if(ex.InnerException is InvalidJwtException)
-            {
-                return null;
-            }
-            else throw ex;
+            return null;
         }
     }
     

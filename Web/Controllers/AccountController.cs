@@ -101,7 +101,7 @@ public class AccountController : DefaultController
     public async Task<IActionResult> GoogleLogin([FromBody]string IdToken)
     {
         var credentials = await _jwtTokenService.VerifyToken(IdToken); //null on invalid
-        if(credentials == null) //TODO:check if aud is correct
+        if(credentials == null)
         {
             return BadRequest("Invalid token");
         }
@@ -112,9 +112,9 @@ public class AccountController : DefaultController
         if(user == null)
         {
             var newUser = new AppUser {
-                UserName = credentials.GivenName+credentials.FamilyName,
-                Firstname = credentials.GivenName,
-                Lastname = credentials.FamilyName,
+                UserName = credentials.GivenName+new Random().Next(99999),
+                Firstname = credentials.GivenName ?? "Firstname",
+                Lastname = credentials.FamilyName ?? "Lastname",
                 Email = credentials.Email
             };
 
@@ -127,18 +127,27 @@ public class AccountController : DefaultController
             newUser.RefreshToken = _jwtTokenService.GenerateRefreshToken();
             newUser.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
 
-            var res = await _userManager.CreateAsync(newUser);
+            var outcome = await _userManager.CreateAsync(newUser);
             await _userManager.AddToRoleAsync(newUser, "User");
 
-            return res.Succeeded ? 
+            return outcome.Succeeded ? 
             Ok(new AuthResponse{
                 AccessToken = await _jwtTokenService.GenerateAccessToken(newUser),
                 RefreshToken = newUser.RefreshToken
             }) : 
             BadRequest("Could not create a user");
         }
-        return Ok();
-        //TODO: login method
+        
+        user.RefreshToken = _jwtTokenService.GenerateRefreshToken();
+        user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+
+        var res = await _context.SaveChangesAsync() > 0;
+
+        return res ? Ok(new AuthResponse {
+            AccessToken = await _jwtTokenService.GenerateAccessToken(user),
+            RefreshToken = user.RefreshToken
+        }) : 
+        BadRequest("Could not log user in");
     }
 
     [HttpGet("profile")]
@@ -179,8 +188,9 @@ public class AccountController : DefaultController
     public async Task<IEnumerable<TransactionDto>> Transactions()
     {
         var id = _jwtTokenService.ExtractId();
+
         var user = await _context.Users.Include(x => x.Transactions)
-        .ThenInclude(x => x.Products).ThenInclude(x => x.Product)
+        .ThenInclude(x => x.Products).ThenInclude(x => x.Product.Photos)
         .FirstAsync(x => x.Id == _jwtTokenService.ExtractId());
 
         if(user == null || user.Transactions.Count <= 0)
@@ -189,7 +199,10 @@ public class AccountController : DefaultController
         }
         // var transactions = _mapper.Map<Transaction[], IEnumerable<TransactionDto>>
         //                     (user.Transactions.ToArray()).Where(x => x.Success);
-        var transactions = _context.Transactions.ProjectTo<TransactionDto>(_mapper.ConfigurationProvider);
+        // var transactions = user.Transactions.ProjectTo<TransactionDto>(_mapper.ConfigurationProvider);
+        var transactions = _mapper
+            .Map<ICollection<Transaction>, IEnumerable<TransactionDto>>(user.Transactions);
+
         return transactions.Any() ? transactions : 
         Enumerable.Empty<TransactionDto>();
     }
