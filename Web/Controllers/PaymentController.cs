@@ -55,8 +55,7 @@ public class PaymentController : DefaultController
 
     [HttpPost("buy")] //example: buy?nonce=test&id=id&quantity=quantity
     public async Task<IActionResult> Buy([FromServices]IMapper mapper, string nonce,
-        Guid id, int quantity, [FromBody]string devData,
-        [FromServices]IValidator<Core.Transaction> validator)
+        Guid id, int quantity, [FromBody]string devData)
     {
         Result<Braintree.Transaction> res;
         Core.Transaction transaction;

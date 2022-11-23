@@ -41,7 +41,7 @@ async function handleSubmit(event: MouseEvent) {
         submitting = false;
         return;
     }
-    const res = !$oneTimeProduct?.id ?
+    const res = !$oneTimeProduct?.quantity ?
     await agent.PaymentGateway.buyCart(payload.nonce, deviceData) :
     await agent.PaymentGateway.buyProduct(payload.nonce,  deviceData, get(oneTimeProduct));
 
@@ -52,7 +52,8 @@ async function handleSubmit(event: MouseEvent) {
     }
     submitting = false;
     toast.push('Transaction was successfull🎉', {theme: {'--toastBackground': '#90EE90'}});
-    await removeShoppingCart();
+    if(!$oneTimeProduct?.quantity) await removeShoppingCart();
+
     push('/');
 }
 

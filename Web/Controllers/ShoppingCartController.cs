@@ -95,6 +95,8 @@ public class ShoppingCartController : DefaultController
         ShoppingCart cart = _context.ShoppingCarts.Include(x => x.CartProducts)
             .FirstOrDefault(x => x.AppUserId == _jwtTokenService.ExtractId())!;
         
+        if(cart.Count == 0) return Ok();
+        
         cart.CartProducts = new List<CartProduct>();
 
         var res = await _context.SaveChangesAsync();

@@ -107,16 +107,22 @@ public class AccountController : DefaultController
         }
 
         var user = await _context.Users
-            .FirstOrDefaultAsync(x => x.Email == credentials.Email);
+            .FirstOrDefaultAsync(x => 
+                x.UserName == (credentials.GivenName ??
+                credentials.Email.Substring(0,credentials.Email.IndexOf('@')))
+
+                +GetAsciiSum(credentials.Email)
+            );
 
         if(user == null)
         {
             var newUser = new AppUser {
-                UserName = credentials.GivenName+new Random().Next(99999),
-                Firstname = credentials.GivenName ?? "Firstname",
+                Firstname = credentials.GivenName ?? 
+                credentials.Email.Substring(0,credentials.Email.IndexOf('@')),
                 Lastname = credentials.FamilyName ?? "Lastname",
                 Email = credentials.Email
             };
+            newUser.UserName = newUser.Firstname+GetAsciiSum(credentials.Email);
 
             var message = await ValidateEntity(newUser);
             if(message != string.Empty)
@@ -238,8 +244,8 @@ public class AccountController : DefaultController
                 (_context.Users.FirstOrDefault(x => x.UserName == c.Username)!)
                 ?? Enumerable.Empty<string>();
         }
-
         return clients;
     }
+    private Func<string, int> GetAsciiSum = input => input.Sum(x => (int)x%99);
 
 }

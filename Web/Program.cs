@@ -61,7 +61,14 @@ builder.Services.AddAuthentication(opt =>
 //Database
 builder.Services.AddDbContext<DataContext>(options => 
 {
-    options.UseSqlite(builder.Configuration.GetConnectionString("Sqlite"));
+    if(builder.Environment.IsDevelopment())
+    {
+        options.UseSqlite(builder.Configuration.GetConnectionString("Sqlite"));
+    }
+    else 
+    {
+        options.UseSqlite(builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
+    }
 });
 
 //Fluent Validation
@@ -96,19 +103,22 @@ var app = builder.Build();
 
 app.UseRouting();
 
-//Security headers
+app.UseDefaultFiles(); //wwwroot files
+app.UseStaticFiles(); //serve static files from wwwroot
+
+// Security headers
 app.UseXContentTypeOptions();
-app.UseReferrerPolicy(o => o.NoReferrer());
+app.UseReferrerPolicy(o => o.NoReferrerWhenDowngrade());
 app.UseXXssProtection(o => o.EnabledWithBlockMode());
 app.UseXfo(o => o.Deny());
-app.UseCspReportOnly(o => o.BlockAllMixedContent()
-    .StyleSources(s => s.Self())
-    .FontSources(s => s.Self())
-    .FormActions(s => s.Self())
-    .FrameAncestors(s => s.Self())
-    .ImageSources(s => s.Self())
-    .ScriptSources(s => s.Self())
-);
+// app.UseCsp(o => o.UpgradeInsecureRequests()
+//     .StyleSources(s => s.Self().UnsafeInline().CustomSources("https://fonts.googleapis.com/", "https://fonts.gstatic.com/", "https://accounts.google.com/gsi/"))
+//     .FontSources(s => s.Self().CustomSources("https://fonts.gstatic.com/"))
+//     .FormActions(s => s.Self())
+//     .FrameAncestors(s => s.Self())
+//     .ImageSources(s => s.Self().CustomSources("http://res.cloudinary.com/", "https://dub.stats.paypal.com/", "https://c.sandbox.paypal.com/v1/", "https://b.stats.paypal.com/"))
+//     .ScriptSources(s => s.Self().UnsafeInline().CustomSources("https://accounts.google.com/gsi/", "https://c.paypal.com"))
+// );
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -139,13 +149,14 @@ using (var scope = app.Services.CreateScope())
 
 app.UseCors();
 
+app.UseHttpsRedirection();
+
 app.UseAuthentication();
 
 app.UseAuthorization();
 
-app.UseHttpsRedirection();
-
-
 app.MapControllers();
+
+app.MapFallbackToController("Index", "Frontend");
 
 app.Run();
