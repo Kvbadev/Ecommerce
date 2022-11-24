@@ -52,6 +52,8 @@ public class DataContext : IdentityDbContext<AppUser>
             .HasOne(p => p.Product)
             .WithMany(p => p.Photos)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
+        builder.Entity<Product>().Property(x => x.Price).HasColumnType("decimal(18,4)"); 
+        builder.Entity<Transaction>().Property(x => x.Price).HasColumnType("decimal(18,4)"); 
     }
 }

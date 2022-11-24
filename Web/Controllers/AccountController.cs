@@ -9,7 +9,6 @@ using Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Infrastructure.DTOs;
 using AutoMapper.QueryableExtensions;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace Web.Controllers;
 
@@ -107,16 +106,18 @@ public class AccountController : DefaultController
         }
 
         var user = await _context.Users
-            .FirstOrDefaultAsync(x => x.Email == credentials.Email);
+            .FirstOrDefaultAsync(x => 
+                x.UserName == (credentials.GivenName ??
+                credentials.Email.Substring(0,credentials.Email.IndexOf('@')))
 
-        if(user == null)
-        {
-            var newUser = new AppUser {
-                UserName = credentials.GivenName+new Random().Next(99999),
-                Firstname = credentials.GivenName ?? "Firstname",
+                +GetAsciiSum(credentials.Email)
+            );
+                Firstname = credentials.GivenName ?? 
+                credentials.Email.Substring(0,credentials.Email.IndexOf('@')),
                 Lastname = credentials.FamilyName ?? "Lastname",
                 Email = credentials.Email
             };
+            newUser.UserName = newUser.Firstname+GetAsciiSum(credentials.Email);
 
             var message = await ValidateEntity(newUser);
             if(message != string.Empty)
@@ -185,26 +186,16 @@ public class AccountController : DefaultController
     }
 
     [HttpGet("transactions")]
-    public async Task<IEnumerable<TransactionDto>> Transactions()
+    public IEnumerable<TransactionDto> Transactions()
     {
-        var id = _jwtTokenService.ExtractId();
+        var transactions = _context.Transactions.Include(x => x.AppUser).Where(x =>
+            x.AppUser.Id == _jwtTokenService.ExtractId()).OrderByDescending(x => x.IssuedAt);
 
-        var user = await _context.Users.Include(x => x.Transactions)
-        .ThenInclude(x => x.Products).ThenInclude(x => x.Product.Photos)
-        .FirstAsync(x => x.Id == _jwtTokenService.ExtractId());
-
-        if(user == null || user.Transactions.Count <= 0)
+        if(transactions.Count() <= 0)
         {
             return Enumerable.Empty<TransactionDto>();
         }
-        // var transactions = _mapper.Map<Transaction[], IEnumerable<TransactionDto>>
-        //                     (user.Transactions.ToArray()).Where(x => x.Success);
-        // var transactions = user.Transactions.ProjectTo<TransactionDto>(_mapper.ConfigurationProvider);
-        var transactions = _mapper
-            .Map<ICollection<Transaction>, IEnumerable<TransactionDto>>(user.Transactions);
-
-        return transactions.Any() ? transactions : 
-        Enumerable.Empty<TransactionDto>();
+        return transactions.ProjectTo<TransactionDto>(_mapper.ConfigurationProvider);
     }
 
     [HttpGet("isAdmin")]
@@ -238,8 +229,8 @@ public class AccountController : DefaultController
                 (_context.Users.FirstOrDefault(x => x.UserName == c.Username)!)
                 ?? Enumerable.Empty<string>();
         }
-
         return clients;
     }
+    private Func<string, int> GetAsciiSum = input => input.Sum(x => (int)x%99);
 
 }

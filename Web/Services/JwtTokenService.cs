@@ -44,8 +44,8 @@ public class JwtTokenService : IJwtTokenService
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             //cannot remove audience here even though it is alredy set in program.cs because then the system breaks
-            Audience = "https://localhost:5000",
-            Issuer = "https://localhost:5000",
+            Audience = "https://jakubcommerce.azurewebsites.net/",
+            Issuer = "https://jakubcommerce.azurewebsites.net/",
             Subject = new ClaimsIdentity(MyClaims),
             Expires = DateTime.UtcNow.AddMinutes(10),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "postbuild": "rm -rf ../wwwroot/* && mv dist/* ../wwwroot",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
