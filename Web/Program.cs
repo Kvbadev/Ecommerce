@@ -20,7 +20,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:5173", "https://localhost");
+        policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://jakubcommerce.azurewebsites.net/", "https://localhost");
     });
 });
 
@@ -44,7 +44,7 @@ builder.Services.AddAuthentication(opt =>
 })
     .AddJwtBearer(jwtOpt => 
     {
-        jwtOpt.Audience = "https://localhost:5000";
+        jwtOpt.Audience = "https://jakubcommerce.azurewebsites.net/";
         jwtOpt.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = false,
@@ -61,14 +61,7 @@ builder.Services.AddAuthentication(opt =>
 //Database
 builder.Services.AddDbContext<DataContext>(options => 
 {
-    if(builder.Environment.IsDevelopment())
-    {
-        options.UseSqlite(builder.Configuration.GetConnectionString("Sqlite"));
-    }
-    else 
-    {
-        options.UseSqlite(builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
-    }
+    options.UseSqlServer(builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTION"));
 });
 
 //Fluent Validation

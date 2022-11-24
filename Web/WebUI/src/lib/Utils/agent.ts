@@ -10,7 +10,6 @@ import { jwtToken, refreshToken } from "../Stores/stores";
 import { get } from "svelte/store";
 import type Client from "../Models/client";
 
-// const apiUrl = "https://localhost:5000/api";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 async function getCart(url: string): Promise<Cart | null> {
