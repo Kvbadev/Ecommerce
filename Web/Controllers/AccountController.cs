@@ -112,10 +112,6 @@ public class AccountController : DefaultController
 
                 +GetAsciiSum(credentials.Email)
             );
-
-        if(user == null)
-        {
-            var newUser = new AppUser {
                 Firstname = credentials.GivenName ?? 
                 credentials.Email.Substring(0,credentials.Email.IndexOf('@')),
                 Lastname = credentials.FamilyName ?? "Lastname",
@@ -199,7 +195,6 @@ public class AccountController : DefaultController
         {
             return Enumerable.Empty<TransactionDto>();
         }
-
         return transactions.ProjectTo<TransactionDto>(_mapper.ConfigurationProvider);
     }
 
