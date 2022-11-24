@@ -1,3 +1,1 @@
-This is a project to learn a new javascript framework (at least for me) - Svelte. Besides that I'm also going to improve my present knowledge of C# and dotnet framework.
-The project posesses of backend and frontend, everything in one repository. For authorization, I use jwt tokens and will use refresh tokens in future.
-The whole thing will be hosted on heroku (or any other free hosting) soon.
+This is my biggest project yet. It includes all important aspects of a web application providing ecommerce services, such as authentication, payments, persisting shopping cart and integration with google openID. I started the project to improve my programming skills, especially in .net and backend in general, but also to learn completely things, such as svelte or azure deployment process. You can check out how the project performs by visiting https://jakubcommerce.azurewebsites.net/, where the entire thing is up and running.
