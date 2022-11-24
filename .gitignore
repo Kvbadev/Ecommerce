@@ -455,4 +455,4 @@ $RECYCLE.BIN/
 
 appsettings.json
 *.db*
-*.env
+.env*
