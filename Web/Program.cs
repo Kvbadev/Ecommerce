@@ -20,7 +20,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://jakubcommerce.azurewebsites.net/", "https://localhost");
+        policy.AllowAnyHeader().AllowAnyMethod().WithOrigins(builder.Configuration["AllowedOrigin"]);
     });
 });
 
@@ -44,15 +44,14 @@ builder.Services.AddAuthentication(opt =>
 })
     .AddJwtBearer(jwtOpt => 
     {
-        jwtOpt.Audience = "https://jakubcommerce.azurewebsites.net/";
         jwtOpt.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = false,
-            ValidateAudience = true,
+            ValidateAudience = false,
             ValidateIssuerSigningKey = true,
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JwtKey"]))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JwtKey"])),
         };
 });
 
@@ -61,7 +60,8 @@ builder.Services.AddAuthentication(opt =>
 //Database
 builder.Services.AddDbContext<DataContext>(options => 
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTION"));
+    // options.UseSqlServer(builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTION"));
+    options.UseSqlite(builder.Configuration.GetConnectionString("Sqlite"));
 });
 
 //Fluent Validation
@@ -135,7 +135,7 @@ else
 
 using (var scope = app.Services.CreateScope())
 {
-    var helper = new CloudinaryHelper(builder.Configuration);
+    var helper = new CloudinaryHelper(builder.Configuration );
     var photos = await helper.GetAllPhotosUrls();
     await Seed.SeedData(scope.ServiceProvider, photos);
 }

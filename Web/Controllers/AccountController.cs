@@ -35,13 +35,13 @@ public class AccountController : DefaultController
     public async Task<IActionResult> RegisterUser(RegisterDto user)
     {
 
-        var updatedUser = _mapper.Map<RegisterDto, AppUser>(user); 
+        var updatedUser = _mapper.Map<RegisterDto, AppUser>(user);
 
         updatedUser.RefreshToken = _jwtTokenService.GenerateRefreshToken();
         updatedUser.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
 
         var message = await ValidateEntity(updatedUser);
-        if(message != string.Empty)
+        if (message != string.Empty)
         {
             return BadRequest(message);
         }
@@ -50,12 +50,13 @@ public class AccountController : DefaultController
         await _userManager.AddToRoleAsync(updatedUser, "User");
 
 
-        if(result.Succeeded)
+        if (result.Succeeded)
         {
             _logger.LogInformation("New user {} has been created", user.Username);
             var accessToken = await _jwtTokenService.GenerateAccessToken(updatedUser);
 
-            return Ok(new AuthResponse{
+            return Ok(new AuthResponse
+            {
                 AccessToken = accessToken,
                 RefreshToken = updatedUser.RefreshToken
             });
@@ -67,16 +68,18 @@ public class AccountController : DefaultController
     [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDto creds,
-        [FromServices]SignInManager<AppUser> manager)
+        [FromServices] SignInManager<AppUser> manager)
     {
         var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == creds.Username);
-        if(user == null){
+        if (user == null)
+        {
             return Unauthorized("This username does not exist");
         }
-        
+
         var res = await manager.CheckPasswordSignInAsync(user, creds.Password, false);
 
-        if(res.Succeeded){
+        if (res.Succeeded)
+        {
             var accessToken = await _jwtTokenService.GenerateAccessToken(user);
             var refreshToken = _jwtTokenService.GenerateRefreshToken();
 
@@ -86,7 +89,8 @@ public class AccountController : DefaultController
             var outcome = await _context.SaveChangesAsync() > 0;
 
             return outcome ?
-            Ok(new AuthResponse{
+            Ok(new AuthResponse
+            {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken
             }) :
@@ -97,30 +101,34 @@ public class AccountController : DefaultController
 
     [AllowAnonymous]
     [HttpPost("GoogleSign")]
-    public async Task<IActionResult> GoogleLogin([FromBody]string IdToken)
+    public async Task<IActionResult> GoogleLogin([FromBody] string IdToken)
     {
         var credentials = await _jwtTokenService.VerifyToken(IdToken); //null on invalid
-        if(credentials == null)
+        if (credentials == null)
         {
             return BadRequest("Invalid token");
         }
 
         var user = await _context.Users
-            .FirstOrDefaultAsync(x => 
+            .FirstOrDefaultAsync(x =>
                 x.UserName == (credentials.GivenName ??
-                credentials.Email.Substring(0,credentials.Email.IndexOf('@')))
-
-                +GetAsciiSum(credentials.Email)
+                credentials.Email.Substring(0, credentials.Email.IndexOf('@'))) + GetAsciiSum(credentials.Email)
             );
-                Firstname = credentials.GivenName ?? 
-                credentials.Email.Substring(0,credentials.Email.IndexOf('@')),
+
+        if (user == null)
+        {
+            var newUser = new AppUser
+            {
+                UserName = credentials.GivenName ??
+                credentials.Email.Substring(0, credentials.Email.IndexOf('@')),
+                Firstname = credentials.GivenName ?? "Firstname",
                 Lastname = credentials.FamilyName ?? "Lastname",
                 Email = credentials.Email
             };
-            newUser.UserName = newUser.Firstname+GetAsciiSum(credentials.Email);
+            newUser.UserName = newUser.Firstname + GetAsciiSum(credentials.Email);
 
             var message = await ValidateEntity(newUser);
-            if(message != string.Empty)
+            if (message != string.Empty)
             {
                 return BadRequest(message);
             }
@@ -131,31 +139,34 @@ public class AccountController : DefaultController
             var outcome = await _userManager.CreateAsync(newUser);
             await _userManager.AddToRoleAsync(newUser, "User");
 
-            return outcome.Succeeded ? 
-            Ok(new AuthResponse{
+            return outcome.Succeeded ?
+            Ok(new AuthResponse
+            {
                 AccessToken = await _jwtTokenService.GenerateAccessToken(newUser),
                 RefreshToken = newUser.RefreshToken
-            }) : 
+            }) :
             BadRequest("Could not create a user");
         }
-        
+
         user.RefreshToken = _jwtTokenService.GenerateRefreshToken();
         user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
 
         var res = await _context.SaveChangesAsync() > 0;
 
-        return res ? Ok(new AuthResponse {
+        return res ? Ok(new AuthResponse
+        {
             AccessToken = await _jwtTokenService.GenerateAccessToken(user),
             RefreshToken = user.RefreshToken
-        }) : 
+        }) :
         BadRequest("Could not log user in");
     }
 
+    // [AllowAnonymous]
     [HttpGet("profile")]
-    public async Task<Core.Profile?> Profile() 
+    public async Task<Core.Profile?> Profile()
     {
         var user = await _context.Users.FindAsync(_jwtTokenService.ExtractId());
-        if(user is null)
+        if (user is null)
         {
             return null;
         }
@@ -167,18 +178,18 @@ public class AccountController : DefaultController
     public async Task<IActionResult> UpdateProfile(Core.Profile updatedProf)
     {
         var user = await _context.Users.FindAsync(_jwtTokenService.ExtractId());
-        if(user is null)
+        if (user is null)
         {
             return BadRequest("User does not exist");
         }
-        _mapper.Map<Core.Profile, AppUser>(updatedProf,user);
+        _mapper.Map<Core.Profile, AppUser>(updatedProf, user);
 
         var message = await ValidateEntity<AppUser>(user);
-        if(message != string.Empty)
+        if (message != string.Empty)
         {
             return BadRequest(message);
         }
-        
+
         var res = await _userManager.UpdateAsync(user);
 
         return res.Succeeded ? Ok() :
@@ -191,7 +202,7 @@ public class AccountController : DefaultController
         var transactions = _context.Transactions.Include(x => x.AppUser).Where(x =>
             x.AppUser.Id == _jwtTokenService.ExtractId()).OrderByDescending(x => x.IssuedAt);
 
-        if(transactions.Count() <= 0)
+        if (transactions.Count() <= 0)
         {
             return Enumerable.Empty<TransactionDto>();
         }
@@ -202,7 +213,7 @@ public class AccountController : DefaultController
     public async Task<bool> isAdmin()
     {
         var user = await _context.Users.FindAsync(_jwtTokenService.ExtractId());
-        if(user is null)
+        if (user is null)
         {
             return false;
         }
@@ -216,14 +227,14 @@ public class AccountController : DefaultController
     public async Task<IEnumerable<ClientDto>> GetClients()
     {
         var users = await _context.Users.Include(x => x.Transactions).ToArrayAsync();
-        if(users.Length is 0)
+        if (users.Length is 0)
         {
             return Enumerable.Empty<ClientDto>();
         }
 
         var clients = _mapper.Map<AppUser[], IEnumerable<ClientDto>>(users);
 
-        foreach(var c in clients)
+        foreach (var c in clients)
         {
             c.Privileges = await _userManager.GetRolesAsync
                 (_context.Users.FirstOrDefault(x => x.UserName == c.Username)!)
@@ -231,6 +242,5 @@ public class AccountController : DefaultController
         }
         return clients;
     }
-    private Func<string, int> GetAsciiSum = input => input.Sum(x => (int)x%99);
-
+    private Func<string, int> GetAsciiSum = input => input.Sum(x => (int)x % 99);
 }
