@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <PublishSingleFile>true</PublishSingleFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,6 +36,11 @@
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Data\Data.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="WebUI\**\*.*" CopyToPublishDirectory="Never" />
+    <Content Update="appsettings.Development.json" CopyToPublishDirectory="Never" />
   </ItemGroup>
 
 </Project>

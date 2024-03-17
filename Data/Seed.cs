@@ -1,5 +1,6 @@
 using Core;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Data;
@@ -11,6 +12,15 @@ public class Seed
         var context = serviceProvider.GetRequiredService<DataContext>();
         var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
         var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+        //automatic migration for sqlite database to not throw table doesn't exist exception
+        try{
+        await context.Database.MigrateAsync();
+        } catch (Exception e) {
+            if(!e.Message.Contains("already exists")) {
+                throw;
+            }
+        }
         
         if(await roleManager.RoleExistsAsync("Administrator") is false)
         {
